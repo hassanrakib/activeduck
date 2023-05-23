@@ -1,5 +1,7 @@
+import Signup from "./Pages/Signup/Signup/Signup";
+
 const App = () => {
-  return <div>Hello,</div>;
+  return <Signup />;
 };
 
 export default App;
