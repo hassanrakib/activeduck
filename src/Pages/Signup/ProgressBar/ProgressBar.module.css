@@ -1,0 +1,78 @@
+/* form progress bar */
+.progressBar {
+    display: flex;
+    margin: 10px 0;
+  }
+  .step {
+    position: relative;
+    width: 100%;
+  }
+  .stepName {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    transition: color 0.3s ease;
+  }
+  .step.active .stepName {
+      color: pink;
+  }
+  .bullet {
+    position: relative;
+    height: 25px;
+    width: 25px;
+    border: 2px solid #000;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .step.active .bullet {
+      border-color: pink;
+      background: pink;
+      transition: border-color 0.3s ease;
+  }
+  .bullet::after, .bullet::before {
+    content: "";
+    position: absolute;
+    width: 53px;
+    height: 3px;
+    background-color: #000;
+    bottom: 11px;
+    left: 27px;
+  }
+  .step.active .bullet::after {
+    background-color: pink;
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: animate 0.4s linear forwards;
+  }
+  
+  @keyframes animate {
+    100% {
+      transform: scaleX(1);
+    }
+  }
+  
+  .step:last-child .bullet::before, .step:last-child .bullet::after {
+    display: none;
+  }
+  .bulletNumber {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 17px;
+    font-weight: 500;
+  }
+  .step.active .bulletNumber {
+      display: none;
+  }
+  .check {
+      position: absolute;
+      font-size: 15px;
+      top: 70%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: none;
+  }
+  .step.active .check{
+      display: block;
+      color: #fff;
+  }

@@ -1,123 +1,121 @@
-import { FaCheck } from "react-icons/fa";
-import signupCSS from "./Signup.module.css";
-import { useEffect, useRef, useState } from "react";
+import ProgressBar from "../ProgressBar/ProgressBar";
+import {
+  containerWrapper,
+  container,
+  containerHeader,
+  formOuter,
+  form,
+  page,
+  field,
+  inputField,
+  btn,
+} from "./Signup.module.css";
+import { useState } from "react";
 
 const Signup = () => {
+  // ge the current page index
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const [steps, setSteps] = useState(null);
-  let currentPage = 1;
-
-  // move the first page and get to other pages
-  const firstPageRef = useRef(null);
-  let marginLeft = 0;
-  const handlePageMove = (isNextPage) => {
-    if (isNextPage) {
-      marginLeft -= 33.33;
-      steps[currentPage - 1].classList.add(signupCSS.active);
-      currentPage += 1;
-    } else {
-      marginLeft += 33.33;
-      steps[currentPage - 2].classList.remove(signupCSS.active);
-      currentPage -= 1;
-    }
-    firstPageRef.current.style.marginLeft = marginLeft.toString() + "%";
+  const moveToPage = (pageNumber) => {
+    setCurrentPage(pageNumber);
   };
 
-  useEffect(() => {
-    const steps = document.querySelectorAll(`.${signupCSS.step}`);
-    setSteps(steps);
-  }, []);
+
 
   return (
-    <div className={signupCSS.containerWrapper}>
-      <div className={signupCSS.container}>
-        <header className={signupCSS.containerHeader}>Sign up</header>
-        <div className={signupCSS.progressBar}>
-          <div className={signupCSS.step}>
-            <p className={signupCSS.stepName}>Name</p>
-            <div className={signupCSS.bullet}>
-              <span className={signupCSS.bulletNumber}>1</span>
-            </div>
-            <FaCheck className={signupCSS.check} />
-          </div>
-          <div className={signupCSS.step}>
-            <p className={signupCSS.stepName}>Email</p>
-            <div className={signupCSS.bullet}>
-              <span className={signupCSS.bulletNumber}>2</span>
-            </div>
-            <FaCheck className={signupCSS.check} />
-          </div>
-          <div className={signupCSS.step}>
-            <p className={signupCSS.stepName}>Password</p>
-            <div className={signupCSS.bullet}>
-              <span className={signupCSS.bulletNumber}>3</span>
-            </div>
-            <FaCheck className={signupCSS.check} />
-          </div>
-        </div>
-        <div className={signupCSS.formOuter}>
-          <form className={signupCSS.form}>
-            <div className={signupCSS.page} ref={firstPageRef}>
-              <div className={signupCSS.field}>
+    <div className={containerWrapper}>
+      <div className={container}>
+        <header className={containerHeader}>Sign up</header>
+
+        {/* progressBar to show progress on the top */}
+        <ProgressBar currentPage={currentPage} />
+        
+        <div className={formOuter}>
+          <form className={form}>
+            
+            {/* move the first page based on currentPage */}
+            <div
+              className={page}
+              style={
+                currentPage === 2
+                  ? { marginLeft: "-33.33%" }
+                  : currentPage === 3
+                  ? { marginLeft: "-66.66%" }
+                  : null
+              }
+            >
+              <div className={field}>
                 <input
-                  className={signupCSS.inputField}
+                  className={inputField}
                   type="text"
                   name="name"
                   placeholder="John Abraham"
                 />
               </div>
-              <div className={signupCSS.field}>
+              <div className={field}>
                 <button
                   type="button"
-                  className={signupCSS.btn}
+                  className={btn}
                   onClick={() => {
-                    handlePageMove(true);
+                    moveToPage(2);
                   }}
                 >
                   Next
                 </button>
               </div>
             </div>
-            <div className={signupCSS.page}>
-              <div className={signupCSS.field}>
+
+            {/* second page */}
+            <div className={page}>
+              <div className={field}>
                 <input
-                  className={signupCSS.inputField}
+                  className={inputField}
                   type="email"
                   name="email"
                   placeholder="john@zitbo.com"
                 />
               </div>
-              <div className={signupCSS.field}>
-                <button type='button' className={`${signupCSS.btn} ${signupCSS.prev}`} onClick={() => {
-                  handlePageMove(false);
-                }}>
+              <div className={field}>
+                <button
+                  type="button"
+                  className={btn}
+                  onClick={() => {
+                    moveToPage(1);
+                  }}
+                >
                   Previous
                 </button>
                 <button
                   type="button"
-                  className={`${signupCSS.btn} ${signupCSS.next}`}
-                  onClick={() => handlePageMove(true)}
+                  className={btn}
+                  onClick={() => moveToPage(3)}
                 >
                   Next
                 </button>
               </div>
             </div>
-            <div className={signupCSS.page}>
-              <div className={signupCSS.field}>
+
+            {/* third page */}
+            <div className={page}>
+              <div className={field}>
                 <input
-                  className={signupCSS.inputField}
+                  className={inputField}
                   type="password"
                   name="password"
                   placeholder="$ecretpassw@rd"
                 />
               </div>
-              <div className={signupCSS.field}>
-                <button type='button' className={`${signupCSS.btn} ${signupCSS.prev}`} onClick={() => {
-                  handlePageMove(false);
-                }}>
+              <div className={field}>
+                <button
+                  type="button"
+                  className={btn}
+                  onClick={() => {
+                    moveToPage(2);
+                  }}
+                >
                   Previous
                 </button>
-                <button className={signupCSS.btn} type="submit">
+                <button className={btn} type="submit">
                   Submit
                 </button>
               </div>
