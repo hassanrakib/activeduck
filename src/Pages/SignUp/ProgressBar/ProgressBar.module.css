@@ -2,6 +2,7 @@
 .progressBar {
   display: flex;
   margin: 10px 0;
+  text-align: center;
 }
 .step {
   position: relative;

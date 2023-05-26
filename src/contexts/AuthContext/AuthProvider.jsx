@@ -18,14 +18,7 @@ const app = initializeFirebase();
 const auth = getAuth(app);
 
 const AuthProvider = ({ children }) => {
-  const [authenticationInfo, setAuthenticationInfo] = useState({
-    signUp,
-    logIn,
-    logOut,
-    updateUserProfile,
-    verifyEmail,
-    user: null,
-  });
+  const [user, setUser] = useState(null);
 
   // create user account
   function signUp(email, password) {
@@ -33,7 +26,7 @@ const AuthProvider = ({ children }) => {
   }
 
   // log in a user
-  function logIn(email, password) {
+  function signIn(email, password) {
     return signInWithEmailAndPassword(auth, email, password);
   }
 
@@ -48,20 +41,25 @@ const AuthProvider = ({ children }) => {
   }
 
   // log out a user
-  function logOut() {
+  function signOutUser() {
     return signOut(auth);
   }
 
   // get the currently signed in user
   React.useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        setAuthenticationInfo({ ...authenticationInfo, user });
+        setUser(user);
+        
       } else {
-        setAuthenticationInfo({ ...authenticationInfo, user: null });
+        setUser(null);
       }
     });
-  }, [authenticationInfo]);
+    // when component gets unmounted stop the observer
+    return () => unsubscribe();
+  }, []);
+
+  const authenticationInfo = {user, signUp, signIn, signOut, updateUserProfile, verifyEmail}
 
   return (
     <AuthContext.Provider value={authenticationInfo}>
