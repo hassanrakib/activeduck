@@ -19,14 +19,17 @@ const auth = getAuth(app);
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   // create user account
   function signUp(email, password) {
+    setLoading(true);
     return createUserWithEmailAndPassword(auth, email, password);
   }
 
   // log in a user
   function signIn(email, password) {
+    setLoading(true);
     return signInWithEmailAndPassword(auth, email, password);
   }
 
@@ -42,6 +45,7 @@ const AuthProvider = ({ children }) => {
 
   // log out a user
   function signOutUser() {
+    setLoading(true);
     return signOut(auth);
   }
 
@@ -50,16 +54,23 @@ const AuthProvider = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setUser(user);
-        
-      } else {
-        setUser(null);
       }
+      setLoading(false);
     });
     // when component gets unmounted stop the observer
     return () => unsubscribe();
   }, []);
 
-  const authenticationInfo = {user, signUp, signIn, signOut, updateUserProfile, verifyEmail}
+  const authenticationInfo = {
+    user,
+    loading,
+    setLoading,
+    signUp,
+    signIn,
+    signOutUser,
+    updateUserProfile,
+    verifyEmail,
+  };
 
   return (
     <AuthContext.Provider value={authenticationInfo}>

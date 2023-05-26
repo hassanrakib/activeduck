@@ -1,4 +1,3 @@
-import { useForm } from "react-hook-form";
 import ProgressBar from "../ProgressBar/ProgressBar";
 import {
   containerWrapper,
@@ -14,121 +13,23 @@ import {
   flexContainer,
   columnGap,
 } from "./SignUp.module.css";
-import { useState } from "react";
-import useAuth from "../../../hooks/useAuth";
 import Loader from "../../Shared/Loader/Loader";
 import Message from "../../Shared/Message/Message";
 import Button from "../../Shared/Button/Button";
+import withMultiStepAuthentication from "../../../HOC/withMultiStepAuthentication";
 
-const Signup = () => {
-  // know when the promise gets fullfilled in the onSubmit function
-  const [signUpInProgress, setSignUpInProgress] = useState(true);
-
-  // currentPage state
-  const [currentPage, setCurrentPage] = useState(1);
-
-  // set sign up error here
-  const [signUpError, setSignUpError] = useState(null);
-
-  // get auth information from AuthContext
-  const { signUp, updateUserProfile, verifyEmail } = useAuth();
-
-  // react hook form useForm() hook
-  const {
-    register,
-    handleSubmit,
-    trigger,
-    formState: { errors },
-  } = useForm({
-    // first blur event will do validation, later input will be revalidated on every change
-    mode: "onTouched",
-    defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-    },
-  });
-
-  // if the input is not touched
-  // input validity will not be checked by the next button click (mode: "onTouched")
-  // so, check input validity
-  const checkInputValidityAndSetCurrentPage = async (fieldName, pageNumber) => {
-    // trigger function returns true if the current input is valid
-    const isValid = await trigger(fieldName, { shouldFocus: true });
-    if (isValid) {
-      // set the current page index
-      setCurrentPage(pageNumber);
-    }
-  };
-
-  // set the page index to next page if the input is valid
-  const handleNextBtn = (pageNumber) => {
-    // check input validity before you move to the next page
-    if (pageNumber === 2) {
-      // check input validity by field name and if valid set current page to next page index
-      checkInputValidityAndSetCurrentPage("form.name", pageNumber);
-    } else if (pageNumber === 3) {
-      checkInputValidityAndSetCurrentPage("form.email", pageNumber);
-    } else if (pageNumber === 4) {
-      checkInputValidityAndSetCurrentPage("form.password", pageNumber);
-    }
-  };
-  // handle enter press in input to trigger next button click
-  const handleOnKeyUp = (e, pageNumber) => {
-    if (e.key === "Enter") handleNextBtn(pageNumber);
-  };
-
-  // no validation required to go back to previous page
-  const handlePreviousBtn = (pageNumber) => setCurrentPage(pageNumber);
-
-  // set first page marginLeft value based on current page index
-  // if the currentPage = 2, after validation, then move the first page to left by -25%
-  let firstPageStyle = {};
-  switch (currentPage) {
-    case 2:
-      firstPageStyle.marginLeft = "-25%";
-      break;
-    case 3:
-      firstPageStyle.marginLeft = "-50%";
-      break;
-    case 4:
-      firstPageStyle.marginLeft = "-75%";
-      break;
-  }
-
-  // get the submitted data
-  const onSubmit = (data) => {
-    // set signUpInProgress state to true
-    setSignUpInProgress(true);
-    // also setError to false
-    setSignUpError(false);
-
-    const form = data.form;
-    console.log(form);
-
-    // create user account (firebase)
-    signUp(form.email, form.password)
-      .then(() => {
-        // after successful sign up update name of the user (firebase)
-        updateUserProfile({ displayName: form.name });
-      })
-      .then(() => {
-        // after successful update send verification email (firebase)
-        verifyEmail();
-      })
-      .then(() => {
-        console.log("email verification sent");
-      })
-      .catch((error) => {
-        setSignUpError(error.message);
-        console.log(error.message);
-      })
-      .finally(() => {
-        // finally setSignUpInProgress to false as the operations are done
-        setSignUpInProgress(false);
-      });
-  };
-
+const SignUp = ({
+  currentPage,
+  handleSubmit,
+  onSubmit,
+  firstPageStyle,
+  register,
+  validateInputSetCurrentPage,
+  setCurrentPage,
+  errors,
+  loading,
+  error,
+}) => {
   return (
     <div className={`${containerWrapper} ${flexContainer}`}>
       <div className={`${container} ${flexContainer}`}>
@@ -155,12 +56,16 @@ const Signup = () => {
                       pattern: /^[a-zA-Z\s]+$/,
                     })}
                     placeholder="John Abraham"
-                    onKeyUp={(e) => handleOnKeyUp(e, 2)}
+                    // handle enter press in input to trigger next button click
+                    onKeyUp={(e) => {
+                      e.key === "Enter" &&
+                        validateInputSetCurrentPage(2, "form.name");
+                    }}
                   />
                 </div>
                 {errors?.form?.name && <Message error="Enter your name" />}
                 <div className={field}>
-                  <Button type="button" onClick={handleNextBtn} onClickArg={2}>
+                  <Button type="button" handleClick={() => validateInputSetCurrentPage(2, "form.name")}>
                     Next
                   </Button>
                 </div>
@@ -178,19 +83,18 @@ const Signup = () => {
                         /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
                     })}
                     placeholder="john@zitbo.com"
-                    onKeyUp={(e) => handleOnKeyUp(e, 3)}
+                    onKeyUp={(e) => e.key === "Enter" && validateInputSetCurrentPage(3, "form.email")}
                   />
                 </div>
                 {errors?.form?.email && <Message error="Enter your email" />}
                 <div className={`${field} ${flexContainer} ${columnGap}`}>
                   <Button
                     type="button"
-                    onClick={handlePreviousBtn}
-                    onClickArg={1}
+                    handleClick={() => setCurrentPage(1)}
                   >
                     Previous
                   </Button>
-                  <Button type="button" onClick={handleNextBtn} onClickArg={3}>
+                  <Button type="button" handleClick={() => validateInputSetCurrentPage(3, "form.email")}>
                     Next
                   </Button>
                 </div>
@@ -224,7 +128,6 @@ const Signup = () => {
                       },
                     })}
                     placeholder="$ecretpassw@rd"
-                    onKeyUp={(e) => handleOnKeyUp(e, 4)}
                   />
                 </div>
                 {errors?.form?.password && (
@@ -233,18 +136,14 @@ const Signup = () => {
                 <div className={`${field} ${flexContainer} ${columnGap}`}>
                   <Button
                     type="button"
-                    onClick={handlePreviousBtn}
-                    onClickArg={2}
+                    handleClick={() => setCurrentPage(2)}
                   >
                     Previous
                   </Button>
                   <Button
                     // stop submitting form by clicking enter from page other than three no. page
-                    // click event will validate the form field first then
-                    // change button type to submit and submit the form
+                    // last button click done by submit, so, watch onSubmit
                     type={currentPage === 3 ? "submit" : "button"}
-                    onClick={handleNextBtn}
-                    onClickArg={4}
                   >
                     Submit
                   </Button>
@@ -253,21 +152,20 @@ const Signup = () => {
 
               {/* fourth page */}
               <div className={page}>
-                {signUpInProgress ? (
+                {loading ? (
                   <div className={`${field} ${flexContainer}`}>
                     <Loader />
                   </div>
-                ) : signUpError ? (
+                ) : error ? (
                   <>
                     <div className={field}>
-                      <Message error={signUpError} />
+                      <Message error={error} />
                     </div>
                     <div className={field}>
                       <Button
                         type="button"
                         className="btnDanger"
-                        onClick={handlePreviousBtn}
-                        onClickArg={1}
+                        handleClick={() => setCurrentPage(1)}
                       >
                         Try Again
                       </Button>
@@ -287,4 +185,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default withMultiStepAuthentication(SignUp);
