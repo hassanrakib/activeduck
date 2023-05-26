@@ -1,5 +1,4 @@
 import { useForm } from "react-hook-form";
-import { IoMdAlert } from "react-icons/io";
 import ProgressBar from "../ProgressBar/ProgressBar";
 import {
   containerWrapper,
@@ -12,18 +11,31 @@ import {
   page,
   field,
   inputField,
-  error,
-  errorIcon,
-  errorMessage,
+  flexContainer,
+  columnGap,
   btn,
-  prev,
-} from "./Signup.module.css";
+  tryAgainBtn,
+} from "./SignUp.module.css";
 import { useState } from "react";
+import useAuth from "../../../hooks/useAuth";
+import Loader from "../../Shared/Loader/Loader";
+import { FaRegCheckCircle } from "react-icons/fa";
+import Error from "../../Shared/Error/Error";
 
 const Signup = () => {
+  // know when the promise gets fullfilled in the onSubmit function
+  const [signUpInProgress, setSignUpInProgress] = useState(true);
+
   // currentPage state
   const [currentPage, setCurrentPage] = useState(1);
 
+  // set sign up error here
+  const [signUpError, setSignUpError] = useState(null);
+
+  // get auth information from AuthContext
+  const { signUp, updateUserProfile, verifyEmail } = useAuth();
+
+  // react hook form useForm() hook
   const {
     register,
     handleSubmit,
@@ -43,8 +55,10 @@ const Signup = () => {
   // input validity will not be checked by the next button click (mode: "onTouched")
   // so, check input validity
   const checkInputValidity = async (fieldName, pageNumber) => {
-    const isValid = await trigger(fieldName, {shouldFocus: true});
+    // trigger function returns true if the current input is valid
+    const isValid = await trigger(fieldName, { shouldFocus: true });
     if (isValid) {
+      // set the current page index
       setCurrentPage(pageNumber);
     }
   };
@@ -53,6 +67,7 @@ const Signup = () => {
   const handleNextBtn = (pageNumber) => {
     // check input validity before you move to the next page
     if (pageNumber === 2) {
+      // check input validity by field name and if valid set page current page to next page index
       checkInputValidity("form.name", pageNumber);
     } else if (pageNumber === 3) {
       checkInputValidity("form.email", pageNumber);
@@ -61,18 +76,61 @@ const Signup = () => {
     }
   };
 
+  // no validation required to go back to previous page
   const handlePreviousBtn = (pageNumber) => setCurrentPage(pageNumber);
+
+  // set first page marginLeft value based on current page index
+  // if the currentPage = 2, after validation, then move the first page to left by -25%
+  let firstPageStyle = {};
+  switch (currentPage) {
+    case 2:
+      firstPageStyle.marginLeft = "-25%";
+      break;
+    case 3:
+      firstPageStyle.marginLeft = "-50%";
+      break;
+    case 4:
+      firstPageStyle.marginLeft = "-75%";
+      break;
+  }
 
   // get the submitted data
   const onSubmit = (data) => {
-    console.log(data);
+    // set signUpInProgress state to true
+    setSignUpInProgress(true);
+    // also setError to false
+    setSignUpError(false);
+
+    const form = data.form;
+
+    // create user account (firebase)
+    signUp(form.email, form.password)
+      .then(() => {
+        // after successful sign up update name of the user (firebase)
+        updateUserProfile({ displayName: form.name });
+      })
+      .then(() => {
+        // after successful update send verification email (firebase)
+        verifyEmail();
+      })
+      .then(() => {
+        console.log("email verification sent");
+      })
+      .catch((error) => {
+        setSignUpError(error.message);
+        console.log(error.message);
+      })
+      .finally(() => {
+        // finally setSignUpInProgress to false as the operations are done
+        setSignUpInProgress(false);
+      });
   };
 
   return (
-    <div className={containerWrapper}>
-      <div className={container}>
+    <div className={`${containerWrapper} ${flexContainer}`}>
+      <div className={`${container} ${flexContainer}`}>
         {/* logo goes here */}
-          <div className={logo}>zitbo</div>
+        <div className={logo}>zitbo</div>
 
         <div className={containerInner}>
           <header className={containerHeader}>Sign up</header>
@@ -81,18 +139,10 @@ const Signup = () => {
           <ProgressBar currentPage={currentPage} />
 
           <div className={formOuter}>
+            {/* hook form handleSubmit takes care of submit event */}
             <form className={form} onSubmit={handleSubmit(onSubmit)}>
               {/* move the first page based on currentPage */}
-              <div
-                className={page}
-                style={
-                  currentPage === 2
-                    ? { marginLeft: "-33.33%" }
-                    : currentPage === 3
-                    ? { marginLeft: "-66.66%" }
-                    : null
-                }
-              >
+              <div className={page} style={firstPageStyle}>
                 <div className={field}>
                   <input
                     className={inputField}
@@ -103,13 +153,8 @@ const Signup = () => {
                     })}
                     placeholder="John Abraham"
                   />
-                  {errors?.form?.name && (
-                    <div className={error}>
-                      <IoMdAlert className={errorIcon} />
-                      <span className={errorMessage}>Enter your name</span>
-                    </div>
-                  )}
                 </div>
+                {errors?.form?.name && <Error message='Enter your name' />}
                 <div className={field}>
                   <button
                     type="button"
@@ -136,17 +181,12 @@ const Signup = () => {
                     })}
                     placeholder="john@zitbo.com"
                   />
-                  {errors?.form?.email && (
-                    <div className={error}>
-                      <IoMdAlert className={errorIcon} />
-                      <span className={errorMessage}>Enter your email</span>
-                    </div>
-                  )}
+                  {errors?.form?.email && <Error message="Enter your email" />}
                 </div>
-                <div className={field}>
+                <div className={`${field} ${flexContainer} ${columnGap}`}>
                   <button
                     type="button"
-                    className={`${btn} ${prev}`}
+                    className={btn}
                     onClick={() => {
                       handlePreviousBtn(1);
                     }}
@@ -171,6 +211,10 @@ const Signup = () => {
                     type="password"
                     {...register("form.password", {
                       required: "Enter your password",
+                      minLength: {
+                        value: 8,
+                        message: "Password must be 8 characters long",
+                      },
                       validate: {
                         lowercaseLetter: (password) =>
                           /[a-z]/.test(password) ||
@@ -188,19 +232,12 @@ const Signup = () => {
                     })}
                     placeholder="$ecretpassw@rd"
                   />
-                  {errors?.form?.password && (
-                    <div className={error}>
-                      <IoMdAlert className={errorIcon} />
-                      <span className={errorMessage}>
-                        {errors.form.password.message}
-                      </span>
-                    </div>
-                  )}
+                  {errors?.form?.password && <Error message={errors.form.password.message} />}
                 </div>
-                <div className={field}>
+                <div className={`${field} ${flexContainer} ${columnGap}`}>
                   <button
                     type="button"
-                    className={`${btn} ${prev}`}
+                    className={btn}
                     onClick={() => {
                       handlePreviousBtn(2);
                     }}
@@ -215,6 +252,37 @@ const Signup = () => {
                     Submit
                   </button>
                 </div>
+              </div>
+
+              {/* fourth page */}
+              <div className={page}>
+                {signUpInProgress ? (
+                  <div className={flexContainer}>
+                    <Loader />
+                  </div>
+                ) : signUpError ? (
+                  <>
+                    <div className={field}>
+                      <Error message={signUpError} />
+                    </div>
+                    <div className={field}>
+                      <button
+                        type="button"
+                        className={`${btn} ${tryAgainBtn}`}
+                        onClick={() => {
+                          handlePreviousBtn(1);
+                        }}
+                      >
+                        Try Again
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <div className={field}>
+                    <FaRegCheckCircle color="gray" size="2em" />
+                    <span>Please check your email for verification!</span>
+                  </div>
+                )}
               </div>
             </form>
           </div>

@@ -1,7 +1,15 @@
-import Signup from "./Pages/Signup/Signup/Signup";
+import { RouterProvider } from "react-router-dom";
+import router from "./Routes/Routes";
+import AuthProvider from "./contexts/AuthContext/AuthProvider";
 
 const App = () => {
-  return <Signup />;
+  return (
+    <>
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </>
+  );
 };
 
 export default App;

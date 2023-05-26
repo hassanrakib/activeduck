@@ -1,0 +1,6 @@
+.errorContainer {
+    display: flex;
+}
+.errorMessage {
+  color: #d50000;
+}
