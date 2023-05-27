@@ -1,8 +1,8 @@
 import {
   containerWrapper,
-  logo,
   container,
-  containerInner,
+  logo,
+  title,
   containerHeader,
   formOuter,
   form,
@@ -11,7 +11,7 @@ import {
   inputField,
   flexContainer,
   columnGap,
-} from "./SignIn.module.css";
+} from "../../../styles/signup-signin.module.css";
 import Message from "../../Shared/Message/Message";
 import Button from "../../Shared/Button/Button";
 import Loader from "../../Shared/Loader/Loader";
@@ -31,12 +31,12 @@ const SignIn = ({
 }) => {
   return (
     <div className={`${containerWrapper} ${flexContainer}`}>
-      <div className={`${container} ${flexContainer}`}>
-        {/* logo goes here */}
-        <div className={logo}>zitbo</div>
-
-        <div className={containerInner}>
-          <header className={containerHeader}>Sign in</header>
+        <div className={container}>
+          {/* form header */}
+          <header className={containerHeader}>
+            <p className={logo}>zitbo</p>
+            <p className={title}>Sign in</p>
+          </header>
           <div className={formOuter}>
             {/* hook form handleSubmit takes care of submit event */}
             <form className={form} onSubmit={handleSubmit(onSubmit)}>
@@ -132,7 +132,6 @@ const SignIn = ({
           </div>
         </div>
       </div>
-    </div>
   );
 };
 

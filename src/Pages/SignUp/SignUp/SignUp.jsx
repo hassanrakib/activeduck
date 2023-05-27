@@ -1,9 +1,9 @@
 import ProgressBar from "../ProgressBar/ProgressBar";
 import {
   containerWrapper,
-  logo,
   container,
-  containerInner,
+  logo,
+  title,
   containerHeader,
   formOuter,
   form,
@@ -12,7 +12,7 @@ import {
   inputField,
   flexContainer,
   columnGap,
-} from "./SignUp.module.css";
+} from "../../../styles/signup-signin.module.css";
 import Loader from "../../Shared/Loader/Loader";
 import Message from "../../Shared/Message/Message";
 import Button from "../../Shared/Button/Button";
@@ -32,12 +32,12 @@ const SignUp = ({
 }) => {
   return (
     <div className={`${containerWrapper} ${flexContainer}`}>
-      <div className={`${container} ${flexContainer}`}>
-        {/* logo goes here */}
-        <div className={logo}>zitbo</div>
-
-        <div className={containerInner}>
-          <header className={containerHeader}>Sign up</header>
+        <div className={container}>
+          {/* form header */}
+          <header className={containerHeader}>
+            <p className={logo}>zitbo</p>
+            <p className={title}>Sign up</p>
+          </header>
 
           {/* progressBar to show progress on the top */}
           <ProgressBar currentPage={currentPage} />
@@ -181,7 +181,6 @@ const SignUp = ({
           </div>
         </div>
       </div>
-    </div>
   );
 };
 

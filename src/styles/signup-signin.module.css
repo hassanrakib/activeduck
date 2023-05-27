@@ -2,31 +2,31 @@
 .containerWrapper {
   min-height: 100vh;
 }
-.container {
-  flex-direction: column;
-}
-/* logo */
-.logo {
-  font-size: 40px;
-  font-weight: 500;
-  margin-bottom: 5px;
-  color: rgb(150, 150, 150);
-}
 /* main form container */
-.containerInner {
+.container {
   width: 330px;
   border-radius: 5px;
   padding: 30px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 20px 25px -5px,
+    rgba(0, 0, 0, 0.04) 0px 10px 10px -5px;
 }
 /* form header */
 .containerHeader {
-  font-size: 40px;
-  font-weight: 500;
   margin-bottom: 30px;
   text-align: center;
 }
-
+/* logo */
+.logo {
+  font-size: 25px;
+  font-weight: 300;
+  margin-bottom: 5px;
+  color: rgb(0, 0, 0);
+}
+/* title of the form*/
+.title {
+  font-size: 40px;
+  font-weight: 500;
+}
 .formOuter {
   width: 100%;
   overflow: hidden;
@@ -46,12 +46,11 @@
 .inputField {
   height: 100%;
   width: 100%;
-  border: none;
+  border: 1px solid rgb(161, 155, 155);
   outline: none;
-  background-color: whitesmoke;
   border-radius: 5px;
   font-size: 18px;
-  padding-left: 15px;
+  padding: 0 10px;
 }
 .flexContainer {
   display: flex;

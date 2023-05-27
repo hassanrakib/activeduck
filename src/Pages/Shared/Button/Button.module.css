@@ -1,12 +1,10 @@
 .btn {
   width: 100%;
-  height: calc(100% + 5px);
+  height: 100%;
   border: none;
-  border-radius: 10px;
   cursor: pointer;
   font-size: 18px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
+
 }
 .btnDanger {
   background-color: white;
