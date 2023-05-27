@@ -10,7 +10,7 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
     const [currentPage, setCurrentPage] = React.useState(1);
 
     // set authentication operation error here
-    const [error, setError] = React.useState(null);
+    const [error, setError] = React.useState("");
 
     // get auth information from AuthContext
     const { signIn, signUp, signOutUser, updateUserProfile, verifyEmail } = useAuth();
@@ -66,8 +66,8 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
 
       // set loading state to true
       setLoading(true);
-      // also setError to false
-      setError(false);
+      // also setError to empty
+      setError("");
 
       const form = data.form;
       console.log(form);
@@ -97,6 +97,7 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
         });
     };
 
+    // handle sign in
     const handleSignIn = (data) => {
       // check validity of the last input set current page index to the last page
       validateInputSetCurrentPage(3, "form.password").then(
@@ -108,16 +109,38 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
 
       // set loading state to true
       setLoading(true);
-      // also setError to false
-      setError(false);
+      // also setError to empty
+      setError("");
 
       const form = data.form;
       console.log(form);
 
-      // create user account (firebase)
+      // sign in user (firebase)
       signIn(form.email, form.password)
         .then((userCredential) => {
-          console.log(userCredential.user);
+          // getting into then block means the user is successful in signing in
+          const user = userCredential.user;
+
+          // only allow verified user to redirect to the destination page
+          if(user.emailVerified) {
+            // navigate
+            console.log("navigating...");
+          } else {
+            // when the user changes
+            // onAuthStateChanged is hit
+            // but unverified user is not allowed to be set to the user variable (AuthProvider)
+            // so, we don't see the user in the frontend although the user is signed in to firebase
+            // and another sign in of the same user (as user can't see his signing in being successful)
+            // doesn't change user, so no hit to onAuthStateChanged
+            // because of no hit to onAuthStateChanged (that contains setLoading(false) statement)
+            // setLoading(true) in signIn() is going to persist loading to be true indefinitely
+
+            // to avoid the above problem
+            signOutUser();
+
+            // and set error
+            setError("Please verify your email and sign in");
+          }
         })
         .catch((error) => {
           setError(error.message);

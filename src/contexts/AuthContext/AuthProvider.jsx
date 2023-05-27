@@ -49,15 +49,18 @@ const AuthProvider = ({ children }) => {
     return signOut(auth);
   }
 
-  // get the currently signed in user
+  // onAuthStateChanged observes the change of auth
   React.useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
+      // when user signed out user is null
+      // when user signed in user must have his emailVerified to true
+      // prevent unverified user to be set in the user variable
+      if (user === null || user.emailVerified) {
         setUser(user);
       }
       setLoading(false);
     });
-    // when component gets unmounted stop the observer
+    // before component gets unmounted stop the observer
     return () => unsubscribe();
   }, []);
 
