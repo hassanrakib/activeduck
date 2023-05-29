@@ -1,0 +1,13 @@
+.container {
+    max-width: 400px;
+}
+.description {
+    text-align: center;
+}
+.btns {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    column-gap: 1em;
+}

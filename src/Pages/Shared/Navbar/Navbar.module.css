@@ -1,0 +1,55 @@
+.navBar {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px 0;
+  background: blueviolet;
+}
+.logo {
+  font-size: 25px;
+  color: white;
+  text-decoration: none;
+}
+.navItems {
+  display: flex;
+  align-items: center;
+  column-gap: 15px;
+}
+.notificationContainer {
+  position: relative;
+  cursor: pointer;
+}
+.notificationIcon {
+  margin-top: 5px;
+  color: white;
+}
+
+.notificationCountContainer {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background-color: black;
+  top: 0;
+  right: -1px;
+  text-align: center;
+  line-height: 12px;
+}
+.notificationCount {
+  color: white;
+  font-size: 12px;
+}
+
+.avatarContainer {
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  border: 2px solid white;
+  border-radius: 50%;
+}
+.avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}

@@ -1,0 +1,16 @@
+.center {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.wrapper {
+  padding: 12px;
+}
+/* logo */
+.logo {
+  font-size: 25px;
+  font-weight: 500;
+  margin-bottom: 15px;
+  text-align: center;
+}

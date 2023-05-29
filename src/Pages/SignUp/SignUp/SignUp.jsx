@@ -1,10 +1,7 @@
 import ProgressBar from "../ProgressBar/ProgressBar";
 import {
-  containerWrapper,
-  container,
-  logo,
-  title,
-  containerHeader,
+  formContainer,
+  formTitle,
   formOuter,
   form,
   page,
@@ -31,13 +28,9 @@ const SignUp = ({
   error,
 }) => {
   return (
-    <div className={`${containerWrapper} ${flexContainer}`}>
-        <div className={container}>
-          {/* form header */}
-          <header className={containerHeader}>
-            <p className={logo}>zitbo</p>
-            <p className={title}>Sign up</p>
-          </header>
+        <div className={formContainer}>
+          {/* form title */}
+          <h1 className={formTitle}>Sign up</h1>
 
           {/* progressBar to show progress on the top */}
           <ProgressBar currentPage={currentPage} />
@@ -55,7 +48,7 @@ const SignUp = ({
                       required: true,
                       pattern: /^[a-zA-Z\s]+$/,
                     })}
-                    placeholder="John Abraham"
+                    placeholder="Full Name"
                     // handle enter press in input to trigger next button click
                     onKeyUp={(e) => {
                       e.key === "Enter" &&
@@ -82,7 +75,7 @@ const SignUp = ({
                       pattern:
                         /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
                     })}
-                    placeholder="john@zitbo.com"
+                    placeholder="Email"
                     onKeyUp={(e) => e.key === "Enter" && validateInputSetCurrentPage(3, "form.email")}
                   />
                 </div>
@@ -127,7 +120,7 @@ const SignUp = ({
                           "Password must contain a special character.",
                       },
                     })}
-                    placeholder="$ecretpassw@rd"
+                    placeholder="Password"
                   />
                 </div>
                 {errors?.form?.password && (
@@ -180,7 +173,6 @@ const SignUp = ({
             </form>
           </div>
         </div>
-      </div>
   );
 };
 
