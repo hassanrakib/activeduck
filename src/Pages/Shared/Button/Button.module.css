@@ -6,9 +6,10 @@
   border-radius: 10px;
   background-color: blueviolet;
   color: white;
+  white-space: nowrap;
 }
 
-/* comes from signUp or signIn component */
+/* comes from SignUp or SignIn component */
 .btnDanger {
   background-color: white;
   border: 2px solid #d50000;
@@ -18,4 +19,10 @@
 .btnHeightWidth100 {
   height:100%;
   width: 100%;
+}
+
+/* comes from Task component */
+.smallBtn {
+  font-size: 11px;
+  padding: 3px 4px;
 }

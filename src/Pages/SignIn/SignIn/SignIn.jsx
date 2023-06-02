@@ -13,6 +13,7 @@ import Message from "../../Shared/Message/Message";
 import Button from "../../Shared/Button/Button";
 import Loader from "../../Shared/Loader/Loader";
 import withMultiStepAuthentication from "../../../HOC/withMultiStepAuthentication";
+import { Link } from "react-router-dom";
 
 const SignIn = ({
   currentPage,
@@ -125,6 +126,7 @@ const SignIn = ({
             </div>
           </form>
         </div>
+        <p>New to zitbo? <Link to="/auth/signup">Create account</Link></p>
       </div>
   );
 };

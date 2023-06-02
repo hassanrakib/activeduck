@@ -15,6 +15,7 @@
 .formOuter {
   width: 100%;
   overflow: hidden;
+  margin-bottom: 8px;
 }
 .form {
   display: flex;

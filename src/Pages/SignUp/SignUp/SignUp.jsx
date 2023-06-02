@@ -14,6 +14,7 @@ import Loader from "../../Shared/Loader/Loader";
 import Message from "../../Shared/Message/Message";
 import Button from "../../Shared/Button/Button";
 import withMultiStepAuthentication from "../../../HOC/withMultiStepAuthentication";
+import { Link } from "react-router-dom";
 
 const SignUp = ({
   currentPage,
@@ -172,6 +173,7 @@ const SignUp = ({
               </div>
             </form>
           </div>
+          <p>Already have an account? <Link to="/auth/signin">Sign in</Link></p>
         </div>
   );
 };

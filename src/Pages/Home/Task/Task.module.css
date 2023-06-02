@@ -1,0 +1,67 @@
+.taskItem {
+  padding: 1em 0 0 1.5em;
+  border: 2px solid #e0e0e0;
+  border-width: 0 0 2px 2px;
+  border-bottom-left-radius: 8px;
+  margin-top: -3px;
+
+  transition: border 2s ease-out;
+
+  /* for play pause icon */
+  position: relative;
+}
+.taskItem.active {
+ border-bottom-color: blueviolet;
+}
+.taskItem.tasksAboveActive {
+  border-left-color: blueviolet;
+}
+.playPauseIcon {
+  background-color: white;
+  /* height width same as icon size */
+  height: 1.5em;
+  width: 1.5em;
+  border-radius: 50%;
+  cursor: pointer;
+  position: absolute;
+  z-index: 1;
+  left: 9px;
+  bottom: -13px;
+}
+.task {
+  background-color: white;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  border-top-left-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.taskDetails {
+  padding: 15px 7px 7px 7px;
+}
+.taskNameAndSettings {
+  display: flex;
+  justify-content: space-between;
+  column-gap: 5px;
+  margin-bottom: 10px;
+}
+.taskSettings {
+  flex-basis: 2em;
+  cursor: pointer;
+}
+.timeSlots {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+/* progress */
+
+.progress {
+  font-size: 9px;
+  text-align: center;
+  border-top-right-radius: 15px;
+  background: #a5a5a5;
+  color: white;
+}
