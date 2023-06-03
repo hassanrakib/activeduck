@@ -26,21 +26,26 @@ const Task = ({
         )}
       </div>
       <div className={styles.task}>
-        <div className={styles.taskDetails}>
-          <div className={styles.taskNameAndSettings}>
-            <p>{name}</p>
-            <BsThreeDots className={styles.taskSettings} />
-          </div>
-          <div className={styles.timeSlots}>
-            {workedSlots?.map((slot) => (
-              <Button key={Math.random()} className="smallBtn">
-                {slot}
-              </Button>
-            ))}
-          </div>
+        <div className={styles.timeSpent}>
+          <span>4h 50m</span>
         </div>
-        <div className={styles.progress} style={{ width: "50%" }}>
-          LEVEL 1 - 15m / 30m
+        <div className={styles.taskDetailsWrapper}>
+          <div className={styles.taskDetails}>
+            <div className={styles.taskNameAndSettings}>
+              <p>{name}</p>
+              <BsThreeDots className={styles.taskSettings} />
+            </div>
+            <div className={styles.timeSlots}>
+              {workedSlots?.map((slot) => (
+                <Button key={Math.random()} className="smallBtn">
+                  {slot}
+                </Button>
+              ))}
+            </div>
+          </div>
+          <div className={styles.progress} style={{ width: "50%" }}>
+            LEVEL 1 - 15m / 30m
+          </div>
         </div>
       </div>
     </li>

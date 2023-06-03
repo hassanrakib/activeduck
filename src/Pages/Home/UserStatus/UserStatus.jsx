@@ -1,3 +1,4 @@
+import TimeChart from "../../Shared/TimeChart/TimeChart";
 import TaskList from "../TaskList/TaskList";
 import UserIntro from "../UserIntro/UserIntro";
 import styles from "./UserStatus.module.css";
@@ -9,6 +10,7 @@ const UserStatus = () => {
         {/* user introduction with total working time */}
         <UserIntro />
         <TaskList />
+        <TimeChart />
     </div>
   )
 };
