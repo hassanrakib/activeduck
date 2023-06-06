@@ -15,7 +15,7 @@ const NewTask = () => {
     setNewTaskName(form.newTaskName.value);
     
     // make the form field blur and reset
-    form.blur();
+    form.newTaskName.blur();
     form.reset();
   }
 
