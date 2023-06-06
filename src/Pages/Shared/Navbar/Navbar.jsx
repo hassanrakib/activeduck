@@ -2,6 +2,7 @@ import { IoMdNotificationsOutline } from "react-icons/io";
 import { Link } from "react-router-dom";
 import avatar from "../../../assets/avatar.jpg";
 import styles from "./Navbar.module.css";
+import Avatar from "../Avatar/Avatar";
 
 const Navbar = () => {
   return (
@@ -20,9 +21,7 @@ const Navbar = () => {
                 <span className={styles.notificationCount}>0</span>
             </div>
         </div>
-        <div className={styles.avatarContainer}>
-            <img src={avatar} className={styles.avatar} alt="avatar" />
-        </div>
+        <Avatar image={avatar} />
       </div>
     </nav>
   );

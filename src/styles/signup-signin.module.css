@@ -1,9 +1,10 @@
 /* main form container */
 .formContainer {
+  background-color: white;
   width: 330px;
   border-radius: 5px;
   padding: 30px;
-  border: 0.5px solid rgb(210, 183, 235);
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 }
 /* form title */
 .formTitle {
@@ -28,15 +29,6 @@
 .field {
   height: 45px;
   margin: 30px 0 5px 0;
-}
-.inputField {
-  height: 100%;
-  width: 100%;
-  border: 1px solid rgb(161, 155, 155);
-  outline: none;
-  border-radius: 5px;
-  font-size: 18px;
-  padding: 0 10px;
 }
 .flexContainer {
   display: flex;

@@ -3,6 +3,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    background-color: rgb(243, 243, 243);
 }
 .wrapper {
   padding: 12px;

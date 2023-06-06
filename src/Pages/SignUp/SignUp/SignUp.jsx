@@ -6,10 +6,10 @@ import {
   form,
   page,
   field,
-  inputField,
   flexContainer,
   columnGap,
 } from "../../../styles/signup-signin.module.css";
+import {inputField} from "../../../styles/global.module.css";
 import Loader from "../../Shared/Loader/Loader";
 import Message from "../../Shared/Message/Message";
 import Button from "../../Shared/Button/Button";
@@ -59,7 +59,7 @@ const SignUp = ({
                 </div>
                 {errors?.form?.name && <Message error="Enter your name" />}
                 <div className={field}>
-                  <Button type="button" handleClick={() => validateInputSetCurrentPage(2, "form.name")}>
+                  <Button type="button" handleClick={() => validateInputSetCurrentPage(2, "form.name")} className="btnHeightWidth100">
                     Next
                   </Button>
                 </div>
@@ -85,10 +85,11 @@ const SignUp = ({
                   <Button
                     type="button"
                     handleClick={() => setCurrentPage(1)}
+                    className="btnHeightWidth100"
                   >
                     Previous
                   </Button>
-                  <Button type="button" handleClick={() => validateInputSetCurrentPage(3, "form.email")}>
+                  <Button type="button" handleClick={() => validateInputSetCurrentPage(3, "form.email")} className="btnHeightWidth100">
                     Next
                   </Button>
                 </div>
@@ -131,6 +132,7 @@ const SignUp = ({
                   <Button
                     type="button"
                     handleClick={() => setCurrentPage(2)}
+                    className="btnHeightWidth100"
                   >
                     Previous
                   </Button>
@@ -138,6 +140,7 @@ const SignUp = ({
                     // stop submitting form by clicking enter from page other than three no. page
                     // last button click done by submit, so, watch onSubmit
                     type={currentPage === 3 ? "submit" : "button"}
+                    className="btnHeightWidth100"
                   >
                     Submit
                   </Button>

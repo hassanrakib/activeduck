@@ -1,7 +1,8 @@
 .taskItem {
   padding: 1em 0 0 1.5em;
-  border: 0.2px dashed #e0e0e0;
-  border-width: 0 0 0.2px 0.2px;
+  border-left: 1.6px solid #cac9c9;
+  border-bottom: 1.6px solid #cac9c9;
+
   border-bottom-left-radius: 8px;
   margin-top: -3px;
 
@@ -11,10 +12,10 @@
   position: relative;
 }
 .taskItem.active {
-  border-bottom-color: rgb(182, 128, 233);
+  border-bottom-color: blueviolet;
 }
 .taskItem.tasksAboveActive {
-  border-left-color: rgb(182, 128, 233);
+  border-left-color: blueviolet;
 }
 .playPauseIcon {
   background-color: white;

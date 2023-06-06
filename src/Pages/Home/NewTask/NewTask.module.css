@@ -1,0 +1,16 @@
+.newTask {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    align-items: center;
+    margin-bottom: 20px;
+    column-gap: 10px;
+}
+
+.field {
+    height: 38px;
+    position: relative;
+    margin-top:4px;
+}
+.inputField {
+    border-radius: 25px;
+}

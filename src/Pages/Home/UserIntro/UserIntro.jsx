@@ -1,13 +1,12 @@
 import styles from "./UserIntro.module.css";
 import userImage from "../../../assets/avatar.jpg";
 import { GiSandsOfTime } from "react-icons/gi";
+import Avatar from "../../Shared/Avatar/Avatar";
 const UserIntro = () => {
   return (
     <div className={styles.userIntro}>
       {/* user image */}
-      <div className={styles.avatarContainer}>
-        <img className={styles.avatar} src={userImage} alt="avatar" />
-      </div>
+      <Avatar image={userImage} className="borderBlueViolet" />
       {/* user name and worked time*/}
       <p className={styles.userName}>
         <b>Ellen DeGeneres</b> worked for <GiSandsOfTime color="blueviolet" />{" "}

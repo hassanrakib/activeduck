@@ -3,7 +3,7 @@
   cursor: pointer;
   font-size: 18px;
   padding: 10px 12px;
-  border-radius: 10px;
+  border-radius: 2px;
   background-color: blueviolet;
   color: white;
   white-space: nowrap;
@@ -25,4 +25,14 @@
 .smallBtn {
   font-size: 11px;
   padding: 3px 4px;
+}
+
+.newTaskSpecific {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  border-top-right-radius: 25px;
+  border-bottom-right-radius: 25px;
+  padding: 0 12px;
+  height: 100%;
 }
