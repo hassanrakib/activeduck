@@ -3,7 +3,7 @@ import styles from "./ProgressBar.module.css";
 
 // three steps to form submit
 const steps = [
-  { name: "Name", number: 1 },
+  { name: "Username", number: 1 },
   { name: "Email", number: 2 },
   { name: "Password", number: 3 },
 ];

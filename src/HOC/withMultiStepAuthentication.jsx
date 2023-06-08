@@ -13,7 +13,8 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
     const [error, setError] = React.useState("");
 
     // get auth information from AuthContext
-    const { signIn, signUp, signOutUser, updateUserProfile, verifyEmail } = useAuth();
+    const { signIn, signUp, signOutUser, updateUserProfile, verifyEmail } =
+      useAuth();
 
     // react hook form useForm() hook
     const {
@@ -25,6 +26,23 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
       // first blur event will do validation, later input will be revalidated on every change
       mode: "onTouched",
     });
+
+    // after successfully signing up to firebase save user to db
+    const createUserInDB = async (username) => {
+      console.log("inside create user");
+      const response = await fetch("http://localhost:5000/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        // save user in db
+        body: JSON.stringify({ username }),
+      });
+
+      const result = await response.json();
+      // generate custom error if user creation fails
+      if (!result.acknowledged) return Promise.reject("User creation failed");
+    };
 
     // if the input is not touched
     // input validity will not be checked by the next button click / enter press (mode: "onTouched")
@@ -54,15 +72,25 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
         break;
     }
 
+    // submit event again does revalidation of all the fields
+    // in SignUp component, error can happen when the client fails to communicate with server
+    // and if error happens react hook form doesn't call onSubmit function
+    // instead call onError function
+    const onError = () => {
+      // set error
+      setError("Unable to complete the operation!");
+
+      // go to next page where we show error
+      setCurrentPage(4);
+    };
+
     // get the submitted data
     const handleSignUp = (data) => {
       // check validity of the last input set current page index to the last page
-      validateInputSetCurrentPage(4, "form.password").then(
-        (isValid) => {
-          // if the last input is not valid then return from here
-          if (!isValid) return;
-        }
-      );
+      validateInputSetCurrentPage(4, "form.password").then((isValid) => {
+        // if the last input is not valid then return from here
+        if (!isValid) return;
+      });
 
       // set loading state to true
       setLoading(true);
@@ -74,9 +102,13 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
 
       // create user account (firebase)
       signUp(form.email, form.password)
+        // after successful user creation in firebase => save user to db
+        .then(() => {
+          createUserInDB(form.username);
+        })
         .then(() => {
           // after successful sign up update name of the user (firebase)
-          updateUserProfile({ displayName: form.name });
+          updateUserProfile({ displayName: form.username });
         })
         .then(() => {
           // after successful update send verification email (firebase)
@@ -100,12 +132,10 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
     // handle sign in
     const handleSignIn = (data) => {
       // check validity of the last input set current page index to the last page
-      validateInputSetCurrentPage(3, "form.password").then(
-        (isValid) => {
-          // if the last input is not valid then return from here
-          if (!isValid) return;
-        }
-      );
+      validateInputSetCurrentPage(3, "form.password").then((isValid) => {
+        // if the last input is not valid then return from here
+        if (!isValid) return;
+      });
 
       // set loading state to true
       setLoading(true);
@@ -122,7 +152,7 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
           const user = userCredential.user;
 
           // only allow verified user to redirect to the destination page
-          if(user.emailVerified) {
+          if (user.emailVerified) {
             // navigate
             console.log("navigating...");
           } else {
@@ -157,6 +187,7 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
         currentPage={currentPage}
         handleSubmit={handleSubmit}
         onSubmit={isSignIn ? handleSignIn : handleSignUp}
+        onError={onError}
         firstPageStyle={firstPageStyle}
         register={register}
         errors={errors}

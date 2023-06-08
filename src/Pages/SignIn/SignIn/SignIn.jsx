@@ -39,7 +39,7 @@ const SignIn = ({
               <div className={field}>
                 <input
                   className={inputField}
-                  type="email"
+                  type="text"
                   {...register("form.email", {
                     required: "The field is required",
                   })}

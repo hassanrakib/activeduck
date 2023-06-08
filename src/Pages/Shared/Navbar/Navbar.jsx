@@ -3,8 +3,10 @@ import { Link } from "react-router-dom";
 import avatar from "../../../assets/avatar.jpg";
 import styles from "./Navbar.module.css";
 import Avatar from "../Avatar/Avatar";
+import useAuth from "../../../hooks/useAuth";
 
 const Navbar = () => {
+  const {signOutUser} = useAuth();
   return (
     <nav className={styles.navBar}>
       {/* logo */}
@@ -22,6 +24,7 @@ const Navbar = () => {
             </div>
         </div>
         <Avatar image={avatar} />
+        <button onClick={signOutUser}>Sign out</button>
       </div>
     </nav>
   );

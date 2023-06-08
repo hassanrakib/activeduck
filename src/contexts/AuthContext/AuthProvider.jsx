@@ -33,7 +33,7 @@ const AuthProvider = ({ children }) => {
     return signInWithEmailAndPassword(auth, email, password);
   }
 
-  // update a uesr profile
+  // update a user profile
   function updateUserProfile(updatePropertyObj) {
     return updateProfile(auth.currentUser, updatePropertyObj);
   }
@@ -51,12 +51,16 @@ const AuthProvider = ({ children }) => {
 
   // onAuthStateChanged observes the change of auth
   React.useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       // when user signed out user is null
       // when user signed in user must have his emailVerified to true
       // prevent unverified user to be set in the user variable
-      if (user === null || user.emailVerified) {
-        setUser(user);
+
+      if (user === null) {
+        setUser(null);
+      } else if (user.emailVerified) {
+        // if the user successfully signs in with verified email
+        
       }
       setLoading(false);
     });
