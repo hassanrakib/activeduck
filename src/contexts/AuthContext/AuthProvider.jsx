@@ -49,9 +49,28 @@ const AuthProvider = ({ children }) => {
     return signOut(auth);
   }
 
+  // if the user successfully signs in with verified emaili => call it on the observer function
+  // to get the user from DB
+  const getUserFromDB = async (username) => {
+    const response = await fetch("http://localhost:5000/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      // send username to get the specified user
+      body: JSON.stringify({
+        username,
+        isSigningIn: true,
+      }),
+    });
+
+    const user = await response.json();
+    return user;
+  };
+
   // onAuthStateChanged observes the change of auth
   React.useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       // when user signed out user is null
       // when user signed in user must have his emailVerified to true
       // prevent unverified user to be set in the user variable
@@ -59,8 +78,9 @@ const AuthProvider = ({ children }) => {
       if (user === null) {
         setUser(null);
       } else if (user.emailVerified) {
-        // if the user successfully signs in with verified email
-        
+        // get the user from DB
+        getUserFromDB(user.displayName)
+        .then((userFromDB) => setUser(userFromDB));
       }
       setLoading(false);
     });
