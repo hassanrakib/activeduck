@@ -27,23 +27,6 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
       mode: "onTouched",
     });
 
-    // after successfully signing up to firebase save user to db
-    const createUserInDB = async (username) => {
-      console.log("inside create user");
-      const response = await fetch("http://localhost:5000/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        // save user in db
-        body: JSON.stringify({ username }),
-      });
-
-      const result = await response.json();
-      // generate custom error if user creation fails
-      if (!result.acknowledged) return Promise.reject("User creation failed");
-    };
-
     // if the input is not touched
     // input validity will not be checked by the next button click / enter press (mode: "onTouched")
     // so, check input validity before going to next page
@@ -72,8 +55,10 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
         break;
     }
 
+    // [caution: sign up related]
     // submit event again does revalidation of all the fields
     // in SignUp component, error can happen when the client fails to communicate with server
+    // specifically in username validation
     // and if error happens react hook form doesn't call onSubmit function
     // instead call onError function
     const onError = () => {
@@ -84,6 +69,21 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
       setCurrentPage(4);
     };
 
+    // [caution: sign  up related]
+    const saveUserToDB = async (newUser) => {
+      const response = await fetch(`http://localhost:5000/users`, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newUser),
+      })
+      const result = await response.json();
+
+      if(!result.acknowledged) Promise.reject("User creation failed");
+    }
+
+    // [caution: sign up related]
     // get the submitted data
     const handleSignUp = (data) => {
       // check validity of the last input set current page index to the last page
@@ -104,7 +104,7 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
       signUp(form.email, form.password)
         // after successful user creation in firebase => save user to db
         .then(() => {
-          createUserInDB(form.username);
+          saveUserToDB({username: form.username});
         })
         .then(() => {
           // after successful sign up update name of the user (firebase)
@@ -143,7 +143,6 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
       setError("");
 
       const form = data.form;
-      console.log(form);
 
       // sign in user (firebase)
       signIn(form.email, form.password)

@@ -18,8 +18,8 @@ const app = initializeFirebase();
 const auth = getAuth(app);
 
 const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
 
   // create user account
   function signUp(email, password) {
@@ -49,40 +49,30 @@ const AuthProvider = ({ children }) => {
     return signOut(auth);
   }
 
-  // if the user successfully signs in with verified emaili => call it on the observer function
-  // to get the user from DB
-  const getUserFromDB = async (username) => {
-    const response = await fetch("http://localhost:5000/users", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      // send username to get the specified user
-      body: JSON.stringify({
-        username,
-        isSigningIn: true,
-      }),
-    });
+  // get user from db
+  function getUserFromDB(userFromFirebase, callback) {
+    // when user signs out from firebase userFromFirebase becomes null
+    // to sign in, user must have his userFromFirebase objects emailVerified property set to true
+    // prevent unverified user to be set in the user variable
+    if (userFromFirebase === null) return callback(null);
 
-    const user = await response.json();
-    return user;
-  };
+    if (userFromFirebase.emailVerified) {
+      // get user from db by sending username
+      // that was previously set to displayName property of the firebase user
+      fetch(`http://localhost:5000/users/${userFromFirebase.displayName}`).then(
+        (userFromDB) => callback(userFromDB)
+      );
+    }
+  }
 
   // onAuthStateChanged observes the change of auth
   React.useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      // when user signed out user is null
-      // when user signed in user must have his emailVerified to true
-      // prevent unverified user to be set in the user variable
-
-      if (user === null) {
-        setUser(null);
-      } else if (user.emailVerified) {
-        // get the user from DB
-        getUserFromDB(user.displayName)
-        .then((userFromDB) => setUser(userFromDB));
-      }
-      setLoading(false);
+    const unsubscribe = onAuthStateChanged(auth, (userFromFirebase) => {
+      // send the userFromFirebase
+      getUserFromDB(userFromFirebase, (userFromDB) => {
+        setUser(userFromDB);
+        setLoading(false);
+      });
     });
     // before component gets unmounted stop the observer
     return () => unsubscribe();

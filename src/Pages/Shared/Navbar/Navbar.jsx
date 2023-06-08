@@ -6,7 +6,7 @@ import Avatar from "../Avatar/Avatar";
 import useAuth from "../../../hooks/useAuth";
 
 const Navbar = () => {
-  const {signOutUser} = useAuth();
+  const {user, signOutUser} = useAuth();
   return (
     <nav className={styles.navBar}>
       {/* logo */}
@@ -24,7 +24,7 @@ const Navbar = () => {
             </div>
         </div>
         <Avatar image={avatar} />
-        <button onClick={signOutUser}>Sign out</button>
+        <button onClick={signOutUser}>{user ? 'log out!': 'log in'}</button>
       </div>
     </nav>
   );

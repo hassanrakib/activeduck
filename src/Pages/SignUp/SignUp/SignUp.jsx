@@ -15,6 +15,7 @@ import Message from "../../Shared/Message/Message";
 import Button from "../../Shared/Button/Button";
 import withMultiStepAuthentication from "../../../HOC/withMultiStepAuthentication";
 import { Link } from "react-router-dom";
+import useAuth from "../../../hooks/useAuth";
 
 const SignUp = ({
   currentPage,
@@ -31,23 +32,16 @@ const SignUp = ({
 }) => {
   // used in validate object of form.username field's register api
   // check if username is unique and if not return a message from here
-  const checkIfUsernameUnique = async (username) => {
-    console.log(`inside checkif...`);
+  const checkIfUsernameUnique = async (usernameToCheck) => {
     try {
-      const response = await fetch("http://localhost:5000/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        // send username to check if username is unique in db
-        body: JSON.stringify({ username, checkUniqueness: true }),
-      });
-      const { usernameExist } = await response.json();
+      const response = await fetch(
+        `http://localhost:5000/users/validate/${usernameToCheck}`
+      );
+      const { username } = await response.json();
 
-      // if username is unique return true
-      if (!usernameExist) return true;
+      if (!username) return true;
 
-      // if username is not unique return the error message
+      // if username exists
       return "Username is taken";
     } catch (err) {
       return "Server error!";
