@@ -13,8 +13,14 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
     const [error, setError] = React.useState("");
 
     // get auth information from AuthContext
-    const { signIn, signUp, signOutUser, updateUserProfile, verifyEmail } =
-      useAuth();
+    const {
+      signIn,
+      signUp,
+      signOutUser,
+      updateUserProfile,
+      verifyEmail,
+      setUserFromFirebase,
+    } = useAuth();
 
     // react hook form useForm() hook
     const {
@@ -74,14 +80,14 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
       const response = await fetch(`http://localhost:5000/users`, {
         method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(newUser),
-      })
+      });
       const result = await response.json();
 
-      if(!result.acknowledged) Promise.reject("User creation failed");
-    }
+      if (!result.acknowledged) Promise.reject("User creation failed");
+    };
 
     // [caution: sign up related]
     // get the submitted data
@@ -104,7 +110,7 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
       signUp(form.email, form.password)
         // after successful user creation in firebase => save user to db
         .then(() => {
-          saveUserToDB({username: form.username});
+          saveUserToDB({ username: form.username });
         })
         .then(() => {
           // after successful sign up update name of the user (firebase)
@@ -148,12 +154,12 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
       signIn(form.email, form.password)
         .then((userCredential) => {
           // getting into then block means the user is successful in signing in
-          const user = userCredential.user;
+          const firebaseUser = userCredential.user;
 
           // only allow verified user to redirect to the destination page
-          if (user.emailVerified) {
-            // navigate
-            console.log("navigating...");
+          if (firebaseUser.emailVerified) {
+            // get token from server so that we can use it for authorization to get data from server
+            setUserFromFirebase(firebaseUser);
           } else {
             // when the user changes
             // onAuthStateChanged is hit

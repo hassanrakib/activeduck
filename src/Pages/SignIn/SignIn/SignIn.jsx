@@ -13,7 +13,8 @@ import Message from "../../Shared/Message/Message";
 import Button from "../../Shared/Button/Button";
 import Loader from "../../Shared/Loader/Loader";
 import withMultiStepAuthentication from "../../../HOC/withMultiStepAuthentication";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
+import useAuth from "../../../hooks/useAuth";
 
 const SignIn = ({
   currentPage,
@@ -27,6 +28,8 @@ const SignIn = ({
   loading,
   error,
 }) => {
+  const {token} = useAuth();
+  if(token) return <Navigate to="/" replace={true} />
   return (
       <div className={formContainer}>
         {/* form header */}
