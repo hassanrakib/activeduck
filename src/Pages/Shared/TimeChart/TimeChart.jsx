@@ -31,7 +31,6 @@ const TimeChart = () => {
 
   //   x-axis custom tick - date modified
   const renderCustomAxisTick = ({ x, y, payload }) => {
-    console.log(payload.value.split("/")[0]);
     return (
       <text x={x - 10} y={y + 15} fill="#a5a5a5">
         {payload.value.split("/")[0]}

@@ -154,12 +154,12 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
       signIn(form.email, form.password)
         .then((userCredential) => {
           // getting into then block means the user is successful in signing in
-          const firebaseUser = userCredential.user;
+          const userFromFirebase = userCredential.user;
 
-          // only allow verified user to redirect to the destination page
-          if (firebaseUser.emailVerified) {
+          if (userFromFirebase.emailVerified) {
             // get token from server so that we can use it for authorization to get data from server
-            setUserFromFirebase(firebaseUser);
+            // after we setUserFromFirebase, state change triggers the useToken hook in AuthProvider 
+            setUserFromFirebase(userFromFirebase);
           } else {
             // when the user changes
             // onAuthStateChanged is hit

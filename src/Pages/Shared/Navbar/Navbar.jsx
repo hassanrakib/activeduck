@@ -6,6 +6,7 @@ import Avatar from "../Avatar/Avatar";
 import useAuth from "../../../hooks/useAuth";
 
 const Navbar = () => {
+  console.log("navbar");
   const {user, signOutUser} = useAuth();
   return (
     <nav className={styles.navBar}>

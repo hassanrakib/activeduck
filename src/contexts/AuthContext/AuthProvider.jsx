@@ -19,16 +19,14 @@ const app = initializeFirebase();
 const auth = getAuth(app);
 
 const AuthProvider = ({ children }) => {
-  // set the user that comes from firebase to invoke useToken hook
-  // setUserFromFirebase is sent to the sign in component
-  // where userFromFirebase is set
+  // set userFromFirebase after sign in, to invoke the useToken hook
   const [userFromFirebase, setUserFromFirebase] = React.useState(null);
 
-  // useToken hook provides you the token from BE
-  const {token, isTokenLoading} = useToken(userFromFirebase);
+  // useToken hook provides you the newly created token from BE
+  const { token } = useToken(userFromFirebase);
 
   const [loading, setLoading] = useState(true);
-  
+
   const [user, setUser] = useState(null);
 
   // create user account
@@ -68,38 +66,42 @@ const AuthProvider = ({ children }) => {
     if (userFromFirebase === null) return callback(null);
 
     if (userFromFirebase.emailVerified) {
-      // get user from db by sending username
-      // that was previously set to displayName property of the firebase user
-      fetch(`http://localhost:5000/users/${userFromFirebase.displayName}`, {
-        headers: {
-          authorization: `Bearer ${localStorage.getItem("token")}`,
-        }
-      }).then(
-        (userFromDB) => callback(userFromDB)
-      );
+      const accessToken = localStorage.getItem("token");
+
+      // token existence check is needed
+      // because when we sign in, observer is called also useToken hook is called
+      // before the token gets ready by useToken hook, we have our userFromFirebase sent to this function
+      if (accessToken) {
+        // get user from db by sending username
+        // that was previously set to displayName property of the firebase user
+        fetch(`http://localhost:5000/users/${userFromFirebase.displayName}`, {
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+        }).then((userFromDB) => callback(userFromDB));
+      }
     }
   }
 
-  // onAuthStateChanged observes the change of auth
+  // auth state change and token change calls the callback of the useEffect hook
   React.useEffect(() => {
-    console.log("Inside observer", isTokenLoading);
     const unsubscribe = onAuthStateChanged(auth, (userFromFirebase) => {
+
       // send the userFromFirebase
       getUserFromDB(userFromFirebase, (userFromDB) => {
-        console.log("set user");
         setUser(userFromDB);
         setLoading(false);
       });
     });
     // before component gets unmounted stop the observer
     return () => unsubscribe();
-  }, [isTokenLoading]);
+  }, [token]);
 
   const authenticationInfo = {
     user,
-    setUserFromFirebase,
     token,
     loading,
+    setUserFromFirebase,
     setLoading,
     signUp,
     signIn,

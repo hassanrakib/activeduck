@@ -2,12 +2,14 @@ import React from "react";
 
 const useToken = (userFromFirebase) => {
   const [token, setToken] = React.useState("");
-  const [isTokenLoading, setIsTokenLoading] = React.useState(true);
-
-
-  console.log("use token hook");
 
   React.useEffect(() => {
+    // useToken is invoked by the userFromFirebase state change in AuthProvider
+    // if userFromFirebase has it's emailVerified to true
+    // then we setUserFromFirebase(userFromFirebase) in sign in handler 
+    
+    // at first userFromFirebase is null
+    // so check is needed
     if (userFromFirebase) {
       fetch(
         `http://localhost:5000/jwt?username=${userFromFirebase.displayName}`
@@ -19,14 +21,12 @@ const useToken = (userFromFirebase) => {
 
             // set token state
             setToken(result.token);
-
-            console.log("inside useToken api call");
-        })
-        .then(() => setIsTokenLoading(false));
+        });
     }
   }, [userFromFirebase]);
 
-  return {token, isTokenLoading};
+  // provides the latest token
+  return {token};
 };
 
 export default useToken;
