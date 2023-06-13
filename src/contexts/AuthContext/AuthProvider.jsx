@@ -59,13 +59,14 @@ const AuthProvider = ({ children }) => {
 
   // get user from db
   function getUserFromDB(userFromFirebase, callback) {
-    console.log("getUserFromDB");
     // when user signs out from firebase userFromFirebase becomes null
-    // to sign in, user must have his userFromFirebase objects emailVerified property set to true
+    // to sign in, user must have his userFromFirebase object's emailVerified property set to true
     // prevent unverified user to be set in the user variable
     if (userFromFirebase === null) return callback(null);
 
     if (userFromFirebase.emailVerified) {
+      // get access token from local storage to fetch user from db
+      // without access token user will not be given from server side
       const accessToken = localStorage.getItem("token");
 
       // token existence check is needed
