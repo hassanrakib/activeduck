@@ -10,7 +10,6 @@ import {
   signOut,
   updateProfile,
 } from "firebase/auth";
-import useToken from "../../hooks/useToken";
 
 // initialize Firebase
 const app = initializeFirebase();
@@ -19,19 +18,17 @@ const app = initializeFirebase();
 const auth = getAuth(app);
 
 const AuthProvider = ({ children }) => {
-  // set userFromFirebase after sign in, to invoke the useToken hook
-  const [userFromFirebase, setUserFromFirebase] = React.useState(null);
 
-  // useToken hook provides you the newly created token from BE
-  const { token } = useToken(userFromFirebase);
+  const [token, setToken] = useState("");
 
   const [loading, setLoading] = useState(true);
+
+  const [error, setError] = useState("");
 
   const [user, setUser] = useState(null);
 
   // create user account
   function signUp(email, password) {
-    setLoading(true);
     return createUserWithEmailAndPassword(auth, email, password);
   }
 
@@ -58,11 +55,11 @@ const AuthProvider = ({ children }) => {
   }
 
   // get user from db
-  function getUserFromDB(userFromFirebase, callback) {
+  async function getUserFromDB(userFromFirebase) {
     // when user signs out from firebase userFromFirebase becomes null
     // to sign in, user must have his userFromFirebase object's emailVerified property set to true
     // prevent unverified user to be set in the user variable
-    if (userFromFirebase === null) return callback(null);
+    if (userFromFirebase === null) return null;
 
     if (userFromFirebase.emailVerified) {
       // get access token from local storage to fetch user from db
@@ -75,11 +72,15 @@ const AuthProvider = ({ children }) => {
       if (accessToken) {
         // get user from db by sending username
         // that was previously set to displayName property of the firebase user
-        fetch(`http://localhost:5000/users/${userFromFirebase.displayName}`, {
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-          },
-        }).then((userFromDB) => callback(userFromDB));
+        const response = await fetch(
+          `http://localhost:5000/users/${userFromFirebase.displayName}`,
+          {
+            headers: {
+              authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+        return await response.json();
       }
     }
   }
@@ -87,22 +88,28 @@ const AuthProvider = ({ children }) => {
   // auth state change and token change calls the callback of the useEffect hook
   React.useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (userFromFirebase) => {
-
-      // send the userFromFirebase
-      getUserFromDB(userFromFirebase, (userFromDB) => {
-        setUser(userFromDB);
-        setLoading(false);
-      });
+      console.log("going to call getUserFromDB");
+      getUserFromDB(userFromFirebase)
+        .then((userFromDB) => {
+          setUser(userFromDB);
+        })
+        .catch((err) => {
+          setError(err.message);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     });
+
     // before component gets unmounted stop the observer
     return () => unsubscribe();
   }, [token]);
 
   const authenticationInfo = {
     user,
-    token,
     loading,
-    setUserFromFirebase,
+    error,
+    setToken,
     setLoading,
     signUp,
     signIn,

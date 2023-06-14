@@ -1,7 +1,7 @@
 import React from "react";
 
 const useToken = (userFromFirebase) => {
-  const [token, setToken] = React.useState("");
+  const [currentToken, setCurrentToken] = React.useState("");
 
   React.useEffect(() => {
     // useToken is invoked by the userFromFirebase state change in AuthProvider
@@ -20,13 +20,13 @@ const useToken = (userFromFirebase) => {
             localStorage.setItem("token", result.token);
 
             // set token state
-            setToken(result.token);
+            setCurrentToken(result.token);
         });
     }
   }, [userFromFirebase]);
 
   // provides the latest token
-  return {token};
+  return {currentToken};
 };
 
 export default useToken;

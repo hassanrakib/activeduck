@@ -5,8 +5,10 @@ import Button from "../../Shared/Button/Button";
 import React from "react";
 
 const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
+  // modalContentRef.current has the modalContent dom element
   const modalContentRef = React.useRef(null);
 
+  // 
   const { register, handleSubmit } = useForm({
     values: {
       name: newTaskName,
@@ -31,20 +33,26 @@ const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
 
   return (
     <div className={styles.modal}>
-      {/* modal content */}
+      {/* ----------- modal content ------------ */}
       <div className={styles.modalContent} ref={modalContentRef}>
+        {/* ----------- modal header ------------ */}
         <div className={styles.modalHeader}>
+          {/* ----------- what user wants to do ------------ */}
           <h1 className={styles.heading}>I want to {newTaskName}</h1>
+          {/* ----------- close modal by setting newTaskName to empty string ------------ */}
           <span className={styles.close} onClick={() => setNewTaskName("")}>
             &times;
           </span>
         </div>
+        {/* ----------- modal body ------------ */}
         <div className={styles.modalBody}>
+          {/* ----------- create new task ------------ */}
           <form onSubmit={handleSubmit(createNewTask)}>
             <div className={styles.field}>
               <div className={styles.selectLabel}>
                 <label className={styles.selectLabelText}>Level 1</label>
               </div>
+              {/* ----------- level_1 field ------------ */}
               <select
                 className={`${globalStyles.inputField} ${styles.inputField}`}
                 {...register("level_1")}
@@ -57,6 +65,7 @@ const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
               <div className={styles.selectLabel}>
                 <label className={styles.selectLabelText}>Level 2</label>
               </div>
+              {/* ----------- level_2 field ------------ */}
               <select
                 className={`${globalStyles.inputField} ${styles.inputField}`}
                 {...register("level_2")}
@@ -69,6 +78,7 @@ const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
               <div className={styles.selectLabel}>
                 <label className={styles.selectLabelText}>Level 3</label>
               </div>
+              {/* ------------ level_3 field ------------ */}
               <select
                 className={`${globalStyles.inputField} ${styles.inputField}`}
                 {...register("level_3")}

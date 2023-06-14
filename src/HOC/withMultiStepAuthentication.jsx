@@ -1,8 +1,16 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import useAuth from "../hooks/useAuth";
+import useToken from "../hooks/useToken";
 const withMultiStepAuthentication = (Form, isSignIn) => {
   return function AuthenticationForm() {
+    // after successful sign in set user from firebase
+    const [userFromFirebase, setUserFromFirebase] = React.useState(null);
+
+    // useToken hook provides you the newly created token from BE
+    const { currentToken } = useToken(userFromFirebase);
+
+
     // know when the promise gets fullfilled in the onSubmit function
     const [loading, setLoading] = React.useState(false);
 
@@ -19,7 +27,7 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
       signOutUser,
       updateUserProfile,
       verifyEmail,
-      setUserFromFirebase,
+      setLoading: setUserLoading,
     } = useAuth();
 
     // react hook form useForm() hook
@@ -158,7 +166,7 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
 
           if (userFromFirebase.emailVerified) {
             // get token from server so that we can use it for authorization to get data from server
-            // after we setUserFromFirebase, state change triggers the useToken hook in AuthProvider 
+            // after we setUserFromFirebase, state change triggers the useToken hook in AuthProvider
             setUserFromFirebase(userFromFirebase);
           } else {
             // when the user changes
@@ -179,7 +187,10 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
         })
         .catch((error) => {
           setError(error.message);
-          console.log(error.message);
+
+          // because of error in sign in operation => onAuthStateChanged will not be called
+          // so, we need to set user loading to false
+          setUserLoading(false);
         })
         .finally(() => {
           // finally setLoading to false as the operations are done
@@ -200,6 +211,7 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
         setCurrentPage={setCurrentPage}
         loading={loading}
         error={error}
+        token = {currentToken}
       />
     );
   };

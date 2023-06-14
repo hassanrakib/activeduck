@@ -5,17 +5,23 @@ import AuthLayout from "../Layouts/AuthLayout/AuthLayout";
 import Auth from "../Pages/Auth/Auth/Auth";
 import MainLayout from "../Layouts/MainLayout/MainLayout";
 import Home from "../Pages/Home/Home/Home";
+import RequireAuth from "./RequireAuth";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <MainLayout />,
+    // Main Layout is protected
+    element: (
+      <RequireAuth>
+        <MainLayout />
+      </RequireAuth>
+    ),
     children: [
       {
         index: true,
-        element: <Home />
-      }
-    ]
+        element: <Home />,
+      },
+    ],
   },
   {
     path: "/auth",
@@ -23,7 +29,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Auth />
+        element: <Auth />,
       },
       {
         path: "signup",
@@ -31,10 +37,10 @@ const router = createBrowserRouter([
       },
       {
         path: "signin",
-        element: <SignIn />
-      }
-    ]
-  }
+        element: <SignIn />,
+      },
+    ],
+  },
 ]);
 
 export default router;
