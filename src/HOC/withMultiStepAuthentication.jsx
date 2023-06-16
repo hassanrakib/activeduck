@@ -29,7 +29,7 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
       verifyEmail,
       setLoading: setUserLoading,
     } = useAuth();
-
+    
     // react hook form useForm() hook
     const {
       register,
@@ -166,7 +166,7 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
 
           if (userFromFirebase.emailVerified) {
             // get token from server so that we can use it for authorization to get data from server
-            // after we setUserFromFirebase, state change triggers the useToken hook in AuthProvider
+            // after we setUserFromFirebase, state change triggers the useToken hook
             setUserFromFirebase(userFromFirebase);
           } else {
             // when the user changes

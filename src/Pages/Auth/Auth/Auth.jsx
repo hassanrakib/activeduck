@@ -2,9 +2,10 @@ import { Link, useLocation } from "react-router-dom";
 import Button from "../../Shared/Button/Button";
 import styles from "./Auth.module.css";
 const Auth = () => {
-
   const location = useLocation();
-  const from = location.state?.from?.pathname || "/"; 
+
+  // redirect url is sent from the RequireAuth component
+  const from = location.state?.from?.pathname || "/";
 
   return (
     <div className={styles.container}>
@@ -12,7 +13,8 @@ const Auth = () => {
         A productive social media platform that makes you win your life.
       </p>
       <div className={styles.btns}>
-        <Link to="/auth/signin" state={{from}} replace>
+        {/* send redirect url to the signin page */}
+        <Link to="/auth/signin" state={{ from }} replace>
           <Button>Signin</Button>
         </Link>
         <Link to="/auth/signup">

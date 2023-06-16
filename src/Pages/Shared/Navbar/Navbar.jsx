@@ -7,6 +7,7 @@ import useAuth from "../../../hooks/useAuth";
 
 const Navbar = () => {
   const {user, signOutUser} = useAuth();
+
   return (
     <nav className={styles.navBar}>
       {/* logo */}

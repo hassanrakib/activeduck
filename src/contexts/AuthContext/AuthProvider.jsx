@@ -23,8 +23,6 @@ const AuthProvider = ({ children }) => {
 
   const [loading, setLoading] = useState(true);
 
-  const [error, setError] = useState("");
-
   const [user, setUser] = useState(null);
 
   // create user account
@@ -80,7 +78,12 @@ const AuthProvider = ({ children }) => {
             },
           }
         );
-        return await response.json();
+        const result = await response.json();
+        if(result.username) {
+          return result;
+        } else {
+          await Promise.reject(result);
+        }
       }
     }
   }
@@ -88,13 +91,13 @@ const AuthProvider = ({ children }) => {
   // auth state change and token change calls the callback of the useEffect hook
   React.useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (userFromFirebase) => {
-      console.log("going to call getUserFromDB");
       getUserFromDB(userFromFirebase)
         .then((userFromDB) => {
           setUser(userFromDB);
         })
-        .catch((err) => {
-          setError(err.message);
+        .catch(() => {
+          // if the token is expired or compromised
+          setUser(null)
         })
         .finally(() => {
           setLoading(false);
@@ -108,7 +111,6 @@ const AuthProvider = ({ children }) => {
   const authenticationInfo = {
     user,
     loading,
-    error,
     setToken,
     setLoading,
     signUp,

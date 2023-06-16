@@ -3,6 +3,7 @@ import router from "./Routes/Routes";
 import AuthProvider from "./contexts/AuthContext/AuthProvider";
 
 const App = () => {
+
   return (
     <>
       <AuthProvider>

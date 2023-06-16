@@ -13,8 +13,9 @@ import Message from "../../Shared/Message/Message";
 import Button from "../../Shared/Button/Button";
 import Loader from "../../Shared/Loader/Loader";
 import withMultiStepAuthentication from "../../../HOC/withMultiStepAuthentication";
-import { Link, Navigate, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import useAuth from "../../../hooks/useAuth";
+import { useEffect } from "react";
 
 const SignIn = ({
   currentPage,
@@ -28,25 +29,37 @@ const SignIn = ({
   // indicates whether sign in operations still in progress
   loading: signInOperationLoading,
   error: signInOperationError,
-  token
+  token,
 }) => {
-
   // we request for the user from db in AuthProvider
   // while doing sign in operation
   // getting user from db may take more time than sign in operations
   // userLoading is used to know that the get user from db in progress or not
-  const { loading: userLoading, error: userError, setToken } = useAuth();
-
+  const {
+    loading: userLoading,
+    user,
+    setToken,
+  } = useAuth();
 
   const location = useLocation();
+  const navigate = useNavigate();
+  // redirect url is sent from the Auth Page
   const from = location.state?.from || "/";
 
-  console.log(token);
 
-  if (token) {
-    setToken(token);
-    return <Navigate to={from} replace />
-  }
+  useEffect(() => {
+    // if user not loading, means user may be already set from db by observer call
+    // this will happen when the user has previously set a valid token in the localStorage
+    if (!userLoading) {
+      if (token && user) {
+        navigate(from, { replace: true });
+      } else if (token) {
+        // set token to call the observer again after getting token
+        // so that, we get user with valid token and previous if block executes
+        setToken(token);
+      }
+    }
+  }, [token, userLoading, user, setToken, from, navigate]);
 
   return (
     <div className={formContainer}>
@@ -115,7 +128,7 @@ const SignIn = ({
 
                 type={currentPage === 2 ? "submit" : "button"}
               >
-                Sigin
+                Signin
               </Button>
             </div>
           </div>
@@ -126,10 +139,10 @@ const SignIn = ({
               <div className={`${field} ${flexContainer}`}>
                 <Loader />
               </div>
-            ) : signInOperationError || userError ? (
+            ) : signInOperationError ? (
               <>
                 <div className={field}>
-                  <Message error={signInOperationError || userError} />
+                  <Message error={signInOperationError} />
                 </div>
                 <div className={field}>
                   <Button
