@@ -19,6 +19,7 @@ const NewTask = () => {
     form.reset();
   }
 
+
   return (
     <div className={styles.newTask}>
       <Avatar image={userImage} className="borderBlueViolet" />

@@ -1,12 +1,26 @@
 import styles from "./NewTaskModal.module.css";
 import globalStyles from "../../../styles/global.module.css";
-import { useForm } from "react-hook-form";
 import Button from "../../Shared/Button/Button";
 import React from "react";
 import { endOfToday, intervalToDuration } from "date-fns";
 import useAuth from "../../../hooks/useAuth";
+import Message from "../../Shared/Message/Message";
 
 const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
+  const [levels, setLevels] = React.useState({
+    level_1: 1,
+    level_2: 2,
+    level_3: 3,
+  });
+
+  // initial remaining time when component is first mounted
+  // used in creating durations for levels
+  const [remainingTime, setRemainingTime] = React.useState(
+    intervalToDuration({
+      start: new Date(),
+      end: endOfToday(),
+    })
+  );
   // get the user from the context
   const { user } = useAuth();
 
@@ -34,41 +48,73 @@ const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
 
   // get the remaining time of the day using date-fns
   // returns {days: 0, hours: 10, minutes: 20, seconds: 1}
-  const remainingTime = intervalToDuration({
-    start: new Date(),
-    end: endOfToday(),
-  });
+  React.useEffect(() => {
+    // creates an interval that update remaining time every 5 minutes
+    const interval = setInterval(() => {
+      setRemainingTime(
+        intervalToDuration({
+          start: new Date(),
+          end: endOfToday(),
+        })
+      );
+    }, 300000);
 
-  // create time durations for levels options
-  const durationsToWork = [];
-  // hours starts at 0 and ends at the remainingTime hours
-  for (let hours = 0; hours <= remainingTime.hours; hours++) {
-    // minutes starts at 0 and goes up to 50, increases by 10
-    for (let minutes = 0; minutes <= 50; minutes += 10) {
-      // if hours is equal to the remainingTime hours
-      // then check if the minutes doesn't exceed the remainingTime minutes
-      if (hours === remainingTime.hours) {
-        if (minutes > remainingTime.minutes) break;
+    // cleanup
+    return () => clearInterval(interval);
+  }, []);
+
+  // get durations to work using remaining time
+  const durationsToWork = React.useMemo(() => {
+    // create time durations for levels options
+    const durations = [];
+    // hours starts at 0 and ends at the remainingTime hours
+    for (let hours = 0; hours <= remainingTime.hours; hours++) {
+      // minutes starts at 0 and goes up to 50, increases by 10
+      for (let minutes = 0; minutes <= 50; minutes += 5) {
+        // if hours is equal to the remainingTime hours
+        // then check if the minutes doesn't exceed the remainingTime minutes
+        if (hours === remainingTime.hours) {
+          if (minutes > remainingTime.minutes) break;
+        }
+        // push to the durationsToWork array
+        durations.push({ hours, minutes });
       }
-      // push to the durationsToWork array
-      durationsToWork.push({ hours, minutes });
     }
-  }
-  // remove the first element as it is {hours: 0, minutes: 0}
-  durationsToWork.shift();
+    // remove the first element as it is {hours: 0, minutes: 0}
+    durations.shift();
 
-  // get the newTaskName from the NewTask component and set it as a form value
-  const { register, handleSubmit } = useForm({
-    defaultValues: {
-      level_1: durationsToWork[0],
-      level_2: durationsToWork[1],
-      level_3: durationsToWork[2],
-    },
-  });
+    return durations;
+  }, [remainingTime]);
+
+  // validate a level's duration index
+  const validateLevel = (e) => {
+    // get duration's index in durationsToWork
+    const { level_1: level_1_value, level_2: level_2_value} = levels;
+    // get currentLevel name that is going to change
+    const currentLevel = e.target.name;
+    // get the value, that we want as next value
+    const currentLevelValue = parseInt(e.target.value);
+
+    if (currentLevel === "level_1") {
+      setLevels({ ...levels, [currentLevel]: currentLevelValue });
+    } else if (currentLevel === "level_2") {
+      if (currentLevelValue > level_1_value) {
+        setLevels({ ...levels, [currentLevel]: currentLevelValue });
+      }
+    } else if (currentLevel === "level_3") {
+      if(currentLevelValue > level_2_value) {
+        setLevels({ ...levels, [currentLevel]: currentLevelValue });
+
+      } 
+    }
+  };
 
   // create new task
-  const createNewTask = (data) => {
-    const { level_1, level_2, level_3 } = data;
+  const createNewTask = (e) => {
+    e.preventDefault();
+
+    // get duration's index in durationsToWork
+    const { level_1, level_2, level_3 } = levels;
 
     const newTask = {
       // date here
@@ -76,9 +122,9 @@ const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
       name: newTaskName,
       workedTimeSpans: [],
       levels: {
-        level_1,
-        level_2,
-        level_3,
+        level_1: durationsToWork[level_1], // ex: {hours: 1, minutes: 30}
+        level_2: durationsToWork[level_2],
+        level_3: durationsToWork[level_3],
       },
     };
     console.log(newTask);
@@ -100,7 +146,7 @@ const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
         {/* ----------- modal body ------------ */}
         <div className={styles.modalBody}>
           {/* ----------- create new task ------------ */}
-          <form onSubmit={handleSubmit(createNewTask)}>
+          <form onSubmit={createNewTask}>
             <div className={styles.field}>
               <div className={styles.selectLabel}>
                 <label className={styles.selectLabelText}>Level 1</label>
@@ -108,10 +154,13 @@ const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
               {/* ----------- level_1 field ------------ */}
               <select
                 className={`${globalStyles.inputField} ${styles.inputField}`}
-                {...register("level_1")}
+                name="level_1"
+                value={levels.level_1}
+                onChange={validateLevel}
               >
-                {durationsToWork.map((duration) => (
-                  <option key={Math.random()} value={duration}>
+                {durationsToWork.map((duration, index) => (
+                  // keeping duration's index in the value to get the actual object later
+                  <option key={Math.random()} value={index}>
                     {duration.hours > 0 && `${duration.hours} hours `}
                     {duration.minutes > 0 && `${duration.minutes} minutes`}
                   </option>
@@ -125,10 +174,17 @@ const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
               {/* ----------- level_2 field ------------ */}
               <select
                 className={`${globalStyles.inputField} ${styles.inputField}`}
-                {...register("level_2")}
+                name="level_2"
+                value={levels.level_2}
+                onChange={validateLevel}
               >
-                <option value="15">15 minutes</option>
-                <option value="30">30 minutes</option>
+                {durationsToWork.map((duration, index) => (
+                  // keeping duration's index in the value to get the actual object later
+                  <option key={Math.random()} value={index}>
+                    {duration.hours > 0 && `${duration.hours} hours `}
+                    {duration.minutes > 0 && `${duration.minutes} minutes`}
+                  </option>
+                ))}
               </select>
             </div>
             <div className={styles.field}>
@@ -138,12 +194,20 @@ const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
               {/* ------------ level_3 field ------------ */}
               <select
                 className={`${globalStyles.inputField} ${styles.inputField}`}
-                {...register("level_3")}
+                name="level_3"
+                value={levels.level_3}
+                onChange={validateLevel}
               >
-                <option value="15">15 minutes</option>
-                <option value="30">30 minutes</option>
+                {durationsToWork.map((duration, index) => (
+                  // keeping duration's index in the value to get the actual object later
+                  <option key={Math.random()} value={index}>
+                    {duration.hours > 0 && `${duration.hours} hours `}
+                    {duration.minutes > 0 && `${duration.minutes} minutes`}
+                  </option>
+                ))}
               </select>
             </div>
+
             <div className={styles.field}>
               <Button type="submit" className="btnHeightWidth100">
                 Create
