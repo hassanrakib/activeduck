@@ -7,10 +7,11 @@ import useAuth from "../../../hooks/useAuth";
 import Message from "../../Shared/Message/Message";
 
 const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
+  // all the levels show the first options of their arrays by default
   const [levels, setLevels] = React.useState({
-    level_1: 1,
-    level_2: 2,
-    level_3: 3,
+    level_1: 0,
+    level_2: 0,
+    level_3: 0,
   });
 
   // initial remaining time when component is first mounted
@@ -63,8 +64,9 @@ const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
     return () => clearInterval(interval);
   }, []);
 
-  // get durations to work using remaining time
-  const durationsToWork = React.useMemo(() => {
+  // get durations to work using remaining time for level_1
+  // if remainingTime updates, level_1_durations will change as well
+  const level_1_durations = React.useMemo(() => {
     // create time durations for levels options
     const durations = [];
     // hours starts at 0 and ends at the remainingTime hours
@@ -76,7 +78,7 @@ const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
         if (hours === remainingTime.hours) {
           if (minutes > remainingTime.minutes) break;
         }
-        // push to the durationsToWork array
+        // push to the level_1_durations array
         durations.push({ hours, minutes });
       }
     }
@@ -86,34 +88,25 @@ const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
     return durations;
   }, [remainingTime]);
 
-  // validate a level's duration index
-  const validateLevel = (e) => {
-    // get duration's index in durationsToWork
-    const { level_1: level_1_value, level_2: level_2_value} = levels;
-    // get currentLevel name that is going to change
-    const currentLevel = e.target.name;
-    // get the value, that we want as next value
-    const currentLevelValue = parseInt(e.target.value);
+  // get durations for level_2 using level_1, slicing to create another array
+  // slicing after the level_1's current duration index to the end
+  const level_2_durations = level_1_durations.slice(
+    levels.level_1 + 1,
+    level_1_durations.length
+  );
 
-    if (currentLevel === "level_1") {
-      setLevels({ ...levels, [currentLevel]: currentLevelValue });
-    } else if (currentLevel === "level_2") {
-      if (currentLevelValue > level_1_value) {
-        setLevels({ ...levels, [currentLevel]: currentLevelValue });
-      }
-    } else if (currentLevel === "level_3") {
-      if(currentLevelValue > level_2_value) {
-        setLevels({ ...levels, [currentLevel]: currentLevelValue });
-
-      } 
-    }
-  };
+  // get durations for level_3 using level_2, slicing to create another array
+  // slicing after the level_2's current duration index to the end
+  const level_3_durations = level_2_durations.slice(
+    levels.level_2 + 1,
+    level_2_durations.length
+  );
 
   // create new task
   const createNewTask = (e) => {
     e.preventDefault();
 
-    // get duration's index in durationsToWork
+    // get duration's index
     const { level_1, level_2, level_3 } = levels;
 
     const newTask = {
@@ -122,13 +115,16 @@ const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
       name: newTaskName,
       workedTimeSpans: [],
       levels: {
-        level_1: durationsToWork[level_1], // ex: {hours: 1, minutes: 30}
-        level_2: durationsToWork[level_2],
-        level_3: durationsToWork[level_3],
+        // getting values from arrays by the levels' indexes
+        level_1: level_1_durations[level_1], // ex: {hours: 1, minutes: 30}
+        level_2: level_2_durations[level_2],
+        level_3: level_3_durations[level_3],
       },
     };
     console.log(newTask);
   };
+
+  console.log("component rendered", levels);
 
   return (
     <div className={styles.modal}>
@@ -156,9 +152,16 @@ const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
                 className={`${globalStyles.inputField} ${styles.inputField}`}
                 name="level_1"
                 value={levels.level_1}
-                onChange={validateLevel}
+                // when change happens to level_1 index , clear indexs of the next levels to 0
+                onChange={(e) =>
+                  setLevels({
+                    level_1: parseInt(e.target.value),
+                    level_2: 0,
+                    level_3: 0,
+                  })
+                }
               >
-                {durationsToWork.map((duration, index) => (
+                {level_1_durations.map((duration, index) => (
                   // keeping duration's index in the value to get the actual object later
                   <option key={Math.random()} value={index}>
                     {duration.hours > 0 && `${duration.hours} hours `}
@@ -176,9 +179,17 @@ const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
                 className={`${globalStyles.inputField} ${styles.inputField}`}
                 name="level_2"
                 value={levels.level_2}
-                onChange={validateLevel}
+                // when change happens to level_2 index , clear indexs of the next levels to 0
+
+                onChange={(e) =>
+                  setLevels({
+                    ...levels,
+                    level_2: parseInt(e.target.value),
+                    level_3: 0,
+                  })
+                }
               >
-                {durationsToWork.map((duration, index) => (
+                {level_2_durations.map((duration, index) => (
                   // keeping duration's index in the value to get the actual object later
                   <option key={Math.random()} value={index}>
                     {duration.hours > 0 && `${duration.hours} hours `}
@@ -196,9 +207,11 @@ const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
                 className={`${globalStyles.inputField} ${styles.inputField}`}
                 name="level_3"
                 value={levels.level_3}
-                onChange={validateLevel}
+                onChange={(e) =>
+                  setLevels({ ...levels, level_3: parseInt(e.target.value) })
+                }
               >
-                {durationsToWork.map((duration, index) => (
+                {level_3_durations.map((duration, index) => (
                   // keeping duration's index in the value to get the actual object later
                   <option key={Math.random()} value={index}>
                     {duration.hours > 0 && `${duration.hours} hours `}
