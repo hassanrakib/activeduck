@@ -12,9 +12,9 @@ const router = createBrowserRouter([
     path: "/",
     // Main Layout is protected
     element: (
-      <RequireAuth>
+      // <RequireAuth>
         <MainLayout />
-      </RequireAuth>
+      // </RequireAuth>
     ),
     children: [
       {

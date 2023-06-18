@@ -4,7 +4,6 @@ import Button from "../../Shared/Button/Button";
 import React from "react";
 import { endOfToday, intervalToDuration } from "date-fns";
 import useAuth from "../../../hooks/useAuth";
-import Message from "../../Shared/Message/Message";
 
 const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
   // all the levels show the first options of their arrays by default
@@ -52,6 +51,12 @@ const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
   React.useEffect(() => {
     // creates an interval that update remaining time every 5 minutes
     const interval = setInterval(() => {
+      // before updating remaining time, we have to reset level_3 index
+      // because, every update will delete the last duration object from level_1_durations array
+      // index of the deleted duration might have previously selected in the level_3
+      // so, creating new task may get a level_3 undefined when finding duration with that index
+      setLevels({ ...levels, level_3: 0 });
+      // update remaining time
       setRemainingTime(
         intervalToDuration({
           start: new Date(),
@@ -62,7 +67,7 @@ const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
 
     // cleanup
     return () => clearInterval(interval);
-  }, []);
+  }, [levels]);
 
   // get durations to work using remaining time for level_1
   // if remainingTime updates, level_1_durations will change as well
@@ -109,22 +114,30 @@ const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
     // get duration's index
     const { level_1, level_2, level_3 } = levels;
 
-    const newTask = {
-      // date here
-      doer: user.username,
-      name: newTaskName,
-      workedTimeSpans: [],
-      levels: {
-        // getting values from arrays by the levels' indexes
-        level_1: level_1_durations[level_1], // ex: {hours: 1, minutes: 30}
-        level_2: level_2_durations[level_2],
-        level_3: level_3_durations[level_3],
-      },
-    };
-    console.log(newTask);
+    // update of remaining time will make durations arrays gradually empty
+    // so, if any of the array is empty we will not create new task
+    // as, multiple levels can be undefined when finding duration with index
+    if (
+      level_1_durations.length &&
+      level_2_durations.length &&
+      level_3_durations.length
+    ) {
+      const newTask = {
+        // date here
+        doer: user?.username,
+        name: newTaskName,
+        workedTimeSpans: [],
+        levels: {
+          // getting values from arrays by the levels' indexes
+          level_1: level_1_durations[level_1], // ex: {hours: 1, minutes: 30}
+          level_2: level_2_durations[level_2],
+          level_3: level_3_durations[level_3],
+        },
+      };
+      console.log(newTask);
+    }
   };
 
-  console.log("component rendered", levels);
 
   return (
     <div className={styles.modal}>
