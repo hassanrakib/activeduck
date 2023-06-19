@@ -47,9 +47,7 @@ const SignIn = ({
   // redirect url is sent from the Auth Page
   const from = location.state?.from || "/";
 
-
   useEffect(() => {
-
     // if user is previously signed in to firebase and we are successful in getting the user from db
     // then observer will not be called again after signin => using token or firebase sign in
     // as a result, userLoading will remain true,
@@ -58,20 +56,19 @@ const SignIn = ({
       setUserLoading(false);
     }
 
-    // if user not loading, means user may be already set from db by observer call
-    // this will happen when the user has previously set a valid token in the localStorage
-    if (!userLoading) {
-      if (token && user) {
-        navigate(from, { replace: true });
-      } else if (token) {
-        // set token to call the observer again after getting token
-        // so that, we get user with valid token and previous if block executes
-        setToken(token);
-      }
+    // if new token is recieved and user also recieved from database by using previous token 
+    if (token && user) {
+      navigate(from, { replace: true });
+    } else if (token) {
+      // set token to call the observer again after getting token
+      // so that, we get user with valid token and previous if block executes
+      setToken(token);
     }
-  }, [token, userLoading, setUserLoading, user, setToken, from, navigate]);
+  }, [token, user, setUserLoading, setToken, from, navigate]);
+
 
   console.log(signInOperationLoading, userLoading);
+
 
   return (
     <div className={formContainer}>

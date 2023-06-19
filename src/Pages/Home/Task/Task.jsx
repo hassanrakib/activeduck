@@ -9,21 +9,35 @@ const Task = ({
   setActiveTaskIdFn,
 }) => {
   return (
-    <li
-      className={`${styles.taskItem}${
-        activeTaskId === _id ? ` ${styles.active}` : ""
-      }${activeTaskId >= _id ? ` ${styles.tasksAboveActive}` : ""}`}
-    >
-      {/* play / pause icon absolute positioned */}
-      <div
-        className={styles.playPauseIcon}
-        onClick={() => setActiveTaskIdFn(_id)}
-      >
-        {activeTaskId === _id ? (
-          <FiPauseCircle size="1.5em" color="blueviolet" />
-        ) : (
-          <FiPlayCircle size="1.5em" color="#a5a5a5" />
-        )}
+    <li className={styles.taskItem}>
+      {/* play / pause icon wrapper absolute positioned */}
+      <div className={styles.iconWrapper}>
+        <div
+          className={styles.iconContainer}
+          // set activeTaskId state
+          onClick={() => setActiveTaskIdFn(_id)}
+        >
+          {/* when the task is active, spin the border */}
+          {/* it is covering the icon container and have a dashed border*/}
+          <div
+            className={`${styles.iconBorder}${
+              activeTaskId === _id ? ` ${styles.spin}` : ""
+            }`}
+          ></div>
+          {activeTaskId === _id ? (
+            <FiPauseCircle
+              size="1.5em"
+              color="blueviolet"
+              className={styles.icon}
+            />
+          ) : (
+            <FiPlayCircle
+              size="1.5em"
+              color="#a5a5a5"
+              className={styles.icon}
+            />
+          )}
+        </div>
       </div>
       <div className={styles.task}>
         <div className={styles.timeSpent}>

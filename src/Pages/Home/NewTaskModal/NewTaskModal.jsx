@@ -158,7 +158,7 @@ const NewTaskModal = ({
       // 5000ms to complete the operation and get the response
       // otherwise error will be recieved by socket (error generated automatically)
       // you just send response from BE after successful operation
-      socket.timeout(5000).emit("task:create", newTask, (err, result) => {
+      socket.timeout(5000).emit("tasks:create", newTask, (err, result) => {
         if (err) {
           // if error happens creating new task set taskCreationResult state
           setTaskCreationResult({ error: "Failed to create the task" });
