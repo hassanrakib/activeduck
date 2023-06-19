@@ -5,20 +5,34 @@ import Avatar from "../../Shared/Avatar/Avatar";
 import Button from "../../Shared/Button/Button";
 import NewTaskModal from "../NewTaskModal/NewTaskModal";
 import React from "react";
+import Message from "../../Shared/Message/Message";
 
 const NewTask = () => {
+  // newTaskName is sent to the NewTaskModal
   const [newTaskName, setNewTaskName] = React.useState("");
+
+  // by default taskCreationResult is null, so that message doesn't show up
+  const [taskCreationResult, setTaskCreationResult] = React.useState(null);
+
+  // set taskCreationResult to null after 5000ms
+  // as we don't want to show the result after 5000ms
+  if (taskCreationResult) {
+    setTimeout(() => {
+      setTaskCreationResult(null);
+    }, 5000);
+  }
 
   const openNewTaskModal = (e) => {
     e.preventDefault();
     const form = e.target;
+    // setting task name opens the modal
     setNewTaskName(form.newTaskName.value);
-    
-    // make the form field blur and reset
-    form.newTaskName.blur();
-    form.reset();
-  }
 
+    // make the form field blur
+    form.newTaskName.blur();
+    // reset the form after submit
+    form.reset();
+  };
 
   return (
     <div className={styles.newTask}>
@@ -37,11 +51,29 @@ const NewTask = () => {
           </Button>
         </div>
       </form>
-      {/* show modal when clicked create button */}
+
+      {/* show message if taskCreationResult has success property */}
+      {taskCreationResult?.success && (
+        <div className={`${styles.message} ${styles.success}`}>
+          <Message success={taskCreationResult.success} />
+        </div>
+      )}
+
+      {/* show message if taskCreationResult has error property */}
+      
+      {taskCreationResult?.error && (
+        <div className={`${styles.message} ${styles.error}`}>
+          <Message error={taskCreationResult.error} />
+        </div>
+      )}
+
+      {/* show modal when clicked create button in the NewTask component */}
+      {/* create button assign newTaskName, when newTaskName exists show modal */}
       {newTaskName && (
         <NewTaskModal
           newTaskName={newTaskName}
           setNewTaskName={setNewTaskName}
+          setTaskCreationResult={setTaskCreationResult}
         />
       )}
     </div>

@@ -37,6 +37,7 @@ const SignIn = ({
   // userLoading is used to know that the get user from db in progress or not
   const {
     loading: userLoading,
+    setLoading: setUserLoading,
     user,
     setToken,
   } = useAuth();
@@ -48,6 +49,15 @@ const SignIn = ({
 
 
   useEffect(() => {
+
+    // if user is previously signed in to firebase and we are successful in getting the user from db
+    // then observer will not be called again after signin => using token or firebase sign in
+    // as a result, userLoading will remain true,
+    // that's why we need to set userLoading to false from here
+    if(user) {
+      setUserLoading(false);
+    }
+
     // if user not loading, means user may be already set from db by observer call
     // this will happen when the user has previously set a valid token in the localStorage
     if (!userLoading) {
@@ -59,7 +69,9 @@ const SignIn = ({
         setToken(token);
       }
     }
-  }, [token, userLoading, user, setToken, from, navigate]);
+  }, [token, userLoading, setUserLoading, user, setToken, from, navigate]);
+
+  console.log(signInOperationLoading, userLoading);
 
   return (
     <div className={formContainer}>

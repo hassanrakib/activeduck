@@ -8,6 +8,10 @@
   color: white;
   white-space: nowrap;
 }
+.btn:disabled {
+  background: gray;
+  cursor: not-allowed;
+}
 
 /* comes from SignUp or SignIn component */
 .btnDanger {

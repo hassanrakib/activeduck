@@ -4,8 +4,14 @@ import Button from "../../Shared/Button/Button";
 import React from "react";
 import { endOfToday, intervalToDuration } from "date-fns";
 import useAuth from "../../../hooks/useAuth";
+import { zonedTimeToUtc } from "date-fns-tz";
+import { socket } from "../../../socket";
 
-const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
+const NewTaskModal = ({
+  newTaskName,
+  setNewTaskName,
+  setTaskCreationResult,
+}) => {
   // all the levels show the first options of their arrays by default
   const [levels, setLevels] = React.useState({
     level_1: 0,
@@ -55,7 +61,7 @@ const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
       // because, every update will delete the last duration object from level_1_durations array
       // index of the deleted duration might have previously selected in the level_3
       // so, creating new task may get a level_3 undefined when finding duration with that index
-      setLevels({ ...levels, level_3: 0 });
+      setLevels((prevLevels) => ({ ...prevLevels, level_3: 0 }));
       // update remaining time
       setRemainingTime(
         intervalToDuration({
@@ -77,7 +83,7 @@ const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
     // hours starts at 0 and ends at the remainingTime hours
     for (let hours = 0; hours <= remainingTime.hours; hours++) {
       // minutes starts at 0 and goes up to 50, increases by 10
-      for (let minutes = 0; minutes <= 50; minutes += 5) {
+      for (let minutes = 0; minutes <= 55; minutes += 5) {
         // if hours is equal to the remainingTime hours
         // then check if the minutes doesn't exceed the remainingTime minutes
         if (hours === remainingTime.hours) {
@@ -107,23 +113,36 @@ const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
     level_2_durations.length
   );
 
+  // update of remaining time will make durations arrays gradually empty
+  // true, if any of the durations arrays is empty
+  const durationsArrayEmpty = !(
+    level_1_durations.length &&
+    level_2_durations.length &&
+    level_3_durations.length
+  );
+
   // create new task
   const createNewTask = (e) => {
     e.preventDefault();
 
+    // get user's machine's date and time zone and
+    // convert the date to utc as it is the universal time
+    const date = new Date();
+    // returns time zone
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    // convert to utc using zonedTimeToUTC from date-fns-tz
+    const utcDate = zonedTimeToUtc(date, timeZone).toISOString();
+
     // get duration's index
     const { level_1, level_2, level_3 } = levels;
 
-    // update of remaining time will make durations arrays gradually empty
+
     // so, if any of the array is empty we will not create new task
     // as, multiple levels can be undefined when finding duration with index
-    if (
-      level_1_durations.length &&
-      level_2_durations.length &&
-      level_3_durations.length
-    ) {
+    if (!durationsArrayEmpty) {
       const newTask = {
-        // date here
+        date: utcDate,
         doer: user?.username,
         name: newTaskName,
         workedTimeSpans: [],
@@ -134,10 +153,25 @@ const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
           level_3: level_3_durations[level_3],
         },
       };
-      console.log(newTask);
+
+      // send newTask to the server to store it in db
+      // 5000ms to complete the operation and get the response
+      // otherwise error will be recieved by socket (error generated automatically)
+      // you just send response from BE after successful operation
+      socket.timeout(5000).emit("task:create", newTask, (err, result) => {
+        if (err) {
+          // if error happens creating new task set taskCreationResult state
+          setTaskCreationResult({ error: "Failed to create the task" });
+        } else {
+          // if successful in creating new tas set taskCreationResult to the result from BE
+          setTaskCreationResult(result);
+        }
+      });
+
+      // close the modal after clicking create button
+      setNewTaskName("");
     }
   };
-
 
   return (
     <div className={styles.modal}>
@@ -195,11 +229,11 @@ const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
                 // when change happens to level_2 index , clear indexs of the next levels to 0
 
                 onChange={(e) =>
-                  setLevels({
-                    ...levels,
+                  setLevels((prevLevels) => ({
+                    ...prevLevels,
                     level_2: parseInt(e.target.value),
                     level_3: 0,
-                  })
+                  }))
                 }
               >
                 {level_2_durations.map((duration, index) => (
@@ -221,7 +255,10 @@ const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
                 name="level_3"
                 value={levels.level_3}
                 onChange={(e) =>
-                  setLevels({ ...levels, level_3: parseInt(e.target.value) })
+                  setLevels((prevLevels) => ({
+                    ...prevLevels,
+                    level_3: parseInt(e.target.value),
+                  }))
                 }
               >
                 {level_3_durations.map((duration, index) => (
@@ -235,7 +272,8 @@ const NewTaskModal = ({ newTaskName, setNewTaskName }) => {
             </div>
 
             <div className={styles.field}>
-              <Button type="submit" className="btnHeightWidth100">
+              {/* disable the button if any durations array is empty */}
+              <Button type="submit" className="btnHeightWidth100" disabled={durationsArrayEmpty}>
                 Create
               </Button>
             </div>
