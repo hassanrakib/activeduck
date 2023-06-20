@@ -54,7 +54,6 @@ const AuthProvider = ({ children }) => {
 
   // get user from db
   async function getUserFromDB(userFromFirebase) {
-    console.log(userFromFirebase);
     // when user signs out from firebase userFromFirebase becomes null
     // to sign in, user must have his userFromFirebase object's emailVerified property set to true
     // prevent unverified user to be set in the user variable

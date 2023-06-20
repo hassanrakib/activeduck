@@ -8,19 +8,19 @@ const tasks = [
   {
     _id: 1,
     name: "Study math for 1h",
-    workedSlots: [
-      "03:00am - 01:00am",
-      "03:00am - 01:00am",
-      "03:00am - 01:00am",
-      "03:00am - 01:00am",
-      "03:00am - 01:00am",
+    workedTimeSpans: [
+      // "03:00am - 01:00am",
+      // "03:00am - 01:00am",
+      // "03:00am - 01:00am",
+      // "03:00am - 01:00am",
+      // "03:00am - 01:00am",
     ],
     totalTime: "4h 50m",
   },
   {
     _id: 2,
     name: "Study JavaScript coding from day to night",
-    workedSlots: [
+    workedTimeSpans: [
       "03:00am - 01:00am",
       "03:00am - 01:00am",
       "03:00am - 01:00am",
@@ -32,7 +32,7 @@ const tasks = [
   {
     _id: 3,
     name: "Study math for 1h",
-    workedSlots: [
+    workedTimeSpans: [
       "03:00am - 01:00am",
       "03:00am - 01:00am",
       "03:00am - 01:00am",
@@ -44,6 +44,11 @@ const tasks = [
 ];
 
 const TaskList = () => {
+
+  // tasks and setTasks
+  // const [tasks, setTasks] = React.useState([]);
+
+  // get user
   const { user } = useAuth();
 
   // know the task id that is currently active
@@ -65,12 +70,19 @@ const TaskList = () => {
 
   React.useEffect(() => {
     // get the tasks of an user for today
-    socket.emit("tasks:read", user);
+    socket.emit("tasks:read", {doer: user?.username});
+
+    // get the tasks from BE
+    socket.on("tasks:read", (tasks) => {
+      // set the tasks to the tasks state
+      // setTasks(tasks);
+    })
+
   }, [user]);
 
   return (
     <ul className={styles.taskList}>
-      {tasks.map((task) => (
+      {tasks?.map((task) => (
         <Task
           key={task._id}
           task={task}

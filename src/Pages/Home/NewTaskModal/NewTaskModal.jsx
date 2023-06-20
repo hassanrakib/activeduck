@@ -4,7 +4,6 @@ import Button from "../../Shared/Button/Button";
 import React from "react";
 import { endOfToday, intervalToDuration } from "date-fns";
 import useAuth from "../../../hooks/useAuth";
-import { zonedTimeToUtc } from "date-fns-tz";
 import { socket } from "../../../socket";
 
 const NewTaskModal = ({
@@ -125,15 +124,6 @@ const NewTaskModal = ({
   const createNewTask = (e) => {
     e.preventDefault();
 
-    // get user's machine's date and time zone and
-    // convert the date to utc as it is the universal time
-    const date = new Date();
-    // returns time zone
-    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-    // convert to utc using zonedTimeToUTC from date-fns-tz
-    const utcDate = zonedTimeToUtc(date, timeZone).toISOString();
-
     // get duration's index
     const { level_1, level_2, level_3 } = levels;
 
@@ -142,7 +132,6 @@ const NewTaskModal = ({
     // as, multiple levels can be undefined when finding duration with index
     if (!durationsArrayEmpty) {
       const newTask = {
-        date: utcDate,
         doer: user?.username,
         name: newTaskName,
         workedTimeSpans: [],
@@ -163,7 +152,7 @@ const NewTaskModal = ({
           // if error happens creating new task set taskCreationResult state
           setTaskCreationResult({ error: "Failed to create the task" });
         } else {
-          // if successful in creating new tas set taskCreationResult to the result from BE
+          // if successful in creating new task set taskCreationResult to the result from BE
           setTaskCreationResult(result);
         }
       });

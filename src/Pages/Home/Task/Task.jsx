@@ -3,8 +3,9 @@ import { FiPauseCircle } from "react-icons/fi";
 import { BsThreeDots } from "react-icons/bs";
 import Button from "../../Shared/Button/Button";
 import styles from "./Task.module.css";
+import zzz from "../../../assets/zzz.gif";
 const Task = ({
-  task: { _id, name, workedSlots, totalTime },
+  task: { _id, name, workedTimeSpans },
   activeTaskId,
   setActiveTaskIdFn,
 }) => {
@@ -40,8 +41,8 @@ const Task = ({
         </div>
       </div>
       <div className={styles.task}>
-        <div className={styles.timeSpent}>
-          <span>4h 50m</span>
+        <div className={styles.currentLevel}>
+          <span>Level - 1</span>
         </div>
         <div className={styles.taskDetailsWrapper}>
           <div className={styles.taskDetails}>
@@ -49,16 +50,35 @@ const Task = ({
               <p>{name}</p>
               <BsThreeDots className={styles.taskSettings} />
             </div>
-            <div className={styles.timeSlots}>
-              {workedSlots?.map((slot) => (
-                <Button key={Math.random()} className="smallBtn">
-                  {slot}
-                </Button>
-              ))}
-            </div>
+            {workedTimeSpans.length === 0 ? (
+              // if not worked show image
+              <div className={styles.zzzContainer}>
+                <img className={styles.zzz} src={zzz} alt="sleeping" />
+              </div>
+            ) : (
+              <div className={styles.timeSpans}>
+                {/* show workedTimeSpans */}
+                {workedTimeSpans?.map((timeSpan) => (
+                  <Button key={Math.random()} className="timeSpan">
+                    {timeSpan}
+                  </Button>
+                ))}
+              </div>
+            )}
           </div>
-          <div className={styles.progress} style={{ width: "50%" }}>
-            LEVEL 1 - 15m / 30m
+          <div className={styles.progressContainer}>
+            {/* move the tooltip as progress value increases by changing width */}
+            {/* to understand more see the css styles */}
+            <div className={styles.progressTooltip} style={{ width: "20%" }}>
+              <span className={styles.progressTooltipText}>
+                30m of 2h 30m completed
+              </span>
+            </div>
+            <progress
+              className={activeTaskId === _id ? `${styles.animate}` : ""}
+              max="100"
+              value="20"
+            ></progress>
           </div>
         </div>
       </div>

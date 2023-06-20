@@ -26,11 +26,17 @@
 }
 
 /* comes from Task component */
-.smallBtn {
-  font-size: 11px;
-  padding: 3px 4px;
+.timeSpan {
+  font-size: 12px;
+  font-weight: 300;
+  border: 2px solid #a5a5a5;
+  padding: 2px;
+  border-radius: 15px;
+  background: white;
+  color: black;
 }
 
+/* comes from newTask component */
 .newTaskSpecific {
   position: absolute;
   bottom: 0;

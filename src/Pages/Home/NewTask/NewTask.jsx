@@ -14,12 +14,12 @@ const NewTask = () => {
   // by default taskCreationResult is null, so that message doesn't show up
   const [taskCreationResult, setTaskCreationResult] = React.useState(null);
 
-  // set taskCreationResult to null after 5000ms
+  // set taskCreationResult to null after 10000ms
   // as we don't want to show the result after 5000ms
   if (taskCreationResult) {
     setTimeout(() => {
       setTaskCreationResult(null);
-    }, 5000);
+    }, 10000);
   }
 
   const openNewTaskModal = (e) => {
