@@ -54,13 +54,22 @@ const TaskList = () => {
   const [activeTaskId, setActiveTaskId] = React.useState("");
 
   // function that sets activeTaskId state
-  // passed this function to the Task component where we set the active task id
-  const setActiveTaskIdFn = (_id) => {
+  // passed this function to the Task component where we call the function
+  // and send task's _id and workedTimeSpans array's last element's index
+  const setActiveTaskIdFn = (_id, lastTimeSpanIndex) => {
     // if we want to set a task id to the activeTaskId
     // check that it exists in the activeTaskId
     // if exists then remove the task id from the activeTaskId
     if (activeTaskId === _id) {
-      setActiveTaskId("");
+      // before removing _id from activeTaskId
+      // register the end time of a task's workedTimeSpan obj in workedTimeSpans array
+      socket.emit("workedTimeSpan:end", _id, lastTimeSpanIndex, (response) => {
+        console.log(response);
+        // if successful in saving the endTime
+        // clear the activeTaskId
+        setActiveTaskId("");
+      });
+
       // or set the task id to the activeTaskId
     } else {
       // register the start time of a task's workedTimeSpan into db

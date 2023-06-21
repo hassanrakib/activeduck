@@ -58,7 +58,8 @@ const Task = ({
         <div
           className={styles.iconContainer}
           // set activeTaskId state
-          onClick={() => setActiveTaskIdFn(_id)}
+          // and send _id of the task also the last element's index in the workedTimeSpans array
+          onClick={() => setActiveTaskIdFn(_id, workedTimeSpans.length - 1)}
         >
           {/* when the task is active, spin the border */}
           {/* it is covering the icon container and have a dashed border*/}
