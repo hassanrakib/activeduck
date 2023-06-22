@@ -14,41 +14,46 @@ const Task = ({
   activeTaskId,
   setActiveTaskIdFn,
 }) => {
+  // completedTimeInMillisecondsRef is the object, in its current property
+  // we will store the calculated completed time in milliseconds from workedTimeSpans array
+  const completedTimeInMillisecondsRef = React.useRef(0);
+
   // last workedTimeSpan object
   const lastWorkedTimeSpan = workedTimeSpans[workedTimeSpans.length - 1];
-  console.log(lastWorkedTimeSpan);
 
   // calculate the completed time in milliseconds from workedTimeSpans array
-  let completedTimeInMilliseconds;
-  // lastWorkedTimeSpan.endTime can be undefined
-  // if undefined then that means the timeSpan is in not yet ended
-  // timeSpan is in progress, so we don't calculate then
-  // when the endTime exists of the last workedTimeSpan object in workedTimeSpans array
-  if (lastWorkedTimeSpan.endTime) {
-    completedTimeInMilliseconds = workedTimeSpans.reduce(
-      (completedTime, timeSpan) => {
-        // timeSpan is an object like {startTime: "utc date string", endTime: "utc date string"};
+  // we have to store it in completedTimeInMillisecondsRef.current
+  // so that it is not lost between renders
+  // also, i don't want the change of completed time to cause re-renders
+  completedTimeInMillisecondsRef.current = workedTimeSpans.reduce(
+    (completedTime, timeSpan) => {
+      // timeSpan is an object like {startTime: "utc date string", endTime: "utc date string"};
 
-        // converts utc date string to the date object
-        const startTime = new Date(timeSpan.startTime);
+      // converts utc date string to the date object
+      const startTime = new Date(timeSpan.startTime);
 
-        // converts utc date string to the date object
-        const endTime = new Date(timeSpan.endTime);
+      // lastWorkedTimeSpan.endTime can be undefined
+      // if undefined then that means the timeSpan is in not yet ended
+      // timeSpan is in progress, 
+      // so we don't calculate further instead return completedTime that has been calculated
+      if (!timeSpan.endTime) return completedTime;
 
-        // get the time difference between startTime and endTime in milliseconds
-        // for every timeSpan we are getting time difference and adding it to the completedTime
-        // finally we get one returned value by the reduce method
-        const timeDifference = differenceInMilliseconds(endTime, startTime);
+      // converts utc date string to the date object
+      const endTime = new Date(timeSpan.endTime);
 
-        // add timeDifference to completedTime
-        // initial completedTime is 0
-        return completedTime + timeDifference;
-      },
-      0
-    );
-  }
+      // get the time difference between startTime and endTime in milliseconds
+      // for every timeSpan we are getting time difference and adding it to the completedTime
+      // finally we get one returned value by the reduce method
+      const timeDifference = differenceInMilliseconds(endTime, startTime);
 
-  console.log(completedTimeInMilliseconds);
+      // add timeDifference to completedTime
+      // initial completedTime is 0
+      return completedTime + timeDifference;
+    },
+    0
+  );
+
+  console.log("before start", completedTimeInMillisecondsRef.current);
 
   React.useEffect(() => {
     // register the listener of the "workedTimeSpan:continue" event
@@ -63,9 +68,9 @@ const Task = ({
         startTime
       );
 
-      // update the completedTimeInMilliseconds
-      completedTimeInMilliseconds + timeDifference;
-      console.log(completedTimeInMilliseconds);
+      // update the completedTimeInMillisecondsRef.current
+      completedTimeInMillisecondsRef.current += timeDifference;
+      console.log("after start", timeDifference);
     }
 
     let interval;
@@ -100,7 +105,7 @@ const Task = ({
       // clear the timer
       clearInterval(interval);
     };
-  }, [activeTaskId, _id, completedTimeInMilliseconds, lastWorkedTimeSpan]);
+  }, [_id, activeTaskId, lastWorkedTimeSpan]);
 
   // format workedTimeSpan start time and end time
   function formatSpanTime(time) {
