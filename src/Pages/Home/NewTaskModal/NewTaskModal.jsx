@@ -2,7 +2,7 @@ import styles from "./NewTaskModal.module.css";
 import globalStyles from "../../../styles/global.module.css";
 import Button from "../../Shared/Button/Button";
 import React from "react";
-import { endOfToday, intervalToDuration } from "date-fns";
+import { endOfToday, hoursToMilliseconds, intervalToDuration, minutesToMilliseconds } from "date-fns";
 import { socket } from "../../../socket";
 
 const NewTaskModal = ({
@@ -117,13 +117,17 @@ const NewTaskModal = ({
     level_3_durations.length
   );
 
+  // convertToMilliseconds takses duration object {hours: 2, minutes: 30}
+  // and converts it to the number of milliseconds before sending to backend to save to db
+  const convertToMilliseconds = (duration) =>
+    hoursToMilliseconds(duration.hours) + minutesToMilliseconds(duration.minutes);
+
   // create new task
   const createNewTask = (e) => {
     e.preventDefault();
 
     // get duration's index
     const { level_1, level_2, level_3 } = levels;
-
 
     // so, if any of the array is empty we will not create new task
     // as, multiple levels can be undefined when finding duration with index
@@ -133,10 +137,12 @@ const NewTaskModal = ({
         name: newTaskName,
         workedTimeSpans: [],
         levels: {
-          // getting values from arrays by the levels' indexes
-          level_1: level_1_durations[level_1], // ex: {hours: 1, minutes: 30}
-          level_2: level_2_durations[level_2],
-          level_3: level_3_durations[level_3],
+          // getting durations from arrays by the levels' indexes
+          // and sending ex: {hours: 1, minutes: 30} duration to the
+          // convertToMinutes function to get the number of minutes
+          level_1: convertToMilliseconds(level_1_durations[level_1]),
+          level_2: convertToMilliseconds(level_2_durations[level_2]),
+          level_3: convertToMilliseconds(level_3_durations[level_3]),
         },
       };
 
@@ -259,7 +265,11 @@ const NewTaskModal = ({
 
             <div className={styles.field}>
               {/* disable the button if any durations array is empty */}
-              <Button type="submit" className="btnHeightWidth100" disabled={durationsArrayEmpty}>
+              <Button
+                type="submit"
+                className="btnHeightWidth100"
+                disabled={durationsArrayEmpty}
+              >
                 Create
               </Button>
             </div>

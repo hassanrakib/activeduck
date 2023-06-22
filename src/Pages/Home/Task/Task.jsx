@@ -7,21 +7,109 @@ import styles from "./Task.module.css";
 import zzz from "../../../assets/zzz.gif";
 import Progress from "../Progress/Progress";
 import { socket } from "../../../socket";
-import { format } from "date-fns";
+import { differenceInMilliseconds, format } from "date-fns";
 
 const Task = ({
   task: { _id, name, workedTimeSpans },
   activeTaskId,
   setActiveTaskIdFn,
 }) => {
+  // last workedTimeSpan object
+  const lastWorkedTimeSpan = workedTimeSpans[workedTimeSpans.length - 1];
+  console.log(lastWorkedTimeSpan);
+
+  // calculate the completed time in milliseconds from workedTimeSpans array
+  let completedTimeInMilliseconds;
+  // lastWorkedTimeSpan.endTime can be undefined
+  // if undefined then that means the timeSpan is in not yet ended
+  // timeSpan is in progress, so we don't calculate then
+  // when the endTime exists of the last workedTimeSpan object in workedTimeSpans array
+  if (lastWorkedTimeSpan.endTime) {
+    completedTimeInMilliseconds = workedTimeSpans.reduce(
+      (completedTime, timeSpan) => {
+        // timeSpan is an object like {startTime: "utc date string", endTime: "utc date string"};
+
+        // converts utc date string to the date object
+        const startTime = new Date(timeSpan.startTime);
+
+        // converts utc date string to the date object
+        const endTime = new Date(timeSpan.endTime);
+
+        // get the time difference between startTime and endTime in milliseconds
+        // for every timeSpan we are getting time difference and adding it to the completedTime
+        // finally we get one returned value by the reduce method
+        const timeDifference = differenceInMilliseconds(endTime, startTime);
+
+        // add timeDifference to completedTime
+        // initial completedTime is 0
+        return completedTime + timeDifference;
+      },
+      0
+    );
+  }
+
+  console.log(completedTimeInMilliseconds);
+
+  React.useEffect(() => {
+    // register the listener of the "workedTimeSpan:continue" event
+    function onWorkedTimeSpanContinue(endTime) {
+      // calculate the last workedTimeSpan object's time difference between startTime and endTime
+      // though endTime is not yet added to the object as it is in progress
+      // we get the endTime by listening to the "workedTimeSpan:continue" event
+      const startTime = new Date(lastWorkedTimeSpan.startTime);
+      const inProgressEndTime = new Date(endTime);
+      const timeDifference = differenceInMilliseconds(
+        inProgressEndTime,
+        startTime
+      );
+
+      // update the completedTimeInMilliseconds
+      completedTimeInMilliseconds + timeDifference;
+      console.log(completedTimeInMilliseconds);
+    }
+
+    let interval;
+    // if activeTaskId is the _id of a task
+    if (activeTaskId === _id) {
+      interval = setInterval(() => {
+        // ping the server every one second
+        // so that, server sends back the end time
+        socket.emit("workedTimeSpan:continue");
+      }, 1000);
+
+      // "workedTimeSpan:continue"
+      socket.on("workedTimeSpan:continue", onWorkedTimeSpanContinue);
+    }
+
+    // when active task id not equal to a task's _id
+    if (!(activeTaskId === _id)) {
+      return () => {
+        // cleanup the listener
+        socket.off("workedTimeSpan:continue", onWorkedTimeSpanContinue);
+
+        // clear the timer
+        clearInterval(interval);
+      };
+    }
+
+    // cleanup before unmounts
+    return () => {
+      // cleanup the listener
+      socket.off("workedTimeSpan:continue", onWorkedTimeSpanContinue);
+
+      // clear the timer
+      clearInterval(interval);
+    };
+  }, [activeTaskId, _id, completedTimeInMilliseconds, lastWorkedTimeSpan]);
+
   // format workedTimeSpan start time and end time
   function formatSpanTime(time) {
     // start time and end time stored in utc time in db
     // so we have to first convert the utc time to local time using new Date()
     // if time is truthy, because endTime can be undefined
     if (time) {
-      // get the utc time converted to local time
-      const localTime = new Date(`${time}`);
+      // get the utc time string converted to local time
+      const localTime = new Date(time);
       // then format to "12:00 AM"
       return format(localTime, "p");
     }
@@ -29,27 +117,6 @@ const Task = ({
     // if endTime is undefined
     return "";
   }
-
-  React.useEffect(() => {
-    let interval;
-    // if activeTaskId is the _id of a task
-    if (activeTaskId === _id) {
-      interval = setInterval(() => {
-        // ping the server every one second
-        // so that, server sends back the updated time
-        socket.emit("workedTimeSpan:continue");
-      }, 1000);
-    }
-
-    // when active task id not equal to a task's _id
-    if (!(activeTaskId === _id)) {
-      // clear the timer
-      return () => clearInterval(interval);
-    }
-
-    // cleanup before unmounts
-    return () => clearInterval(interval);
-  }, [activeTaskId, _id]);
 
   return (
     <li className={styles.taskItem}>
