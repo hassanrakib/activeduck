@@ -3,7 +3,6 @@ import globalStyles from "../../../styles/global.module.css";
 import Button from "../../Shared/Button/Button";
 import React from "react";
 import { endOfToday, intervalToDuration } from "date-fns";
-import useAuth from "../../../hooks/useAuth";
 import { socket } from "../../../socket";
 
 const NewTaskModal = ({
@@ -26,8 +25,6 @@ const NewTaskModal = ({
       end: endOfToday(),
     })
   );
-  // get the user from the context
-  const { user } = useAuth();
 
   // modalContentRef.current has the modalContent dom element
   const modalContentRef = React.useRef(null);
@@ -132,7 +129,7 @@ const NewTaskModal = ({
     // as, multiple levels can be undefined when finding duration with index
     if (!durationsArrayEmpty) {
       const newTask = {
-        doer: user?.username,
+        // add date and doer(username of the user) in the server side
         name: newTaskName,
         workedTimeSpans: [],
         levels: {

@@ -9,7 +9,7 @@ const UserIntro = () => {
       <Avatar image={userImage} className="borderBlueViolet" />
       {/* user name and worked time*/}
       <p className={styles.userName}>
-        <b>Ellen DeGeneres</b> worked for <GiSandsOfTime color="blueviolet" />{" "}
+        <b>@elen_de</b> worked for <GiSandsOfTime color="blueviolet" />{" "}
         <span className={styles.totalTime}>8hours 30minutes</span>
       </p>
     </div>

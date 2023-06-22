@@ -2,7 +2,7 @@ import React from "react";
 import Task from "../Task/Task";
 import styles from "./TaskList.module.css";
 import { socket } from "../../../socket";
-import useAuth from "../../../hooks/useAuth";
+
 // fake data later use real data
 const tasks = [
   {
@@ -47,9 +47,6 @@ const TaskList = () => {
   // tasks and setTasks
   const [tasks, setTasks] = React.useState([]);
 
-  // get user
-  const { user } = useAuth();
-
   // know the task id that is currently active
   const [activeTaskId, setActiveTaskId] = React.useState("");
 
@@ -62,7 +59,7 @@ const TaskList = () => {
     // if exists then remove the task id from the activeTaskId
     if (activeTaskId === _id) {
       // before removing _id from activeTaskId
-      // register the end time of a task's workedTimeSpan obj in workedTimeSpans array
+      // register the end time of a task's last workedTimeSpan obj in workedTimeSpans array
       socket.emit("workedTimeSpan:end", _id, lastTimeSpanIndex, (response) => {
         console.log(response);
         // if successful in saving the endTime
@@ -72,7 +69,8 @@ const TaskList = () => {
 
       // or set the task id to the activeTaskId
     } else {
-      // register the start time of a task's workedTimeSpan into db
+      // push workedTimeSpan obj in workedTimeSpans array 
+      // with startTime property set to the current time
       // before setting it as active task
       socket
         .timeout(5000)
@@ -91,15 +89,35 @@ const TaskList = () => {
   };
 
   React.useEffect(() => {
-    // get the tasks of an user for today
-    socket.emit("tasks:read", { doer: user?.username });
+    // "tasks:read" event listener
+    function onTasksReadEvent(tasks) {
+      setTasks(tasks);
+    }
+
+    // "tasks:change" event listener emits the "tasks:read" event
+    function onTasksChangeEvent() {
+      // send event to get the tasks of an user for today
+      // used query { doer: username, date: { $gte: startOfToday() } } in the backend
+      socket.emit("tasks:read");
+    }
+
+    // send event to get the tasks of an user for today
+    // used query { doer: username, date: { $gte: startOfToday() } } in the backend
+    socket.emit("tasks:read");
 
     // get the tasks from BE
-    socket.on("tasks:read", (tasks) => {
-      // set the tasks to the tasks state
-      setTasks(tasks);
-    });
-  }, [user]);
+    socket.on("tasks:read", onTasksReadEvent);
+
+    // get the tasks whenever change happens to tasks collection
+    // such as if someone creates a task
+    socket.on("tasks:change", onTasksChangeEvent);
+
+    // cleanup event listeners
+    return () => {
+      socket.off("tasks:read", onTasksReadEvent);
+      socket.off("tasks:change", onTasksChangeEvent);
+    };
+  }, []);
 
   return (
     <ul className={styles.taskList}>
