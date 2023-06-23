@@ -1,5 +1,6 @@
 import styles from "./Progress.module.css";
-const Progress = ({activeTaskId, _id}) => {
+const Progress = ({ isTaskActive, completedTimeInMilliseconds }) => {
+  
   return (
     <div className={styles.progressContainer}>
       {/* move the tooltip as progress value increases by changing width */}
@@ -10,7 +11,7 @@ const Progress = ({activeTaskId, _id}) => {
         </span>
       </div>
       <progress
-        className={activeTaskId === _id ? `${styles.animate}` : ""}
+        className={isTaskActive ? `${styles.animate}` : ""}
         max="100"
         value="20"
       ></progress>

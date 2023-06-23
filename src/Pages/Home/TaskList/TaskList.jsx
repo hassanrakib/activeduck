@@ -44,61 +44,25 @@ const tasks = [
 ];
 
 const TaskList = () => {
-  // tasks and setTasks
-  const [tasks, setTasks] = React.useState([]);
-
-  // know the task id that is currently active
-  const [activeTaskId, setActiveTaskId] = React.useState("");
-
-  // function that sets activeTaskId state
-  // passed this function to the Task component where we call the function
-  // and send task's _id and workedTimeSpans array's last element's index
-  const setActiveTaskIdFn = (_id, lastTimeSpanIndex) => {
-    // if we want to set a task id to the activeTaskId
-    // check that it exists in the activeTaskId
-    // if exists then remove the task id from the activeTaskId
-    if (activeTaskId === _id) {
-      // before removing _id from activeTaskId
-      // register the end time of a task's last workedTimeSpan obj in workedTimeSpans array
-      socket.emit("workedTimeSpan:end", _id, lastTimeSpanIndex, (response) => {
-        console.log(response);
-        // if successful in saving the endTime
-        // clear the activeTaskId
-        setActiveTaskId("");
-      });
-
-      // or set the task id to the activeTaskId
-    } else {
-      // push workedTimeSpan obj in workedTimeSpans array 
-      // with startTime property set to the current time
-      // before setting it as active task
-      socket
-        .timeout(5000)
-        .emit("workedTimeSpan:start", _id, (err, response) => {
-          if (err) {
-            console.log(err);
-          }
-          if (response) {
-            console.log(response);
-            // if response comes that successful insertion of startTime
-            // then set activeTaskId
-            setActiveTaskId(_id);
-          }
-        });
-    }
-  };
+  // tasksInfo contains the tasks and activeTaskId
+  const [tasksInfo, setTasksInfo] = React.useState({
+    tasks: [],
+    activeTaskId: "",
+  });
 
   React.useEffect(() => {
-    // "tasks:read" event listener
-    function onTasksReadEvent(tasks) {
-      setTasks(tasks);
+    // "tasks:read" event listener recieves the tasks and activeTaskId
+    function onTasksReadEvent({ tasks, activeTaskId }) {
+      setTasksInfo({ tasks, activeTaskId });
     }
 
-    // "tasks:change" event listener emits the "tasks:read" event
-    function onTasksChangeEvent() {
+    // "tasks:change" event listener recieves the active task id
+    // that we sent to BE during "workedTimeSpan:start" event in the Task component
+    // this listener emits the "tasks:read" event and send the activeTaskId
+    function onTasksChangeEvent(activeTaskId) {
       // send event to get the tasks of an user for today
       // used query { doer: username, date: { $gte: startOfToday() } } in the backend
-      socket.emit("tasks:read");
+      socket.emit("tasks:read", activeTaskId);
     }
 
     // send event to get the tasks of an user for today
@@ -108,8 +72,7 @@ const TaskList = () => {
     // get the tasks from BE
     socket.on("tasks:read", onTasksReadEvent);
 
-    // get the tasks whenever change happens to tasks collection
-    // such as if someone creates a task
+    // get the tasks again whenever a task is modified by modifying workedTimeSpans array
     socket.on("tasks:change", onTasksChangeEvent);
 
     // cleanup event listeners
@@ -119,14 +82,29 @@ const TaskList = () => {
     };
   }, []);
 
+  React.useEffect(() => {
+    // it emits "tasks:read" event with the stored activeTaskId of the state
+    // because in the time of creating a new task, another task might be active 
+    const onTasksChangeByCreateEvent = () => {
+      socket.emit("tasks:read", tasksInfo.activeTaskId);
+    };
+
+    // "tasks:change-by-create" event is fired from server when new task is created
+    // by listening "tasks:create" event
+    socket.on("tasks:change-by-create", onTasksChangeByCreateEvent);
+
+    return () => {
+      socket.off("tasks:change-by-create", onTasksChangeByCreateEvent);
+    };
+  }, [tasksInfo.activeTaskId]);
+
   return (
     <ul className={styles.taskList}>
-      {tasks?.map((task) => (
+      {tasksInfo.tasks?.map((task) => (
         <Task
           key={task._id}
           task={task}
-          activeTaskId={activeTaskId}
-          setActiveTaskIdFn={setActiveTaskIdFn}
+          activeTaskId={tasksInfo.activeTaskId}
         />
       ))}
     </ul>

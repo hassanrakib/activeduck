@@ -9,51 +9,115 @@ import Progress from "../Progress/Progress";
 import { socket } from "../../../socket";
 import { differenceInMilliseconds, format } from "date-fns";
 
-const Task = ({
-  task: { _id, name, workedTimeSpans },
-  activeTaskId,
-  setActiveTaskIdFn,
-}) => {
+const Task = ({ task, activeTaskId }) => {
+
+  console.log("render");
+
+  // destructuring
+  const { _id, name, workedTimeSpans } = task;
+
   // completedTimeInMillisecondsRef is the object, in its current property
   // we will store the calculated completed time in milliseconds from workedTimeSpans array
   const completedTimeInMillisecondsRef = React.useRef(0);
 
-  // last workedTimeSpan object
-  const lastWorkedTimeSpan = workedTimeSpans[workedTimeSpans.length - 1];
+  // last time span object's index in workedTimeSpans array of the task 
+  const lastTimeSpanIndex = workedTimeSpans.length - 1;
+
+  //  if the current activeTaskId equals to this task's _id, that means the task is active
+  const isTaskActive = _id === activeTaskId;
+
+  // function that registers startTime and endTime property to a workedTimeSpan in workedTimeSpans array
+  // used this function as onClick handler of the play pause icon container
+  // and send task's _id and workedTimeSpans array's last element's index
+  const addWorkedTimeSpan = (_id, lastTimeSpanIndex) => {
+    // if the task is active
+    // we need to set the endTime property to the last time span object in workedTimeSpans array
+    if (isTaskActive) {
+      // register the end time to a task's last workedTimeSpan obj in workedTimeSpans array
+      return socket.emit(
+        "workedTimeSpan:end",
+        _id,
+        lastTimeSpanIndex,
+        (response) => {
+          console.log(response);
+          // if successful in saving the endTime
+          // "tasks:change" event is emitted from BE, that is listened by the TaskList component
+          // then the TaskList component emits "tasks:read" event to listen "tasks:read" event emitted by BE
+          // then by listening "tasks:read", TaskList component sets tasks state
+          // so re-render happens to this task as well
+          // and we clear activeTaskId to empty string in this process
+        }
+      );
+    }
+
+    // first check that any other task is active or not
+    // if not active activeTaskId is empty string
+    // so we can activate the task
+    if (!activeTaskId) {
+      // push workedTimeSpan obj in workedTimeSpans array
+      // with startTime property set to the current time
+      // no endTime property
+
+      // here we send _id to the "workedTimeSpan:start" listener in the backend
+      // "workedTimeSpan:start" listener recieves and send _id as activeTaskId 
+      // with "tasks:change" event to the client side
+      // "tasks:change" is listened in the TaskList component that finally does re-render of the
+      // tasks and we get activeTaskId
+      socket
+        .timeout(5000)
+        .emit("workedTimeSpan:start", _id, (err, response) => {
+          if (err) {
+            console.log(err);
+          }
+          if (response) {
+            console.log(response);
+          }
+        });
+    }
+  };
+
+  // get time difference in milliseconds between two date objects
+  const getTimeDifferenceInMilliseconds = (
+    startTimeInString,
+    endTimeInString
+  ) => {
+    // converts utc date strings to the date objects
+    const startTime = new Date(startTimeInString);
+    const endTime = new Date(endTimeInString);
+
+    // get the time difference between startTime and endTime in milliseconds
+    return differenceInMilliseconds(endTime, startTime);
+  };
+
+  //*** if the task not active ***//
 
   // calculate the completed time in milliseconds from workedTimeSpans array
   // we have to store it in completedTimeInMillisecondsRef.current
   // so that it is not lost between renders
   // also, i don't want the change of completed time to cause re-renders
-  completedTimeInMillisecondsRef.current = workedTimeSpans.reduce(
-    (completedTime, timeSpan) => {
-      // timeSpan is an object like {startTime: "utc date string", endTime: "utc date string"};
 
-      // converts utc date string to the date object
-      const startTime = new Date(timeSpan.startTime);
+  // lastWorkedTimeSpan.endTime can be undefined
+  // if undefined then that means the task is active
+  // so, when the task is not active or endTime property not undefined then we calculate
+  // the completed time in milliseconds
+  if (!isTaskActive) {
+    completedTimeInMillisecondsRef.current = workedTimeSpans.reduce(
+      (completedTime, timeSpan) => {
+        // get the time difference between startTime and endTime in milliseconds
+        // for every timeSpan we are getting time difference and adding it to the completedTime
+        // finally we get one returned value by the reduce method
+        const timeDifference = getTimeDifferenceInMilliseconds(
+          timeSpan.startTime,
+          timeSpan.endTime
+        );
 
-      // lastWorkedTimeSpan.endTime can be undefined
-      // if undefined then that means the timeSpan is in not yet ended
-      // timeSpan is in progress, 
-      // so we don't calculate further instead return completedTime that has been calculated
-      if (!timeSpan.endTime) return completedTime;
-
-      // converts utc date string to the date object
-      const endTime = new Date(timeSpan.endTime);
-
-      // get the time difference between startTime and endTime in milliseconds
-      // for every timeSpan we are getting time difference and adding it to the completedTime
-      // finally we get one returned value by the reduce method
-      const timeDifference = differenceInMilliseconds(endTime, startTime);
-
-      // add timeDifference to completedTime
-      // initial completedTime is 0
-      return completedTime + timeDifference;
-    },
-    0
-  );
-
-  console.log("before start", completedTimeInMillisecondsRef.current);
+        // add timeDifference to completedTime
+        // initial completedTime is 0
+        return completedTime + timeDifference;
+      },
+      0
+    );
+  }
 
   React.useEffect(() => {
     // register the listener of the "workedTimeSpan:continue" event
@@ -61,33 +125,30 @@ const Task = ({
       // calculate the last workedTimeSpan object's time difference between startTime and endTime
       // though endTime is not yet added to the object as it is in progress
       // we get the endTime by listening to the "workedTimeSpan:continue" event
-      const startTime = new Date(lastWorkedTimeSpan.startTime);
-      const inProgressEndTime = new Date(endTime);
-      const timeDifference = differenceInMilliseconds(
-        inProgressEndTime,
-        startTime
+      const timeDifference = getTimeDifferenceInMilliseconds(
+        workedTimeSpans[lastTimeSpanIndex].startTime,
+        endTime
       );
 
       // update the completedTimeInMillisecondsRef.current
       completedTimeInMillisecondsRef.current += timeDifference;
-      console.log("after start", timeDifference);
     }
 
     let interval;
-    // if activeTaskId is the _id of a task
-    if (activeTaskId === _id) {
+    // if the task is active
+    if (isTaskActive) {
       interval = setInterval(() => {
         // ping the server every one second
         // so that, server sends back the end time
         socket.emit("workedTimeSpan:continue");
       }, 1000);
 
-      // "workedTimeSpan:continue"
+      // "workedTimeSpan:continue" for getting end time
       socket.on("workedTimeSpan:continue", onWorkedTimeSpanContinue);
     }
 
-    // when active task id not equal to a task's _id
-    if (!(activeTaskId === _id)) {
+    // when the task is not active
+    if (!isTaskActive) {
       return () => {
         // cleanup the listener
         socket.off("workedTimeSpan:continue", onWorkedTimeSpanContinue);
@@ -105,7 +166,7 @@ const Task = ({
       // clear the timer
       clearInterval(interval);
     };
-  }, [_id, activeTaskId, lastWorkedTimeSpan]);
+  }, [isTaskActive, lastTimeSpanIndex, workedTimeSpans]);
 
   // format workedTimeSpan start time and end time
   function formatSpanTime(time) {
@@ -129,18 +190,18 @@ const Task = ({
       <div className={styles.iconWrapper}>
         <div
           className={styles.iconContainer}
-          // set activeTaskId state
-          // and send _id of the task also the last element's index in the workedTimeSpans array
-          onClick={() => setActiveTaskIdFn(_id, workedTimeSpans.length - 1)}
+          // add workedTimeSpan to workedTimeSpans array
+          // and send _id of the task also the last element's index
+          onClick={() => addWorkedTimeSpan(_id, lastTimeSpanIndex)}
         >
-          {/* when the task is active, spin the border */}
+          {/* when the task is active, means lastWorkedTimeSpan doesn't have endTime => spin the border */}
           {/* it is covering the icon container and have a dashed border*/}
           <div
             className={`${styles.iconBorder}${
-              activeTaskId === _id ? ` ${styles.spin}` : ""
+              isTaskActive ? ` ${styles.spin}` : ""
             }`}
           ></div>
-          {activeTaskId === _id ? (
+          {isTaskActive ? (
             <FiPauseCircle
               size="1.5em"
               color="blueviolet"
@@ -183,7 +244,10 @@ const Task = ({
             )}
           </div>
           {/* progress bar */}
-          <Progress activeTaskId={activeTaskId} _id={_id} />
+          <Progress
+            isTaskActive={isTaskActive}
+            completedTimeInMilliseconds={completedTimeInMillisecondsRef.current}
+          />
         </div>
       </div>
     </li>
