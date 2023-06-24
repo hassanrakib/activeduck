@@ -1,7 +1,7 @@
 import { millisecondsToHours, millisecondsToMinutes } from "date-fns";
 import styles from "./Progress.module.css";
-const Progress = ({ isTaskActive, completedTimeInMilliseconds, levels }) => {
-  const { level_1, level_2, level_3 } = levels;
+import withTaskProgressCalculation from "../../../HOC/withTaskProgressCalculation";
+const Progress = ({ completedTimeInMilliseconds, isTaskActive }) => {
 
   // converts the time in milliseconds to {hours: 3, minutes: 30} type object
   const converToDurationObject = (timeInMilliseconds) => {
@@ -37,4 +37,4 @@ const Progress = ({ isTaskActive, completedTimeInMilliseconds, levels }) => {
   );
 };
 
-export default Progress;
+export default withTaskProgressCalculation(Progress);
