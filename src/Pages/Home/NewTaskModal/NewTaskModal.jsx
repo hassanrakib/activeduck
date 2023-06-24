@@ -139,7 +139,7 @@ const NewTaskModal = ({
         levels: {
           // getting durations from arrays by the levels' indexes
           // and sending ex: {hours: 1, minutes: 30} duration to the
-          // convertToMinutes function to get the number of minutes
+          // convertToMilliseconds function to get the number of milliseconds
           level_1: convertToMilliseconds(level_1_durations[level_1]),
           level_2: convertToMilliseconds(level_2_durations[level_2]),
           level_3: convertToMilliseconds(level_3_durations[level_3]),
