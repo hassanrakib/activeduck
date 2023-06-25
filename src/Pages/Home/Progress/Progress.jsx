@@ -37,4 +37,5 @@ const Progress = ({ completedTimeInMilliseconds, isTaskActive }) => {
   );
 };
 
-export default withTaskProgressCalculation(Progress);
+const EnhancedProgress = withTaskProgressCalculation(Progress);
+export default EnhancedProgress;
