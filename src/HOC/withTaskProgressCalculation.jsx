@@ -129,11 +129,14 @@ const withTaskProgressCalculation = (WrappedComponent) => {
 
       // it sets current level
       const setCurrentLevelFn = (completedTime) => {
+        // first check completedTime is greater than level_2
+        // if greater, then setCurrentLevel
+        if (completedTime > level_2) {
+          return setCurrentLevel("Level - 3");
+        }
+        // if completedTime not greater than level_2, it might become greater than level_1
         if (completedTime > level_1) {
           setCurrentLevel("Level - 2");
-        }
-        if (completedTime > level_2) {
-          setCurrentLevel("Level - 3");
         }
       };
       // if the task is active, completedTime = completedTimeInMilliseconds
