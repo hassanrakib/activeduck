@@ -17,10 +17,6 @@ const withTaskProgressCalculation = (WrappedComponent) => {
 
     const completedTimeBeforeTaskActiveRef = React.useRef(0);
 
-    // state that holds total completed time when the task is active
-    const [completedTimeInMilliseconds, setCompletedTimeInMilliseconds] =
-      React.useState(completedTimeBeforeTaskActiveRef.current);
-
     // get time difference in milliseconds between two date objects
     const getTimeDifferenceInMilliseconds = (
       startTimeInString,
@@ -65,6 +61,12 @@ const withTaskProgressCalculation = (WrappedComponent) => {
       // store the initial time before the task is active
       completedTimeBeforeTaskActiveRef.current = completedTimeBeforeTaskActive;
     }
+
+    // state that holds total completed time when the task is active
+    // this state has to be in this position as we rely on the completedTimeBeforeTaskActiveRef.current
+    // value that is calculated above and we use it as initial value for the state
+    const [completedTimeInMilliseconds, setCompletedTimeInMilliseconds] =
+      React.useState(completedTimeBeforeTaskActiveRef.current);
 
     React.useEffect(() => {
       // register the listener of the "workedTimeSpan:continue" event
@@ -121,13 +123,7 @@ const withTaskProgressCalculation = (WrappedComponent) => {
     // return the wrapped component with necessary props that has been calculated here
     return (
       <WrappedComponent
-        completedTimeInMilliseconds={
-          // if the task is active get the completed time from the state
-          // if the task is not active get the completed time from the ref object
-          isTaskActive
-            ? completedTimeInMilliseconds
-            : completedTimeBeforeTaskActiveRef.current
-        }
+        completedTimeInMilliseconds={completedTimeInMilliseconds}
         {...props}
       />
     );
