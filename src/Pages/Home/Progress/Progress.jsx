@@ -20,7 +20,16 @@ const Progress = ({
       minutes: millisecondsToMinutes(timeInMilliseconds % (1000 * 60 * 60)),
     };
     
-    return formatDuration(duration);
+    const humanReadableTime = formatDuration(duration);
+
+    // if timeInMilliseconds parameter is assigned a value of zero 
+    // humanReadableTime will be empty string. so, instead return "0 minute"
+    // timeInMilliseconds will be zero if completedTimeInMilliseconds is zero
+    // completedTimeInMilliseconds will be zero if no element in workedTimeSpans array of the task
+    // or an element exists with startTime property but has not completed 1 minute
+    if(!humanReadableTime) return "0 minute";
+
+    return humanReadableTime;
   };
 
   // convert the completedTimeInMilliseconds to a human readable string that we show in the ui
