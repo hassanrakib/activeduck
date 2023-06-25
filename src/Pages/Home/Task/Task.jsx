@@ -7,6 +7,7 @@ import zzz from "../../../assets/zzz.gif";
 import Progress from "../Progress/Progress";
 import { socket } from "../../../socket";
 import { format } from "date-fns";
+import Level from "../Level/Level";
 
 //** socket disconnection handling is important otherwise endTime property will not be added **//
 const Task = ({ task, activeTaskId }) => {
@@ -69,7 +70,6 @@ const Task = ({ task, activeTaskId }) => {
     }
   };
 
-  
   // format workedTimeSpan start time and end time
   function formatSpanTime(time) {
     // start time and end time stored in utc time in db
@@ -120,9 +120,11 @@ const Task = ({ task, activeTaskId }) => {
       </div>
       <div className={styles.task}>
         {/* current level */}
-        <div className={styles.currentLevel}>
-          <span>Level - 1</span>
-        </div>
+        <Level
+          isTaskActive={isTaskActive}
+          workedTimeSpans={workedTimeSpans}
+          levels={levels}
+        />
         <div className={styles.taskDetailsWrapper}>
           <div className={styles.taskDetails}>
             <div className={styles.taskNameAndSettings}>
