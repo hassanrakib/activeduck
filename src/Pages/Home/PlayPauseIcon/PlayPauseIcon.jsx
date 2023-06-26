@@ -2,6 +2,7 @@ import { FiPlayCircle } from "react-icons/fi";
 import { FiPauseCircle } from "react-icons/fi";
 import { socket } from "../../../socket";
 import styles from "./PlayPauseIcon.module.css";
+import withTaskProgressCalculation from "../../../HOC/withTaskProgressCalculation";
 
 const PlayPauseIcon = ({
   isTaskActive,
@@ -11,6 +12,7 @@ const PlayPauseIcon = ({
   completedTimeInMilliseconds,
   levels,
 }) => {
+
   // destructure
   const { level_3 } = levels;
 
@@ -43,10 +45,10 @@ const PlayPauseIcon = ({
 
     // first check that any other task is active or not
     // if not active, activeTaskId is empty string
-    // then check that completedTimeInMilliseconds is not equal to level_3
+    // then check that completedTimeInMilliseconds is not greather than or equal to level_3
     // if not equal to level_3, that means the task will take more time to complete
     // so we can activate the task
-    if (!activeTaskId && completedTimeInMilliseconds !== level_3) {
+    if (!activeTaskId && !(completedTimeInMilliseconds >= level_3)) {
       // push workedTimeSpan obj in workedTimeSpans array
       // with startTime property set to the current time
       // no endTime property
@@ -69,12 +71,12 @@ const PlayPauseIcon = ({
     }
   };
 
-  // whenever completedTimeInMilliseconds is equal to level_3 (last target time completed)
+  // whenever completedTimeInMilliseconds become greater than or equal to level_3 (last target time completed)
   // we call the addWorkedTimeSpan function
   // it checks that the task is active
   // then, registers the endTime property to the last workedTimeSpan object
   // and makes the task inactive
-  if (completedTimeInMilliseconds === level_3) {
+  if (completedTimeInMilliseconds >= level_3) {
     addWorkedTimeSpan(_id, lastTimeSpanIndex);
   }
 
@@ -107,4 +109,6 @@ const PlayPauseIcon = ({
   );
 };
 
-export default PlayPauseIcon;
+const EnhancedPlayPauseIcon = withTaskProgressCalculation(PlayPauseIcon);
+
+export default EnhancedPlayPauseIcon;
