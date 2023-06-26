@@ -8,8 +8,6 @@ const Progress = ({
   currentLevel,
 }) => {
 
-  console.log("render");
-
   // destructure to get every level
   const { level_1, level_2, level_3 } = levels;
 
