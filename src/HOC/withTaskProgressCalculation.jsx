@@ -5,7 +5,11 @@ import { socket } from "../socket";
 const withTaskProgressCalculation = (WrappedComponent) => {
   return function ContainerComponent(props) {
     // destructure
-    const { isTaskActive, workedTimeSpans, levels } = props;
+    const { activeTaskId, isTaskActive, workedTimeSpans, levels } = props;
+
+    // when the task is active, "workedTimeSpan:continue" event listener
+    // recieves the endTime and updates the ref.current
+    const activeTaskEndTimeRef = React.useRef();
 
     // state that holds total completed time when the task is active
     const [completedTimeInMilliseconds, setCompletedTimeInMilliseconds] =
@@ -74,6 +78,11 @@ const withTaskProgressCalculation = (WrappedComponent) => {
     React.useEffect(() => {
       // register the listener of the "workedTimeSpan:continue" event
       function onWorkedTimeSpanContinue(endTime) {
+        // update the activeTaskEndTimeRef.current, so that when the socket gets disconnected
+        // we can store the endTime in localStorage to update endTime of the task after socket
+        // again reconnects
+        activeTaskEndTimeRef.current = endTime;
+
         // calculate the last workedTimeSpan object's time difference between startTime and endTime
         // though endTime is not yet added to the object as it is in progress
         // we get the endTime by listening to the "workedTimeSpan:continue" event
@@ -100,6 +109,22 @@ const withTaskProgressCalculation = (WrappedComponent) => {
 
         // "workedTimeSpan:continue" for getting end time
         socket.on("workedTimeSpan:continue", onWorkedTimeSpanContinue);
+
+        // when socket gets disconnected
+        socket.on("disconnect", (err) => {
+          console.log(err);
+          // if client can't communicate with the server we get err
+          // save the endTime to localStorage that we updated in activeTaskEndTimeRef.current
+          // when the socket had connection to the server and we listened to "workedTimeSpan:continue"
+          localStorage.setItem(
+            "endTime",
+            JSON.stringify({
+              _id: activeTaskId,
+              endTime: activeTaskEndTimeRef.current,
+            })
+          );
+          // disable the progress and play pause icon
+        });
       }
 
       // when the task is not active
@@ -107,6 +132,7 @@ const withTaskProgressCalculation = (WrappedComponent) => {
         return () => {
           // cleanup the listener
           socket.off("workedTimeSpan:continue", onWorkedTimeSpanContinue);
+          socket.off("disconnect");
 
           // clear the timer
           clearInterval(interval);
@@ -117,11 +143,12 @@ const withTaskProgressCalculation = (WrappedComponent) => {
       return () => {
         // cleanup the listener
         socket.off("workedTimeSpan:continue", onWorkedTimeSpanContinue);
+        socket.off("disconnect");
 
         // clear the timer
         clearInterval(interval);
       };
-    }, [isTaskActive, workedTimeSpans]);
+    }, [isTaskActive, workedTimeSpans, activeTaskId]);
 
     // determine the current level
     React.useEffect(() => {
