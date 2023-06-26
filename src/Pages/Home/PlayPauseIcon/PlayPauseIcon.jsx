@@ -9,8 +9,11 @@ const PlayPauseIcon = ({
   _id,
   activeTaskId,
   completedTimeInMilliseconds,
-  currentLevel,
+  levels,
 }) => {
+  // destructure
+  const { level_3 } = levels;
+
   // last time span object's index in workedTimeSpans array of the task
   const lastTimeSpanIndex = workedTimeSpans.length - 1;
 
@@ -39,9 +42,11 @@ const PlayPauseIcon = ({
     }
 
     // first check that any other task is active or not
-    // if not active activeTaskId is empty string
+    // if not active, activeTaskId is empty string
+    // then check that completedTimeInMilliseconds is not equal to level_3
+    // if not equal to level_3, that means the task will take more time to complete
     // so we can activate the task
-    if (!activeTaskId) {
+    if (!activeTaskId && completedTimeInMilliseconds !== level_3) {
       // push workedTimeSpan obj in workedTimeSpans array
       // with startTime property set to the current time
       // no endTime property
@@ -63,6 +68,15 @@ const PlayPauseIcon = ({
         });
     }
   };
+
+  // whenever completedTimeInMilliseconds is equal to level_3 (last target time completed)
+  // we call the addWorkedTimeSpan function
+  // it checks that the task is active
+  // then, registers the endTime property to the last workedTimeSpan object
+  // and makes the task inactive
+  if (completedTimeInMilliseconds === level_3) {
+    addWorkedTimeSpan(_id, lastTimeSpanIndex);
+  }
 
   return (
     <div className={styles.iconWrapper}>
