@@ -65,9 +65,33 @@ const TaskList = () => {
       socket.emit("tasks:read", activeTaskId);
     }
 
-    // send event to get the tasks of an user for today
-    // used query { doer: username, date: { $gte: startOfToday() } } in the backend
-    socket.emit("tasks:read");
+    // if socket got disconnected while a task was active, we stored endTime in localStorage
+    // now, before reading tasks register endTime to workedTimeSpan object of that task
+    if (localStorage.endTime) {
+      const endTime = JSON.parse(localStorage.endTime);
+      socket.emit(
+        "workedTimeSpan:end",
+        endTime._id,
+        endTime.lastTimeSpanIndex,
+        endTime.endTime,
+        (response) => {
+          console.log(response);
+          // if successful in saving the endTime
+          // "tasks:change" event is emitted from BE, that is listened by the TaskList component
+          // then the TaskList component emits "tasks:read" event to listen "tasks:read" event emitted by BE
+          // then by listening "tasks:read", TaskList component sets tasks state
+          // so re-render happens to this task as well
+          // and we clear activeTaskId to empty string in this process
+
+          // clear the local storage after saving endTime
+          localStorage.removeItem("endTime");
+        }
+      );
+    } else {
+      // send event to get the tasks of an user for today
+      // used query { doer: username, date: { $gte: startOfToday() } } in the backend
+      socket.emit("tasks:read");
+    }
 
     // get the tasks from BE
     socket.on("tasks:read", onTasksReadEvent);
@@ -84,7 +108,7 @@ const TaskList = () => {
 
   React.useEffect(() => {
     // it emits "tasks:read" event with the stored activeTaskId of the state
-    // because in the time of creating a new task, another task might be active 
+    // because in the time of creating a new task, another task might be active
     const onTasksChangeByCreateEvent = () => {
       socket.emit("tasks:read", tasksInfo.activeTaskId);
     };

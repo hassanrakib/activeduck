@@ -114,13 +114,15 @@ const withTaskProgressCalculation = (WrappedComponent) => {
         socket.on("disconnect", (err) => {
           console.log(err);
           // if client can't communicate with the server we get err
-          // save the endTime to localStorage that we updated in activeTaskEndTimeRef.current
+          // save the endTime of the active task to localStorage
+          // that we updated to activeTaskEndTimeRef.current
           // when the socket had connection to the server and we listened to "workedTimeSpan:continue"
           localStorage.setItem(
             "endTime",
             JSON.stringify({
               _id: activeTaskId,
               endTime: activeTaskEndTimeRef.current,
+              lastTimeSpanIndex: workedTimeSpans.length - 1,
             })
           );
           // disable the progress and play pause icon
