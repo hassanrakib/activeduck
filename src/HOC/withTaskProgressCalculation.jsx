@@ -5,7 +5,10 @@ import { socket } from "../socket";
 const withTaskProgressCalculation = (WrappedComponent) => {
   return function ContainerComponent(props) {
     // destructure
-    const { activeTaskId, isTaskActive, workedTimeSpans, levels } = props;
+    const { _id, activeTaskId, isTaskActive, workedTimeSpans, levels } = props;
+
+    // get the index of the workedTimeSpans array's last element
+    const lastTimeSpanIndex = workedTimeSpans.length - 1;
 
     // when the task is active, "workedTimeSpan:continue" event listener
     // recieves the endTime and updates the ref.current
@@ -43,15 +46,24 @@ const withTaskProgressCalculation = (WrappedComponent) => {
     //*** if the task not active ***//
 
     // calculate the completed time in milliseconds from workedTimeSpans array
-    // we have to store it in the completedTimeInMilliseconds state
+    // we have to store it in the completedTimeBeforeTaskActiveRef.current
     // so that when the task becomes active, we can add last workedTimeSpan's startTime
     // and endTime difference to this state
-
-    // lastWorkedTimeSpan.endTime can be undefined
-    // if undefined then that means the task is active
-    // so, when the task is not active or endTime property not undefined then we calculate
-    // the completed time in milliseconds
     if (!isTaskActive) {
+      // before calculating completedTimeBeforeTaskActive
+
+      // workedTimeSpans last element may not have its endTime property
+      // because user may delete endTime from localStorage that was saved when user got
+      // disconnected while doing a task, so we havn't been able to register endTime and
+      // and set taks, instead we set tasks only skipping the registering endTime part
+
+      // get the last workedTimeSpan object
+      const lastWorkedTimeSpan = workedTimeSpans[lastTimeSpanIndex];
+      // if lastWorkedTimeSpan.endTime is undefined, delete that from workedTimeSpans array
+      if (!lastWorkedTimeSpan.endTime) {
+        socket.emit("workedTimeSpan:delete", _id);
+      }
+
       const completedTimeBeforeTaskActive = workedTimeSpans.reduce(
         (completedTime, timeSpan) => {
           // get the time difference between startTime and endTime in milliseconds
@@ -87,7 +99,7 @@ const withTaskProgressCalculation = (WrappedComponent) => {
         // though endTime is not yet added to the object as it is in progress
         // we get the endTime by listening to the "workedTimeSpan:continue" event
         const timeDifference = getTimeDifferenceInMilliseconds(
-          workedTimeSpans[workedTimeSpans.length - 1].startTime,
+          workedTimeSpans[lastTimeSpanIndex].startTime,
           endTime
         );
 
@@ -112,19 +124,70 @@ const withTaskProgressCalculation = (WrappedComponent) => {
 
         // when socket gets disconnected
         socket.on("disconnect", (err) => {
+          // clear the listener that gets endTime from BE
+          socket.off("workedTimeSpan:continue", onWorkedTimeSpanContinue);
+
           console.log(err);
           // if client can't communicate with the server we get err
           // save the endTime of the active task to localStorage
           // that we updated to activeTaskEndTimeRef.current
           // when the socket had connection to the server and we listened to "workedTimeSpan:continue"
+
+          // saving to localStorage is important becuase the user may leave the application
+          // while he/she was disconnected
           localStorage.setItem(
             "endTime",
             JSON.stringify({
               _id: activeTaskId,
               endTime: activeTaskEndTimeRef.current,
-              lastTimeSpanIndex: workedTimeSpans.length - 1,
+              lastTimeSpanIndex,
             })
           );
+
+          // but if user doesn't leave the application we will continuously try to save the endTime
+          const registerUnfinishedEndtime = (
+            event,
+            activeTaskId,
+            lastTimeSpanIndex,
+            endTime
+          ) => {
+            socket
+              .timeout(2000)
+              .emit(
+                event,
+                activeTaskId,
+                lastTimeSpanIndex,
+                endTime,
+                (err, response) => {
+                  // if err happens in saving endTime, try again
+                  if (err) {
+                    return registerUnfinishedEndtime(
+                      event,
+                      activeTaskId,
+                      lastTimeSpanIndex,
+                      endTime
+                    );
+                  }
+                  console.log(response);
+                  // if successful in saving the endTime
+                  // "tasks:change" event is emitted from BE, that is listened by the TaskList component
+                  // then the TaskList component emits "tasks:read" event to listen "tasks:read" event emitted by BE
+                  // then by listening "tasks:read", TaskList component sets tasks state
+                  // so re-render happens to this task as well
+                  // and we clear activeTaskId to empty string in this process
+
+                  // clear the local storage after saving endTime
+                  localStorage.removeItem("endTime");
+                }
+              );
+          };
+          registerUnfinishedEndtime(
+            "workedTimeSpan:end",
+            activeTaskId,
+            lastTimeSpanIndex,
+            activeTaskEndTimeRef.current
+          );
+
           // disable the progress and play pause icon
         });
       }

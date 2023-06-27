@@ -48,6 +48,7 @@ const Task = ({ task, activeTaskId }) => {
           workedTimeSpans={workedTimeSpans}
           levels={levels}
           activeTaskId={activeTaskId}
+          _id={_id}
         />
         <div className={styles.taskDetailsWrapper}>
           <div className={styles.taskDetails}>
@@ -78,6 +79,7 @@ const Task = ({ task, activeTaskId }) => {
             workedTimeSpans={workedTimeSpans}
             levels={levels}
             activeTaskId={activeTaskId}
+            _id={_id}
           />
         </div>
       </div>

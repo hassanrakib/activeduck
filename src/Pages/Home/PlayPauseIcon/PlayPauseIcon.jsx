@@ -31,6 +31,9 @@ const PlayPauseIcon = ({
         "workedTimeSpan:end",
         _id,
         lastTimeSpanIndex,
+        // don't send endTime instead send undefined, because we manually stopping the task
+        // so, it takes endTime from BE
+        undefined,
         (response) => {
           console.log(response);
           // if successful in saving the endTime

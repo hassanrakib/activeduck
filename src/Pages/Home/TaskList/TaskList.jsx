@@ -51,6 +51,7 @@ const TaskList = () => {
   });
 
   React.useEffect(() => {
+    
     // "tasks:read" event listener recieves the tasks and activeTaskId
     function onTasksReadEvent({ tasks, activeTaskId }) {
       setTasksInfo({ tasks, activeTaskId });
