@@ -43,14 +43,8 @@ const withTaskProgressCalculation = (WrappedComponent) => {
       return differenceInMilliseconds(endTime, startTime);
     };
 
-    //*** if the task not active ***//
-
-    // calculate the completed time in milliseconds from workedTimeSpans array
-    // we have to store it in the completedTimeBeforeTaskActiveRef.current
-    // so that when the task becomes active, we can add last workedTimeSpan's startTime
-    // and endTime difference to this state
-    if (!isTaskActive) {
-      // before calculating completedTimeBeforeTaskActive
+    function setCompletedTimeBeforeTaskActiveRef() {
+      // before calculating and setting completedTimeBeforeTaskActive
 
       // workedTimeSpans last element may not have its endTime property
       // because user may delete endTime from localStorage that was saved when user got
@@ -60,10 +54,12 @@ const withTaskProgressCalculation = (WrappedComponent) => {
       // get the last workedTimeSpan object
       const lastWorkedTimeSpan = workedTimeSpans[lastTimeSpanIndex];
       // if lastWorkedTimeSpan.endTime is undefined, delete that from workedTimeSpans array
-      if (!lastWorkedTimeSpan.endTime) {
+      if (lastWorkedTimeSpan && !lastWorkedTimeSpan.endTime) {
         socket.emit("workedTimeSpan:delete", _id);
+        return;
       }
 
+      // if lastWorkedTimeSpan.endTime not undefined, we can calculate without any bug
       const completedTimeBeforeTaskActive = workedTimeSpans.reduce(
         (completedTime, timeSpan) => {
           // get the time difference between startTime and endTime in milliseconds
@@ -83,6 +79,16 @@ const withTaskProgressCalculation = (WrappedComponent) => {
 
       // store the initial time before the task is active
       completedTimeBeforeTaskActiveRef.current = completedTimeBeforeTaskActive;
+    } 
+
+    //*** if the task not active ***//
+
+    // calculate the completed time in milliseconds from workedTimeSpans array
+    // we have to store it in the completedTimeBeforeTaskActiveRef.current
+    // so that when the task becomes active, we can add last workedTimeSpan's startTime
+    // and endTime difference to this
+    if (!isTaskActive) {
+      setCompletedTimeBeforeTaskActiveRef();
     }
 
     //*** if task active ***//
