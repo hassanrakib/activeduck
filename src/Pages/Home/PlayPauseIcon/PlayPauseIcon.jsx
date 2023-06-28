@@ -11,6 +11,7 @@ const PlayPauseIcon = ({
   activeTaskId,
   completedTimeInMilliseconds,
   levels,
+  isDisconnected
 }) => {
 
   // destructure
@@ -91,14 +92,14 @@ const PlayPauseIcon = ({
         // and send _id of the task also the last element's index
         onClick={() => addWorkedTimeSpan(_id, lastTimeSpanIndex)}
       >
-        {/* when the task is active, means lastWorkedTimeSpan doesn't have endTime => spin the border */}
+        {/* when the task is active and not disconnected => spin the border */}
         {/* it is covering the icon container and have a dashed border*/}
         <div
           className={`${styles.iconBorder}${
-            isTaskActive ? ` ${styles.spin}` : ""
+            isTaskActive && !isDisconnected ? ` ${styles.spin}` : ""
           }`}
         ></div>
-        {isTaskActive ? (
+        {isTaskActive && !isDisconnected ? (
           <FiPauseCircle
             size="1.5em"
             color="blueviolet"

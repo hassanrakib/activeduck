@@ -5,7 +5,7 @@ import { socket } from "../socket";
 const withTaskProgressCalculation = (WrappedComponent) => {
   return function ContainerComponent(props) {
     // destructure
-    const { _id, activeTaskId, isTaskActive, workedTimeSpans, levels } = props;
+    const { activeTaskId, isTaskActive, workedTimeSpans, levels } = props;
 
     // get the index of the workedTimeSpans array's last element
     const lastTimeSpanIndex = workedTimeSpans.length - 1;
@@ -29,6 +29,9 @@ const withTaskProgressCalculation = (WrappedComponent) => {
 
     // know which is the current level of a task
     const [currentLevel, setCurrentLevel] = React.useState("Level - 1");
+
+    // know when the user got disconnected and use this to do some styling of progress & play pause icon
+    const [isDisconnected, setIsDisconnected] = React.useState(false);
 
     // get time difference in milliseconds between two date objects
     const getTimeDifferenceInMilliseconds = (
@@ -65,7 +68,7 @@ const withTaskProgressCalculation = (WrappedComponent) => {
 
       // store the initial time before the task is active
       completedTimeBeforeTaskActiveRef.current = completedTimeBeforeTaskActive;
-    } 
+    }
 
     //*** if the task not active ***//
 
@@ -136,6 +139,10 @@ const withTaskProgressCalculation = (WrappedComponent) => {
             })
           );
 
+          // set isDisconnected to true so that Progress & PlayPauseIcon component can use it
+          // for some kind of styling
+          setIsDisconnected(true);
+
           // but if user doesn't leave the application we will continuously try to save the endTime
           const registerUnfinishedEndtime = (
             event,
@@ -153,23 +160,27 @@ const withTaskProgressCalculation = (WrappedComponent) => {
                 (err, response) => {
                   // if err happens in saving endTime, try again
                   if (err) {
-                    return registerUnfinishedEndtime(
+                    registerUnfinishedEndtime(
                       event,
                       activeTaskId,
                       lastTimeSpanIndex,
                       endTime
                     );
-                  }
-                  console.log(response);
-                  // if successful in saving the endTime
-                  // "tasks:change" event is emitted from BE, that is listened by the TaskList component
-                  // then the TaskList component emits "tasks:read" event to listen "tasks:read" event emitted by BE
-                  // then by listening "tasks:read", TaskList component sets tasks state
-                  // so re-render happens to this task as well
-                  // and we clear activeTaskId to empty string in this process
+                  } else {
+                    console.log(response);
+                    // if connection reestablishes, set isDisconnected to false
+                    setIsDisconnected(false);
 
-                  // clear the local storage after saving endTime
-                  localStorage.removeItem("endTime");
+                    // if successful in saving the endTime
+                    // "tasks:change" event is emitted from BE, that is listened by the TaskList component
+                    // then the TaskList component emits "tasks:read" event to listen "tasks:read" event emitted by BE
+                    // then by listening "tasks:read", TaskList component sets tasks state
+                    // so re-render happens to this task as well
+                    // and we clear activeTaskId to empty string in this process
+
+                    // clear the local storage after saving endTime
+                    localStorage.removeItem("endTime");
+                  }
                 }
               );
           };
@@ -179,8 +190,6 @@ const withTaskProgressCalculation = (WrappedComponent) => {
             lastTimeSpanIndex,
             activeTaskEndTimeRef.current
           );
-
-          // disable the progress and play pause icon
         });
       }
 
@@ -249,6 +258,7 @@ const withTaskProgressCalculation = (WrappedComponent) => {
             ? completedTimeInMilliseconds
             : completedTimeBeforeTaskActiveRef.current
         }
+        isDisconnected={isDisconnected}
         currentLevel={currentLevel}
         {...props}
       />

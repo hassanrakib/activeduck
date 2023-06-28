@@ -6,6 +6,7 @@ const Progress = ({
   isTaskActive,
   levels,
   currentLevel,
+  isDisconnected
 }) => {
 
   // destructure to get every level
@@ -74,7 +75,7 @@ const Progress = ({
         </span>
       </div>
       <progress
-        className={isTaskActive ? `${styles.animate}` : ""}
+        className={isTaskActive && !isDisconnected ? `${styles.animate}` : ""}
         // max is the number of the  and value is the completedTime
         max={targetTimeInMilliseconds}
         value={completedTimeInMilliseconds}
