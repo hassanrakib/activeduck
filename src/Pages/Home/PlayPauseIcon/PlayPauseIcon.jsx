@@ -3,6 +3,7 @@ import { FiPauseCircle } from "react-icons/fi";
 import { socket } from "../../../socket";
 import styles from "./PlayPauseIcon.module.css";
 import withTaskProgressCalculation from "../../../HOC/withTaskProgressCalculation";
+import React from "react";
 
 const PlayPauseIcon = ({
   isTaskActive,
@@ -11,14 +12,31 @@ const PlayPauseIcon = ({
   activeTaskId,
   completedTimeInMilliseconds,
   levels,
-  isDisconnected
+  isDisconnected,
 }) => {
-
   // destructure
   const { level_3 } = levels;
 
+  // a user can click more than one on the icon at a time
+  // before getting response from the server
+  // and making this task active by getting and using activeTaskId
+  // whereis isTaskActive prevents making a task active if the task is already in active state
+  // to stop emitting more than one "workedTimeSpan:start" event to server
+  // before registering endTime by emitting "workedTimeSpan:end" event
+  // we will use this state
+  const [isTaskActiveLoading, setIsTaskActiveLoading] = React.useState(false);
+
+  console.log(isTaskActiveLoading);
+
   // last time span object's index in workedTimeSpans array of the task
   const lastTimeSpanIndex = workedTimeSpans.length - 1;
+
+
+  // if isTaskActiveLoading,
+  // after making the task active we update isTaskActiveLoading state to false
+  if(isTaskActiveLoading && isTaskActive) {
+    setIsTaskActiveLoading(false);
+  }
 
   // function that registers startTime and endTime property to a workedTimeSpan in workedTimeSpans array
   // used this function as onClick handler of the play pause icon container
@@ -52,7 +70,14 @@ const PlayPauseIcon = ({
     // then check that completedTimeInMilliseconds is not greather than or equal to level_3
     // if not equal to level_3, that means the task will take more time to complete
     // so we can activate the task
-    if (!activeTaskId && !(completedTimeInMilliseconds >= level_3)) {
+    if (
+      !activeTaskId &&
+      !isTaskActiveLoading &&
+      !(completedTimeInMilliseconds >= level_3)
+    ) {
+      // make isTaskActiveLoading state true
+      setIsTaskActiveLoading(true);
+
       // push workedTimeSpan obj in workedTimeSpans array
       // with startTime property set to the current time
       // no endTime property
@@ -67,9 +92,13 @@ const PlayPauseIcon = ({
         .emit("workedTimeSpan:start", _id, (err, response) => {
           if (err) {
             console.log(err);
-          }
-          if (response) {
+            // as error happened so, set isTaskActiveLoading to false
+            setIsTaskActiveLoading(false);
+          } else {
             console.log(response);
+            // as we have got the response from the server
+            // we will get the new activeTaskId to update isTaskActive in Task component
+            // so, we check if isTaskActive then set isTaskActiveLoading to false
           }
         });
     }
