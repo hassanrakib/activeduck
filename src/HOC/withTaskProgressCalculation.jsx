@@ -43,23 +43,9 @@ const withTaskProgressCalculation = (WrappedComponent) => {
       return differenceInMilliseconds(endTime, startTime);
     };
 
+    // set the completedTimeBeforeTaskActiveRef.current
     function setCompletedTimeBeforeTaskActiveRef() {
-      // before calculating and setting completedTimeBeforeTaskActive
-
-      // workedTimeSpans last element may not have its endTime property
-      // because user may delete endTime from localStorage that was saved when user got
-      // disconnected while doing a task, so we havn't been able to register endTime and
-      // and set taks, instead we set tasks only skipping the registering endTime part
-
-      // get the last workedTimeSpan object
-      const lastWorkedTimeSpan = workedTimeSpans[lastTimeSpanIndex];
-      // if lastWorkedTimeSpan.endTime is undefined, delete that from workedTimeSpans array
-      if (lastWorkedTimeSpan && !lastWorkedTimeSpan.endTime) {
-        socket.emit("workedTimeSpan:delete", _id);
-        return;
-      }
-
-      // if lastWorkedTimeSpan.endTime not undefined, we can calculate without any bug
+      // calculate the completed time in milliseconds from workedTimeSpans array
       const completedTimeBeforeTaskActive = workedTimeSpans.reduce(
         (completedTime, timeSpan) => {
           // get the time difference between startTime and endTime in milliseconds
@@ -219,7 +205,7 @@ const withTaskProgressCalculation = (WrappedComponent) => {
         // clear the timer
         clearInterval(interval);
       };
-    }, [isTaskActive, workedTimeSpans, activeTaskId]);
+    }, [isTaskActive, workedTimeSpans, activeTaskId, lastTimeSpanIndex]);
 
     // determine the current level
     React.useEffect(() => {
