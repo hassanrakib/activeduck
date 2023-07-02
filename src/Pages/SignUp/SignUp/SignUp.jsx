@@ -97,7 +97,7 @@ const SignUp = ({
                 handleClick={() =>
                   validateInputSetCurrentPage(2, "form.username")
                 }
-                className="fullHeightWidth btnLarge btnBlueViolet"
+                className="btnFullHeightWidth btnLarge btnBlueviolet"
               >
                 Next
               </Button>
@@ -127,14 +127,14 @@ const SignUp = ({
               <Button
                 type="button"
                 handleClick={() => setCurrentPage(1)}
-                className="fullHeightWidth btnLarge btnBlueViolet"
+                className="btnFullHeightWidth btnLarge btnBlueviolet"
               >
                 Previous
               </Button>
               <Button
                 type="button"
                 handleClick={() => validateInputSetCurrentPage(3, "form.email")}
-                className="fullHeightWidth btnLarge btnBlueViolet"
+                className="btnFullHeightWidth btnLarge btnBlueviolet"
               >
                 Next
               </Button>
@@ -178,7 +178,7 @@ const SignUp = ({
               <Button
                 type="button"
                 handleClick={() => setCurrentPage(2)}
-                className="fullHeightWidth btnLarge btnBlueViolet"
+                className="btnFullHeightWidth btnLarge btnBlueviolet"
               >
                 Previous
               </Button>
@@ -186,7 +186,7 @@ const SignUp = ({
                 // stop submitting form by clicking enter from page other than three no. page
                 // last button click done by submit, so, watch onSubmit
                 type={currentPage === 3 ? "submit" : "button"}
-                className="fullHeightWidth btnLarge btnBlueViolet"
+                className="btnFullHeightWidth btnLarge btnBlueviolet"
               >
                 Submit
               </Button>
@@ -207,7 +207,7 @@ const SignUp = ({
                 <div className={field}>
                   <Button
                     type="button"
-                    className="fullHeightWidth btnDanger btnLarge"
+                    className="btnFullHeightWidth btnDanger btnLarge"
                     handleClick={() => setCurrentPage(1)}
                   >
                     Try Again

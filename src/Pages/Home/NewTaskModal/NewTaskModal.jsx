@@ -267,7 +267,7 @@ const NewTaskModal = ({
               {/* disable the button if any durations array is empty */}
               <Button
                 type="submit"
-                className="btnLarge btnBlueViolet fullHeightWidth"
+                className="btnLarge btnBlueviolet btnFullHeightWidth"
                 disabled={durationsArrayEmpty}
               >
                 Create

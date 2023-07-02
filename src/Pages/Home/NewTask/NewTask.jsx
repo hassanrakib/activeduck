@@ -46,7 +46,7 @@ const NewTask = () => {
             placeholder="Enter your task"
             required
           />
-          <Button type="submit" className="createTaskBtn btnBlueViolet">
+          <Button type="submit" className="createTaskBtn btnBlueviolet">
             Create
           </Button>
         </div>

@@ -29,7 +29,7 @@
 }
 
 /* button blue violet */
-.btnBlueViolet {
+.btnBlueviolet {
   background-color: blueviolet;
   color: white;
 }
@@ -48,13 +48,13 @@
 }
 
 /* button full height and width */
-.fullHeightWidth {
+.btnFullHeightWidth {
   height: 100%;
   width: 100%;
 }
 
 /* button with blueviolet border */
-.btnBlueVioletBorder {
+.btnBluevioletBorder {
   border: 1px solid blueviolet;
 }
 

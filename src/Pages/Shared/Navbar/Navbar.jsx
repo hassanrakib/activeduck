@@ -37,7 +37,7 @@ const Navbar = () => {
           {isPopupActive && (
             <Popup>
               {/* popup container */}
-              <Button className="btnMedium btnBlueVioletBorder" handleClick={signOutUser}>Sign out</Button>
+              <Button className="btnMedium btnBluevioletBorder" handleClick={signOutUser}>Sign out</Button>
             </Popup>
           )}
         </div>
