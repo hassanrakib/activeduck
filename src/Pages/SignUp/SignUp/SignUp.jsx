@@ -15,7 +15,6 @@ import Message from "../../Shared/Message/Message";
 import Button from "../../Shared/Button/Button";
 import withMultiStepAuthentication from "../../../HOC/withMultiStepAuthentication";
 import { Link } from "react-router-dom";
-import useAuth from "../../../hooks/useAuth";
 
 const SignUp = ({
   currentPage,
@@ -35,7 +34,7 @@ const SignUp = ({
   const checkIfUsernameUnique = async (usernameToCheck) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/users/validate/${usernameToCheck}`
+        `${import.meta.env.VITE_LOCAL_HOST}/users/validate/${usernameToCheck}`
       );
       const { username } = await response.json();
 

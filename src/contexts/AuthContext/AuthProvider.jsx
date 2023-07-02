@@ -71,7 +71,7 @@ const AuthProvider = ({ children }) => {
         // get user from db by sending username
         // that was previously set to displayName property of the firebase user
         const response = await fetch(
-          `http://localhost:5000/users/${userFromFirebase.displayName}`,
+          `${import.meta.env.VITE_LOCAL_HOST}/users/${userFromFirebase.displayName}`,
           {
             headers: {
               authorization: `Bearer ${accessToken}`,

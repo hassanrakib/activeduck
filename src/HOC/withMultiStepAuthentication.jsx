@@ -85,7 +85,7 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
 
     // [caution: sign  up related]
     const saveUserToDB = async (newUser) => {
-      const response = await fetch(`http://localhost:5000/users`, {
+      const response = await fetch(`${import.meta.env.VITE_LOCAL_HOST}/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

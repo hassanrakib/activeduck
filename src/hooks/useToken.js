@@ -12,7 +12,7 @@ const useToken = (userFromFirebase) => {
     // so check is needed
     if (userFromFirebase) {
       fetch(
-        `http://localhost:5000/jwt?username=${userFromFirebase.displayName}`
+        `${import.meta.env.VITE_LOCAL_HOST}/jwt?username=${userFromFirebase.displayName}`
       )
         .then((res) => res.json())
         .then(result => {
