@@ -1,43 +1,71 @@
+/* for all button */
 .btn {
   border: none;
   cursor: pointer;
+  background-color: white;
+  color: black;
+  white-space: nowrap;
+}
+
+/* small button */
+.btnSmall {
+  padding: 2px;
+  font-size: 12px;
+  font-weight: 300;
+  border-radius: 16px;
+}
+
+/* medium button */
+.btnMedium {
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+/* large button */
+.btnLarge {
   font-size: 18px;
   padding: 10px 12px;
   border-radius: 2px;
+}
+
+/* button blue violet */
+.btnBlueViolet {
   background-color: blueviolet;
   color: white;
-  white-space: nowrap;
 }
+
+/* disabled button */
 .btn:disabled {
   background: gray;
   cursor: not-allowed;
 }
 
-/* comes from SignUp or SignIn component */
+/* button danger */
 .btnDanger {
   background-color: white;
   border: 2px solid #d50000;
   color: #d50000;
 }
 
-.btnHeightWidth100 {
-  height:100%;
+/* button full height and width */
+.fullHeightWidth {
+  height: 100%;
   width: 100%;
 }
 
-/* comes from Task component */
-.timeSpan {
-  font-size: 12px;
-  font-weight: 300;
-  border: 2px solid #a5a5a5;
-  padding: 2px;
-  border-radius: 15px;
-  background: white;
-  color: black;
+/* button with blueviolet border */
+.btnBlueVioletBorder {
+  border: 1px solid blueviolet;
 }
 
-/* comes from newTask component */
-.newTaskSpecific {
+/* button with gray border */
+.btnGrayBorder {
+  border: 1px solid gray;
+}
+
+/* NewTask component's create task btn */
+.createTaskBtn {
+  font-size: 18px;
   position: absolute;
   bottom: 0;
   right: 0;

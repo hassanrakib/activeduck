@@ -26,7 +26,6 @@ const PlayPauseIcon = ({
   // we will use this state
   const [isTaskActiveLoading, setIsTaskActiveLoading] = React.useState(false);
 
-  console.log(isTaskActiveLoading);
 
   // last time span object's index in workedTimeSpans array of the task
   const lastTimeSpanIndex = workedTimeSpans.length - 1;

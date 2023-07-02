@@ -98,7 +98,7 @@ const SignIn = ({
             )}
             <div className={`${field}`}>
               <Button
-                className="btnHeightWidth100"
+                className="fullHeightWidth btnLarge btnBlueViolet"
                 type="button"
                 handleClick={() => validateInputSetCurrentPage(2, "form.email")}
               >
@@ -125,13 +125,13 @@ const SignIn = ({
             <div className={`${field} ${flexContainer} ${columnGap}`}>
               <Button
                 type="button"
-                className="btnHeightWidth100"
+                className="fullHeightWidth btnLarge btnBlueViolet"
                 handleClick={() => setCurrentPage(1)}
               >
                 Previous
               </Button>
               <Button
-                className="btnHeightWidth100"
+                className="fullHeightWidth btnLarge btnBlueViolet"
                 // stop submitting form by clicking enter from page other than page index two
                 // last button click done by submit, so, watch onSubmit
 
@@ -156,7 +156,7 @@ const SignIn = ({
                 <div className={field}>
                   <Button
                     type="button"
-                    className="btnDanger"
+                    className="btnDanger btnLarge fullHeightWidth"
                     handleClick={() => setCurrentPage(1)}
                   >
                     Try Again

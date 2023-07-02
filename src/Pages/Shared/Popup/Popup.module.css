@@ -1,0 +1,33 @@
+/* popup */
+.popup {
+    position: absolute;
+    z-index: 1;
+    background-color: #ffffff;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    border-radius: 6px;
+    padding: 4px;
+    right: 27%;
+    top: 110%;
+    animation: fadeIn 0.5s;
+}
+
+/* popup animation */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* arrow above popup */
+.popup::after {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    right: 5%;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #ffffff transparent;
+}

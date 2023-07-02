@@ -97,7 +97,7 @@ const SignUp = ({
                 handleClick={() =>
                   validateInputSetCurrentPage(2, "form.username")
                 }
-                className="btnHeightWidth100"
+                className="fullHeightWidth btnLarge btnBlueViolet"
               >
                 Next
               </Button>
@@ -127,14 +127,14 @@ const SignUp = ({
               <Button
                 type="button"
                 handleClick={() => setCurrentPage(1)}
-                className="btnHeightWidth100"
+                className="fullHeightWidth btnLarge btnBlueViolet"
               >
                 Previous
               </Button>
               <Button
                 type="button"
                 handleClick={() => validateInputSetCurrentPage(3, "form.email")}
-                className="btnHeightWidth100"
+                className="fullHeightWidth btnLarge btnBlueViolet"
               >
                 Next
               </Button>
@@ -178,7 +178,7 @@ const SignUp = ({
               <Button
                 type="button"
                 handleClick={() => setCurrentPage(2)}
-                className="btnHeightWidth100"
+                className="fullHeightWidth btnLarge btnBlueViolet"
               >
                 Previous
               </Button>
@@ -186,7 +186,7 @@ const SignUp = ({
                 // stop submitting form by clicking enter from page other than three no. page
                 // last button click done by submit, so, watch onSubmit
                 type={currentPage === 3 ? "submit" : "button"}
-                className="btnHeightWidth100"
+                className="fullHeightWidth btnLarge btnBlueViolet"
               >
                 Submit
               </Button>
@@ -207,7 +207,7 @@ const SignUp = ({
                 <div className={field}>
                   <Button
                     type="button"
-                    className="btnDanger"
+                    className="fullHeightWidth btnDanger btnLarge"
                     handleClick={() => setCurrentPage(1)}
                   >
                     Try Again

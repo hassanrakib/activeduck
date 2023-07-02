@@ -89,7 +89,7 @@ const Task = ({ task, activeTaskId }) => {
               <div className={styles.timeSpans}>
                 {/* show workedTimeSpans */}
                 {workedTimeSpans?.map((timeSpan) => (
-                  <Button key={Math.random()} className="timeSpan">
+                  <Button key={Math.random()} className="btnGrayBorder btnSmall">
                     {formatSpanTime(timeSpan.startTime)} -{" "}
                     {formatSpanTime(timeSpan.endTime)}
                   </Button>

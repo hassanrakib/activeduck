@@ -15,10 +15,10 @@ const Auth = () => {
       <div className={styles.btns}>
         {/* send redirect url to the signin page */}
         <Link to="/auth/signin" state={{ from }} replace>
-          <Button>Signin</Button>
+          <Button className="btnMedium btnBlueViolet">Signin</Button>
         </Link>
         <Link to="/auth/signup">
-          <Button>Signup</Button>
+          <Button className="btnMedium btnBlueViolet">Signup</Button>
         </Link>
       </div>
     </div>

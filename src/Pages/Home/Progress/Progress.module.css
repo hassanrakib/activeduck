@@ -1,9 +1,7 @@
 .progressContainer {
-  position: relative;
   padding: 0 7px;
   width: 100%;
 }
-
 .progressTooltip {
   text-align: right;
   margin-bottom: 5px;
