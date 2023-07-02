@@ -1,6 +1,6 @@
 import styles from "./NewTask.module.css";
 import globalStyles from "../../../styles/global.module.css";
-import userImage from "../../../assets/avatar.jpg";
+import userImage from "../../../assets/user.png";
 import Avatar from "../../Shared/Avatar/Avatar";
 import Button from "../../Shared/Button/Button";
 import NewTaskModal from "../NewTaskModal/NewTaskModal";
@@ -36,7 +36,7 @@ const NewTask = () => {
 
   return (
     <div className={styles.newTask}>
-      <Avatar image={userImage} className="borderBlueViolet" />
+      <Avatar image={userImage} />
       <form onSubmit={openNewTaskModal}>
         <div className={styles.field}>
           <input

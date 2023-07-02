@@ -1,7 +1,7 @@
 import styles from "./Avatar.module.css";
-const Avatar = ({image, className}) => {
+const Avatar = ({image}) => {
   return (
-    <div className={`${styles.avatarContainer} ${styles[className]}`}>
+    <div className={styles.avatarContainer}>
       <img className={styles.avatar} src={image} alt="avatar" />
     </div>
   );

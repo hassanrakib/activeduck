@@ -1,6 +1,6 @@
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { Link } from "react-router-dom";
-import avatar from "../../../assets/avatar.jpg";
+import userImage from "../../../assets/user.png";
 import styles from "./Navbar.module.css";
 import Avatar from "../Avatar/Avatar";
 import useAuth from "../../../hooks/useAuth";
@@ -24,7 +24,7 @@ const Navbar = () => {
                 <span className={styles.notificationCount}>0</span>
             </div>
         </div>
-        <Avatar image={avatar} />
+        <Avatar image={userImage} />
         <button onClick={signOutUser}>{user ? 'log out!': 'log in'}</button>
       </div>
     </nav>

@@ -1,15 +1,20 @@
 import styles from "./UserIntro.module.css";
-import userImage from "../../../assets/avatar.jpg";
+import userImage from "../../../assets/user.png";
 import { GiSandsOfTime } from "react-icons/gi";
 import Avatar from "../../Shared/Avatar/Avatar";
+import useAuth from "../../../hooks/useAuth";
 const UserIntro = () => {
+
+  // get the user from the context
+  const { user } = useAuth();
+
   return (
     <div className={styles.userIntro}>
       {/* user image */}
-      <Avatar image={userImage} className="borderBlueViolet" />
+      <Avatar image={userImage} />
       {/* user name and worked time*/}
       <p className={styles.userName}>
-        <b>@elen_de</b> worked for <GiSandsOfTime color="blueviolet" />{" "}
+        <b>@{user?.username}</b> worked for <GiSandsOfTime color="blueviolet" />{" "}
         <span className={styles.totalTime}>8hours 30minutes</span>
       </p>
     </div>
