@@ -34,10 +34,6 @@
   column-gap: 5px;
   margin-bottom: 10px;
 }
-.taskSettings {
-  flex-basis: 2em;
-  cursor: pointer;
-}
 .timeSpans {
   display: flex;
   gap: 5px;

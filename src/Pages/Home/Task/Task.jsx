@@ -1,4 +1,3 @@
-import { BsThreeDots } from "react-icons/bs";
 import Button from "../../Shared/Button/Button";
 import styles from "./Task.module.css";
 import zzz from "../../../assets/zzz.gif";
@@ -7,9 +6,11 @@ import { format } from "date-fns";
 import Level from "../Level/Level";
 import PlayPauseIcon from "../PlayPauseIcon/PlayPauseIcon";
 import { socket } from "../../../socket";
+import TaskSettings from "../TaskSettings/TaskSettings";
 
 //** socket disconnection handling is important otherwise endTime property will not be added **//
 const Task = ({ task, activeTaskId }) => {
+
   // destructuring
   const { _id, name, levels, workedTimeSpans } = task;
 
@@ -76,9 +77,10 @@ const Task = ({ task, activeTaskId }) => {
         />
         <div className={styles.taskDetailsWrapper}>
           <div className={styles.taskDetails}>
+            {/* task name and settings */}
             <div className={styles.taskNameAndSettings}>
               <p>{name}</p>
-              <BsThreeDots className={styles.taskSettings} />
+              <TaskSettings />
             </div>
             {workedTimeSpans.length === 0 ? (
               // if not worked show image

@@ -53,11 +53,6 @@
   width: 100%;
 }
 
-/* button with blueviolet border */
-.btnBluevioletBorder {
-  border: 1px solid blueviolet;
-}
-
 /* button with gray border */
 .btnGrayBorder {
   border: 1px solid gray;

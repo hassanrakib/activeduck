@@ -1,0 +1,8 @@
+.taskSettings {
+    position: relative;
+    flex-basis: 2em;
+    height: 1.2em;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+}

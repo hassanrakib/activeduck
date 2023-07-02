@@ -35,9 +35,9 @@ const Navbar = () => {
         >
           <Avatar image={userImage} />
           {isPopupActive && (
-            <Popup>
+            <Popup position="forNavbarAvatar">
               {/* popup container */}
-              <Button className="btnMedium btnBluevioletBorder" handleClick={signOutUser}>Sign out</Button>
+              <Button className="btnMedium" handleClick={signOutUser}>Sign out</Button>
             </Popup>
           )}
         </div>
