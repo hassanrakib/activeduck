@@ -9,6 +9,11 @@ const TaskSettings = () => {
     // defines whether to show the popup
     const [isPopupActive, setIsPopupActive] = React.useState(false);
 
+    // delete the task
+    const deleteTask = () => {
+
+    }
+
     return (
         <div
             className={styles.taskSettings}
@@ -27,7 +32,7 @@ const TaskSettings = () => {
                             </Button>
                         </li>
                         <li>
-                            <Button className="btnMedium btnFlex btnDanger">
+                            <Button handleClick={deleteTask} className="btnMedium btnFlex btnDanger">
                                 <AiOutlineDelete />
                                 Delete
                             </Button>

@@ -32,10 +32,11 @@
     border-color: transparent transparent rgb(225, 194, 255) transparent;
 }
 
-/* popup arrow positioning for navbar avatar */
+/* popup arrow positioning for task settngs three dots icon */
 .forTaskSettings.popup::after {
     right: 7%;
 }
+/* popup arrow positioning for navbar avatar */
 .forNavbarAvatar.popup::after {
     right: 17%;
 }
