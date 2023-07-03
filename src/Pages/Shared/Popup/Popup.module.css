@@ -8,7 +8,6 @@
     padding: 2px;
     right: 0%;
     top: 110%;
-    border: 1px solid blueviolet;
     animation: fadeIn 0.5s;
 }
 
@@ -30,7 +29,7 @@
     bottom: 100%;
     border-width: 5px;
     border-style: solid;
-    border-color: transparent transparent rgb(203, 148, 255) transparent;
+    border-color: transparent transparent rgb(225, 194, 255) transparent;
 }
 
 /* popup arrow positioning for navbar avatar */

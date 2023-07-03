@@ -22,6 +22,7 @@ const Progress = ({
       minutes: millisecondsToMinutes(timeInMilliseconds % (1000 * 60 * 60)),
     };
     
+    // convert duration object to human readable time
     const humanReadableTime = formatDuration(duration);
 
     // if timeInMilliseconds parameter is assigned a value of zero 
@@ -76,7 +77,7 @@ const Progress = ({
       </div>
       <progress
         className={isTaskActive && !isDisconnected ? `${styles.animate}` : ""}
-        // max is the number of the  and value is the completedTime
+        // max is the number of the targetTimeInMilliseconds and value is the completedTimeInMilliseconds
         max={targetTimeInMilliseconds}
         value={completedTimeInMilliseconds}
       ></progress>

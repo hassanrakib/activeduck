@@ -6,6 +6,7 @@ import Popup from "../../Shared/Popup/Popup";
 import Button from "../../Shared/Button/Button";
 
 const TaskSettings = () => {
+    // defines whether to show the popup
     const [isPopupActive, setIsPopupActive] = React.useState(false);
 
     return (
@@ -15,16 +16,18 @@ const TaskSettings = () => {
         >
             <BsThreeDots />
             {isPopupActive && (
+                // popup
                 <Popup position="forTaskSettings">
-                    <ul>
+                    {/* popup content */}
+                    <ul className={styles.settingsList}>
                         <li>
-                            <Button className="btnMedium btnBlueviolet">
+                            <Button className="btnMedium btnFlex">
                                 <AiOutlineEdit />
                                 Edit
                             </Button>
                         </li>
                         <li>
-                            <Button className="btnMedium btnDanger">
+                            <Button className="btnMedium btnFlex btnDanger">
                                 <AiOutlineDelete />
                                 Delete
                             </Button>

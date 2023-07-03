@@ -6,3 +6,6 @@
     display: flex;
     justify-content: center;
 }
+.settingsList {
+    list-style: none;
+}

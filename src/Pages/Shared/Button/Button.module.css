@@ -3,7 +3,6 @@
   border: none;
   cursor: pointer;
   background-color: white;
-  color: black;
   white-space: nowrap;
 }
 
@@ -43,7 +42,7 @@
 /* button danger */
 .btnDanger {
   background-color: white;
-  border: 2px solid #d50000;
+  border: 1px solid #d50000;
   color: #d50000;
 }
 
@@ -56,6 +55,14 @@
 /* button with gray border */
 .btnGrayBorder {
   border: 1px solid gray;
+}
+
+/* for buttons with icon */
+.btnFlex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  column-gap: 4px;
 }
 
 /* NewTask component's create task btn */
