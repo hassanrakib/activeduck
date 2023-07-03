@@ -80,7 +80,7 @@ const Task = ({ task, activeTaskId }) => {
             {/* task name and settings */}
             <div className={styles.taskNameAndSettings}>
               <p>{name}</p>
-              <TaskSettings />
+              <TaskSettings _id={_id} />
             </div>
             {workedTimeSpans.length === 0 ? (
               // if not worked show image
