@@ -145,7 +145,7 @@ const NewTaskModal = ({
   };
 
   return (
-    <Modal onClose={() => setNewTaskName("")} title={`I want to ${newTaskName}`}>
+    <Modal onClose={() => setNewTaskName("")} title={newTaskName}>
       {/* ----------- modal body passed as children of the Modal component ------------ */}
       {/* ----------- create new task ------------ */}
       <form onSubmit={createNewTask}>

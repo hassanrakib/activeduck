@@ -2,12 +2,15 @@ import Modal from "../../Shared/Modal/Modal";
 import styles from "./DeleteTaskModal.module.css";
 
 
-const DeleteTaskModal = ({deletingTaskId, setDeletingTaskId}) => {
+const DeleteTaskModal = ({ deletingTaskId, closeDeleteTaskModal }) => {
   return (
-    <Modal title="Are you sure to delete the task?" onClose={() => setDeletingTaskId("")}>
-        <p>Here is the task id: {deletingTaskId}</p>
+    <Modal
+      onClose={closeDeleteTaskModal}
+      title="Are you sure to delete the task?"
+    >
+      <p>Here is the task id: {deletingTaskId}</p>
     </Modal>
   )
 };
 
-export default DeleteTaskModal
+export default DeleteTaskModal;
