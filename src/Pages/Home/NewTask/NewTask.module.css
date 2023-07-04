@@ -10,11 +10,19 @@
 .field {
     height: 38px;
     position: relative;
-    margin-top:4px;
+    margin-top: 4px;
 }
+
 .inputField {
+    height: 100%;
+    width: 100%;
+    border: 0.7px solid #a5a5a5;
+    outline: none;
     border-radius: 25px;
+    font-size: 18px;
+    padding: 0 10px;
 }
+
 .message {
     grid-column-start: 2;
     padding: 10px;
@@ -24,6 +32,7 @@
 .success {
     background: #DFF2BF;
 }
+
 .error {
     background-color: #FFBABA;
 }

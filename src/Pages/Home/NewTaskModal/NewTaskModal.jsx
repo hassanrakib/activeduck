@@ -1,5 +1,4 @@
 import styles from "./NewTaskModal.module.css";
-import globalStyles from "../../../styles/global.module.css";
 import Button from "../../Shared/Button/Button";
 import React from "react";
 import { endOfToday, hoursToMilliseconds, intervalToDuration, minutesToMilliseconds } from "date-fns";
@@ -145,17 +144,19 @@ const NewTaskModal = ({
   };
 
   return (
-    <Modal onClose={() => setNewTaskName("")} title={newTaskName}>
+    <Modal
+      onClose={() => setNewTaskName("")}
+      title={<h1>{newTaskName}</h1>}>
       {/* ----------- modal body passed as children of the Modal component ------------ */}
       {/* ----------- create new task ------------ */}
-      <form onSubmit={createNewTask}>
+      <form onSubmit={createNewTask} className={styles.modalBody}>
         <div className={styles.field}>
           <div className={styles.selectLabel}>
             <label className={styles.selectLabelText}>Level 1</label>
           </div>
           {/* ----------- level_1 field ------------ */}
           <select
-            className={`${globalStyles.inputField} ${styles.inputField}`}
+            className={styles.inputField}
             name="level_1"
             value={levels.level_1}
             // when change happens to level_1 index , clear indexs of the next levels to 0
@@ -182,7 +183,7 @@ const NewTaskModal = ({
           </div>
           {/* ----------- level_2 field ------------ */}
           <select
-            className={`${globalStyles.inputField} ${styles.inputField}`}
+            className={styles.inputField}
             name="level_2"
             value={levels.level_2}
             // when change happens to level_2 index , clear indexs of the next levels to 0
@@ -210,7 +211,7 @@ const NewTaskModal = ({
           </div>
           {/* ------------ level_3 field ------------ */}
           <select
-            className={`${globalStyles.inputField} ${styles.inputField}`}
+            className={styles.inputField}
             name="level_3"
             value={levels.level_3}
             onChange={(e) =>

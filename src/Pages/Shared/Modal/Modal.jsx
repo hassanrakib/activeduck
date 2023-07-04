@@ -2,7 +2,7 @@ import styles from "./Modal.module.css";
 import React from "react";
 
 
-const Modal = ({ onClose, title, children }) => {
+const Modal = ({ onClose, title = null, children }) => {
 
   // close modal when clicked outside of the modal content
   React.useEffect(() => {
@@ -37,16 +37,14 @@ const Modal = ({ onClose, title, children }) => {
         {/* modal header */}
         <div className={styles.modalHeader}>
           {/* ----------- modal title ------------ */}
-          <h1 className={styles.title}>{title}</h1>
+          {title}
           {/* ----------- close modal by calling onClose function ------------ */}
           <span className={styles.close} onClick={() => onClose()}>
             &times;
           </span>
         </div>
         {/* modal body recieved as children */}
-        <div className={styles.modalBody}>
-          {children}
-        </div>
+        {children}
       </div>
     </div>
   )

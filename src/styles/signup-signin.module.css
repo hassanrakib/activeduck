@@ -30,6 +30,15 @@
   height: 45px;
   margin: 30px 0 5px 0;
 }
+.inputField {
+  height: 100%;
+  width: 100%;
+  border: 0.7px solid #a5a5a5;
+  outline: none;
+  border-radius: 5px;
+  font-size: 18px;
+  padding: 0 10px;
+}
 .flexContainer {
   display: flex;
   justify-content: center;

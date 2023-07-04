@@ -1,5 +1,4 @@
 import styles from "./NewTask.module.css";
-import globalStyles from "../../../styles/global.module.css";
 import userImage from "../../../assets/user.png";
 import Avatar from "../../Shared/Avatar/Avatar";
 import Button from "../../Shared/Button/Button";
@@ -40,7 +39,7 @@ const NewTask = () => {
       <form onSubmit={openNewTaskModal}>
         <div className={styles.field}>
           <input
-            className={`${globalStyles.inputField} ${styles.inputField}`}
+            className={styles.inputField}
             type="text"
             name="newTaskName"
             placeholder="Enter your task"

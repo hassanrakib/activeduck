@@ -6,10 +6,10 @@ import {
   form,
   page,
   field,
+  inputField,
   flexContainer,
   columnGap,
 } from "../../../styles/signup-signin.module.css";
-import { inputField } from "../../../styles/global.module.css";
 import Loader from "../../Shared/Loader/Loader";
 import Message from "../../Shared/Message/Message";
 import Button from "../../Shared/Button/Button";
