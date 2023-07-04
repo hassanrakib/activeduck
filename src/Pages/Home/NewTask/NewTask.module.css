@@ -25,14 +25,4 @@
 
 .message {
     grid-column-start: 2;
-    padding: 10px;
-    border-radius: 3px;
-}
-
-.success {
-    background: #DFF2BF;
-}
-
-.error {
-    background-color: #FFBABA;
 }

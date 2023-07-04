@@ -2,13 +2,14 @@ import { IoMdAlert } from "react-icons/io";
 import styles from "./Message.module.css";
 import { FaRegCheckCircle } from "react-icons/fa";
 
-const Message = ({ error, success }) => {
+const Message = ({ error, success, withBackgroundColor = false }) => {
   return (
-    <div className={styles.container}>
+    <div
+      className={`${withBackgroundColor ? error ? ` ${styles.errorBg} ${styles.withBackground}` : ` ${styles.successBg}  ${styles.withBackground}` : ""}`}>
       {error ? (
-        <IoMdAlert color="#D8000C" size="1.2em" />
+        <IoMdAlert color="#D8000C" className={styles.icon} />
       ) : (
-        <FaRegCheckCircle color="#270" size="1.2em" />
+        <FaRegCheckCircle color="#270" className={styles.icon} />
       )}
       <span className={error ? styles.errorMessage : ""}>
         {error || success}

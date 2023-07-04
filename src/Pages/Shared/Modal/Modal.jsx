@@ -2,13 +2,12 @@ import styles from "./Modal.module.css";
 import React from "react";
 
 
-const Modal = ({ onClose, title = null, children }) => {
+const Modal = ({ onClose, title, children }) => {
 
   // close modal when clicked outside of the modal content
   React.useEffect(() => {
     // handleClickOutside function checks that the click is inside modal content or not
     const handleClickOutside = (e) => {
-      console.log(e.target);
       // The closest() method searches up the DOM tree for elements which matches a specified CSS selector
       // here, if clicked outside of modalContent, no matched Element will be found
       // so, close the modal
@@ -37,7 +36,7 @@ const Modal = ({ onClose, title = null, children }) => {
         {/* modal header */}
         <div className={styles.modalHeader}>
           {/* ----------- modal title ------------ */}
-          {title}
+          <h1 className={styles.modalTitle}>{title}</h1>
           {/* ----------- close modal by calling onClose function ------------ */}
           <span className={styles.close} onClick={() => onClose()}>
             &times;

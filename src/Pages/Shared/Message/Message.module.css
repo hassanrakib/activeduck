@@ -1,6 +1,16 @@
-.container {
-    display: flex;
-    gap: 5px;
+.withBackground {
+  padding: 10px;
+  border-radius: 6px;
+}
+.errorBg {
+  background-color: #FFBABA;
+}
+.successBg {
+  background: #DFF2BF;
+}
+.icon {
+  margin-right: 2px;
+  font-size: 18px;
 }
 .errorMessage {
   color: #d50000;

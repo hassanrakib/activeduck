@@ -1,18 +1,3 @@
 .modalBody {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    row-gap: 15px;
-    text-align: center;
-}
-
-.deleteIconContainer {
-    width: 4em;
-    height: 4em;
-    border: 1px solid #d50000;
-    border-radius: 50%;
-    color: #da3e3e;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    max-width: 350px;
 }

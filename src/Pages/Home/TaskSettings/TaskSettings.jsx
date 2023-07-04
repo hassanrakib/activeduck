@@ -6,7 +6,10 @@ import Popup from "../../Shared/Popup/Popup";
 import Button from "../../Shared/Button/Button";
 import DeleteTaskModal from "../DeleteTaskModal/DeleteTaskModal";
 
-const TaskSettings = ({ _id }) => {
+const TaskSettings = ({ task }) => {
+
+    // get the id of the task
+    const {_id} = task;
 
     // defines whether to show the popup
     const [isPopupActive, setIsPopupActive] = React.useState(false);
@@ -54,7 +57,7 @@ const TaskSettings = ({ _id }) => {
             </div>
             {/* modals to open when edit or delete button clicked */}
             {deletingTaskId && <DeleteTaskModal
-                deletingTaskId={deletingTaskId}
+                task={task}
                 closeDeleteTaskModal={closeDeleteTasModal}
             />}
         </>

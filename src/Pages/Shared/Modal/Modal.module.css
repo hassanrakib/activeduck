@@ -34,10 +34,14 @@
 }
 
 .modalHeader {
-    padding: 8px;
+    margin-bottom: 15px;
     position: relative;
+    border-bottom: 1px solid #ddd;
 }
-
+.modalTitle {
+    font-size: 25px;
+    font-weight: 300;
+}
 /* close btn */
 .close {
     position: absolute;

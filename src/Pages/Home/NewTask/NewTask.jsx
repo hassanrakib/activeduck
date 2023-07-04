@@ -53,16 +53,16 @@ const NewTask = () => {
 
       {/* show message if taskCreationResult has success property */}
       {taskCreationResult?.success && (
-        <div className={`${styles.message} ${styles.success}`}>
-          <Message success={taskCreationResult.success} />
+        <div className={styles.message}>
+          <Message success={taskCreationResult.success} withBackgroundColor={true} />
         </div>
       )}
 
       {/* show message if taskCreationResult has error property */}
       
       {taskCreationResult?.error && (
-        <div className={`${styles.message} ${styles.error}`}>
-          <Message error={taskCreationResult.error} />
+        <div className={styles.message}>
+          <Message error={taskCreationResult.error} withBackgroundColor={true} />
         </div>
       )}
 

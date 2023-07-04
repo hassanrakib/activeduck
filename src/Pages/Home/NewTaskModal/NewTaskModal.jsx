@@ -146,102 +146,105 @@ const NewTaskModal = ({
   return (
     <Modal
       onClose={() => setNewTaskName("")}
-      title={<h1>{newTaskName}</h1>}>
+      title='Create Task'>
       {/* ----------- modal body passed as children of the Modal component ------------ */}
       {/* ----------- create new task ------------ */}
-      <form onSubmit={createNewTask} className={styles.modalBody}>
-        <div className={styles.field}>
-          <div className={styles.selectLabel}>
-            <label className={styles.selectLabelText}>Level 1</label>
+      <div className={styles.modalBody}>
+        <p>{newTaskName}</p>
+        <form onSubmit={createNewTask}>
+          <div className={styles.field}>
+            <div className={styles.selectLabel}>
+              <label className={styles.selectLabelText}>Level 1</label>
+            </div>
+            {/* ----------- level_1 field ------------ */}
+            <select
+              className={styles.inputField}
+              name="level_1"
+              value={levels.level_1}
+              // when change happens to level_1 index , clear indexs of the next levels to 0
+              onChange={(e) =>
+                setLevels({
+                  level_1: parseInt(e.target.value),
+                  level_2: 0,
+                  level_3: 0,
+                })
+              }
+            >
+              {level_1_durations.map((duration, index) => (
+                // keeping duration's index in the value to get the actual object later
+                <option key={Math.random()} value={index}>
+                  {duration.hours > 0 && `${duration.hours} hours `}
+                  {duration.minutes > 0 && `${duration.minutes} minutes`}
+                </option>
+              ))}
+            </select>
           </div>
-          {/* ----------- level_1 field ------------ */}
-          <select
-            className={styles.inputField}
-            name="level_1"
-            value={levels.level_1}
-            // when change happens to level_1 index , clear indexs of the next levels to 0
-            onChange={(e) =>
-              setLevels({
-                level_1: parseInt(e.target.value),
-                level_2: 0,
-                level_3: 0,
-              })
-            }
-          >
-            {level_1_durations.map((duration, index) => (
-              // keeping duration's index in the value to get the actual object later
-              <option key={Math.random()} value={index}>
-                {duration.hours > 0 && `${duration.hours} hours `}
-                {duration.minutes > 0 && `${duration.minutes} minutes`}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className={styles.field}>
-          <div className={styles.selectLabel}>
-            <label className={styles.selectLabelText}>Level 2</label>
-          </div>
-          {/* ----------- level_2 field ------------ */}
-          <select
-            className={styles.inputField}
-            name="level_2"
-            value={levels.level_2}
-            // when change happens to level_2 index , clear indexs of the next levels to 0
+          <div className={styles.field}>
+            <div className={styles.selectLabel}>
+              <label className={styles.selectLabelText}>Level 2</label>
+            </div>
+            {/* ----------- level_2 field ------------ */}
+            <select
+              className={styles.inputField}
+              name="level_2"
+              value={levels.level_2}
+              // when change happens to level_2 index , clear indexs of the next levels to 0
 
-            onChange={(e) =>
-              setLevels((prevLevels) => ({
-                ...prevLevels,
-                level_2: parseInt(e.target.value),
-                level_3: 0,
-              }))
-            }
-          >
-            {level_2_durations.map((duration, index) => (
-              // keeping duration's index in the value to get the actual object later
-              <option key={Math.random()} value={index}>
-                {duration.hours > 0 && `${duration.hours} hours `}
-                {duration.minutes > 0 && `${duration.minutes} minutes`}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className={styles.field}>
-          <div className={styles.selectLabel}>
-            <label className={styles.selectLabelText}>Level 3</label>
+              onChange={(e) =>
+                setLevels((prevLevels) => ({
+                  ...prevLevels,
+                  level_2: parseInt(e.target.value),
+                  level_3: 0,
+                }))
+              }
+            >
+              {level_2_durations.map((duration, index) => (
+                // keeping duration's index in the value to get the actual object later
+                <option key={Math.random()} value={index}>
+                  {duration.hours > 0 && `${duration.hours} hours `}
+                  {duration.minutes > 0 && `${duration.minutes} minutes`}
+                </option>
+              ))}
+            </select>
           </div>
-          {/* ------------ level_3 field ------------ */}
-          <select
-            className={styles.inputField}
-            name="level_3"
-            value={levels.level_3}
-            onChange={(e) =>
-              setLevels((prevLevels) => ({
-                ...prevLevels,
-                level_3: parseInt(e.target.value),
-              }))
-            }
-          >
-            {level_3_durations.map((duration, index) => (
-              // keeping duration's index in the value to get the actual object later
-              <option key={Math.random()} value={index}>
-                {duration.hours > 0 && `${duration.hours} hours `}
-                {duration.minutes > 0 && `${duration.minutes} minutes`}
-              </option>
-            ))}
-          </select>
-        </div>
+          <div className={styles.field}>
+            <div className={styles.selectLabel}>
+              <label className={styles.selectLabelText}>Level 3</label>
+            </div>
+            {/* ------------ level_3 field ------------ */}
+            <select
+              className={styles.inputField}
+              name="level_3"
+              value={levels.level_3}
+              onChange={(e) =>
+                setLevels((prevLevels) => ({
+                  ...prevLevels,
+                  level_3: parseInt(e.target.value),
+                }))
+              }
+            >
+              {level_3_durations.map((duration, index) => (
+                // keeping duration's index in the value to get the actual object later
+                <option key={Math.random()} value={index}>
+                  {duration.hours > 0 && `${duration.hours} hours `}
+                  {duration.minutes > 0 && `${duration.minutes} minutes`}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <div className={styles.field}>
-          {/* disable the button if any durations array is empty */}
-          <Button
-            type="submit"
-            className="btnLarge btnBlueviolet btnFullHeightWidth"
-            disabled={durationsArrayEmpty}
-          >
-            Create
-          </Button>
-        </div>
-      </form>
+          <div className={styles.field}>
+            {/* disable the button if any durations array is empty */}
+            <Button
+              type="submit"
+              className="btnLarge btnBlueviolet btnFullHeightWidth"
+              disabled={durationsArrayEmpty}
+            >
+              Create
+            </Button>
+          </div>
+        </form>
+      </div>
     </Modal>
   );
 };
