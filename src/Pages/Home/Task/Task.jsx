@@ -53,8 +53,10 @@ const Task = ({ task, activeTaskId }) => {
               <p>{name}</p>
               <TaskSettings
                 task={task}
+                activeTaskId={activeTaskId}
                 currentLevel={currentLevel}
                 completedTimeInMilliseconds={completedTimeInMilliseconds}
+                isTaskActive={isTaskActive}
               />
             </div>
             {workedTimeSpans.length === 0 ? (

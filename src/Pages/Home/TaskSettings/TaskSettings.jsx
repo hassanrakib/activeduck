@@ -6,10 +6,10 @@ import Popup from "../../Shared/Popup/Popup";
 import Button from "../../Shared/Button/Button";
 import DeleteTaskModal from "../DeleteTaskModal/DeleteTaskModal";
 
-const TaskSettings = ({ task, currentLevel, completedTimeInMilliseconds }) => {
+const TaskSettings = ({ task, activeTaskId, currentLevel, completedTimeInMilliseconds, isTaskActive }) => {
 
     // get the id of the task
-    const {_id} = task;
+    const { _id } = task;
 
     // defines whether to show the popup
     const [isPopupActive, setIsPopupActive] = React.useState(false);
@@ -46,7 +46,11 @@ const TaskSettings = ({ task, currentLevel, completedTimeInMilliseconds }) => {
                                 </Button>
                             </li>
                             <li>
-                                <Button handleClick={openDeleteTaskModal} className="btnMedium btnFlex btnDanger">
+                                {/* if the task is active, don't allow user to delete the task */}
+                                <Button
+                                    handleClick={!isTaskActive ? openDeleteTaskModal : undefined}
+                                    className="btnMedium btnFlex" disabled={isTaskActive}
+                                >
                                     <AiOutlineDelete />
                                     Delete
                                 </Button>
@@ -59,6 +63,7 @@ const TaskSettings = ({ task, currentLevel, completedTimeInMilliseconds }) => {
             {/* kept modals outside the .taskSettings because there is a click event listener */}
             {deletingTaskId && <DeleteTaskModal
                 task={task}
+                activeTaskId={activeTaskId}
                 currentLevel={currentLevel}
                 completedTimeInMilliseconds={completedTimeInMilliseconds}
                 closeDeleteTaskModal={closeDeleteTasModal}
