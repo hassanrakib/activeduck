@@ -1,9 +1,11 @@
 import Modal from "../../Shared/Modal/Modal";
 import styles from "./DeleteTaskModal.module.css";
 import Button from "../../Shared/Button/Button";
+import convertToHumanReadableTime from "../../../lib/convertToHumanReadableTime";
+import Message from "../../Shared/Message/Message";
 
 
-const DeleteTaskModal = ({ task, closeDeleteTaskModal }) => {
+const DeleteTaskModal = ({ task, currentLevel, completedTimeInMilliseconds, closeDeleteTaskModal }) => {
   const { name } = task;
   return (
     <Modal
@@ -12,8 +14,16 @@ const DeleteTaskModal = ({ task, closeDeleteTaskModal }) => {
     >
       {/* send modal body as children */}
       <div className={styles.modalBody}>
-        <p>{name}</p>
-        <Button className="btnLarge btnFullHeightWidth btnDanger">Delete</Button>
+        <h3>{name}</h3>
+        <Message error="The following progress will be lost!" withBackgroundColor={true} />
+        <ul className={styles.progressList}>
+          <li>Level: {currentLevel}</li>
+          <li>Completed Time: {convertToHumanReadableTime(completedTimeInMilliseconds)}</li>
+        </ul>
+        <div className={styles.buttons}>
+          <Button className="btnMedium btnBlueviolet" handleClick={closeDeleteTaskModal}>Cancel</Button>
+          <Button className="btnMedium btnDanger">Delete</Button>
+        </div>
       </div>
     </Modal>
   )

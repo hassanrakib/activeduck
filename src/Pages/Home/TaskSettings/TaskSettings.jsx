@@ -6,7 +6,7 @@ import Popup from "../../Shared/Popup/Popup";
 import Button from "../../Shared/Button/Button";
 import DeleteTaskModal from "../DeleteTaskModal/DeleteTaskModal";
 
-const TaskSettings = ({ task }) => {
+const TaskSettings = ({ task, currentLevel, completedTimeInMilliseconds }) => {
 
     // get the id of the task
     const {_id} = task;
@@ -56,8 +56,11 @@ const TaskSettings = ({ task }) => {
                 )}
             </div>
             {/* modals to open when edit or delete button clicked */}
+            {/* kept modals outside the .taskSettings because there is a click event listener */}
             {deletingTaskId && <DeleteTaskModal
                 task={task}
+                currentLevel={currentLevel}
+                completedTimeInMilliseconds={completedTimeInMilliseconds}
                 closeDeleteTaskModal={closeDeleteTasModal}
             />}
         </>

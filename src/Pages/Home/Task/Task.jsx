@@ -51,7 +51,11 @@ const Task = ({ task, activeTaskId }) => {
             {/* task name and settings */}
             <div className={styles.taskNameAndSettings}>
               <p>{name}</p>
-              <TaskSettings task={task} />
+              <TaskSettings
+                task={task}
+                currentLevel={currentLevel}
+                completedTimeInMilliseconds={completedTimeInMilliseconds}
+              />
             </div>
             {workedTimeSpans.length === 0 ? (
               // if not worked show image

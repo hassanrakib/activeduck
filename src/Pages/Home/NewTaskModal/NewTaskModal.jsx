@@ -150,7 +150,7 @@ const NewTaskModal = ({
       {/* ----------- modal body passed as children of the Modal component ------------ */}
       {/* ----------- create new task ------------ */}
       <div className={styles.modalBody}>
-        <p>{newTaskName}</p>
+        <h3>{newTaskName}</h3>
         <form onSubmit={createNewTask}>
           <div className={styles.field}>
             <div className={styles.selectLabel}>
