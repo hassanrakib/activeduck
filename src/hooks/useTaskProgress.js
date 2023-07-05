@@ -2,10 +2,15 @@ import { differenceInMilliseconds } from "date-fns";
 import React from "react";
 import { socket } from "../socket";
 
-const useTaskProgress = (activeTaskId, isTaskActive, workedTimeSpans, levels) => {
+const useTaskProgress = (_id, activeTaskId, workedTimeSpans, levels) => {
+
+  //  if the current activeTaskId equals to this task's _id, that means the task is active
+  const isTaskActive = _id === activeTaskId;
 
   // get the index of the workedTimeSpans array's last element
   const lastTimeSpanIndex = workedTimeSpans.length - 1;
+  // get the last workedTimeSpan object
+  const lastWorkedTimeSpan = workedTimeSpans[lastTimeSpanIndex];
 
   // when the task is active, "workedTimeSpan:continue" event listener
   // recieves the endTime and updates the ref.current
@@ -30,6 +35,11 @@ const useTaskProgress = (activeTaskId, isTaskActive, workedTimeSpans, levels) =>
   // know when the user got disconnected and use this to do some styling of progress & play pause icon
   const [isDisconnected, setIsDisconnected] = React.useState(false);
 
+
+  // pops out the last element from workedTimeSpans array
+  function deleteLastWorkedTimeSpan(_id) {
+    socket.emit("workedTimeSpan:delete", _id);
+  }
 
   // get time difference in milliseconds between two date objects
   const getTimeDifferenceInMilliseconds = (
@@ -70,12 +80,29 @@ const useTaskProgress = (activeTaskId, isTaskActive, workedTimeSpans, levels) =>
 
   //*** if the task not active ***//
 
-  // calculate the completed time in milliseconds from workedTimeSpans array
-  // we have to store it in the completedTimeBeforeTaskActiveRef.current
-  // so that when the task becomes active, we can add last workedTimeSpan's startTime
-  // and endTime difference to this
-  if (!isTaskActive) {
-    setCompletedTimeBeforeTaskActiveRef();
+  // if the task is not active and it has lastWorkedTimeSpan object in workedTimeSpans array
+  // ensures that at least one element exists in the array
+  if (!isTaskActive && lastWorkedTimeSpan) {
+    // before calculating and setting completedTimeBeforeTaskActiveRef.current
+    // workedTimeSpans last element may not have its endTime property
+    // because user may delete endTime from localStorage that was saved when user got
+    // disconnected while doing a task, so we haven't been able to register endTime and
+    // and set tasks in TaskList component
+    // instead we set tasks only, skipping the registering endTime part in the TaskList
+
+    // if the task is not active, lastWorkedTimeSpan.endTime should exist
+    // even then, if lastWorkedTimeSpan.endTime doesn't exist
+    // we will delete that lastWorkedTimeSpan object from workedTimeSpans array
+    if (!lastWorkedTimeSpan.endTime) {
+      // delete the lastWorkedTimeSpan
+      deleteLastWorkedTimeSpan(_id);
+    } else {
+      // calculate the completed time in milliseconds from workedTimeSpans array
+      // we have to store it in the completedTimeBeforeTaskActiveRef.current
+      // so that when the task becomes active, we can add last workedTimeSpan's startTime
+      // and endTime difference to this
+      setCompletedTimeBeforeTaskActiveRef();
+    }
   }
 
   //*** if task active ***//
@@ -255,7 +282,8 @@ const useTaskProgress = (activeTaskId, isTaskActive, workedTimeSpans, levels) =>
         ? completedTimeInMilliseconds
         : completedTimeBeforeTaskActiveRef.current,
     isDisconnected,
-    currentLevel
+    currentLevel,
+    isTaskActive,
   }
 };
 

@@ -5,16 +5,18 @@ import styles from "./PlayPauseIcon.module.css";
 import React from "react";
 
 const PlayPauseIcon = ({
-  isTaskActive,
-  lastTimeSpanIndex,
-  _id,
+  task,
   activeTaskId,
+  isTaskActive,
   completedTimeInMilliseconds,
-  levels,
   isDisconnected,
 }) => {
   // destructure
+  const { workedTimeSpans, _id, levels } = task;
   const { level_3 } = levels;
+
+  // get the index of the workedTimeSpans array's last element
+  const lastTimeSpanIndex = workedTimeSpans.length - 1;
 
   // a user can click more than one on the icon at a time
   // before getting response from the server
@@ -28,7 +30,7 @@ const PlayPauseIcon = ({
 
   // if isTaskActiveLoading,
   // after making the task active we update isTaskActiveLoading state to false
-  if(isTaskActiveLoading && isTaskActive) {
+  if (isTaskActiveLoading && isTaskActive) {
     setIsTaskActiveLoading(false);
   }
 
@@ -118,9 +120,8 @@ const PlayPauseIcon = ({
         {/* when the task is active and not disconnected => spin the border */}
         {/* it is covering the icon container and have a dashed border*/}
         <div
-          className={`${styles.iconBorder}${
-            isTaskActive && !isDisconnected ? ` ${styles.spin}` : ""
-          }`}
+          className={`${styles.iconBorder}${isTaskActive && !isDisconnected ? ` ${styles.spin}` : ""
+            }`}
         ></div>
         {isTaskActive && !isDisconnected ? (
           <FiPauseCircle
