@@ -1,4 +1,3 @@
-import withTaskProgressCalculation from "../../../HOC/withTaskProgressCalculation";
 import styles from "./Level.module.css";
 
 const Level = ({ currentLevel }) => {
@@ -9,6 +8,4 @@ const Level = ({ currentLevel }) => {
   );
 };
 
-const EnhancedLevel = withTaskProgressCalculation(Level);
-
-export default EnhancedLevel;
+export default Level;

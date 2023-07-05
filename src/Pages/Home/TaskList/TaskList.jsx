@@ -3,46 +3,6 @@ import Task from "../Task/Task";
 import styles from "./TaskList.module.css";
 import { socket } from "../../../socket";
 
-// fake data later use real data
-const tasks = [
-  {
-    _id: 1,
-    name: "Study math for 1h",
-    workedTimeSpans: [
-      // "03:00am - 01:00am",
-      // "03:00am - 01:00am",
-      // "03:00am - 01:00am",
-      // "03:00am - 01:00am",
-      // "03:00am - 01:00am",
-    ],
-    totalTime: "4h 50m",
-  },
-  {
-    _id: 2,
-    name: "Study JavaScript coding from day to night",
-    workedTimeSpans: [
-      "03:00am - 01:00am",
-      "03:00am - 01:00am",
-      "03:00am - 01:00am",
-      "03:00am - 01:00am",
-      "03:00am - 01:00am",
-    ],
-    totalTime: "4h 50m",
-  },
-  {
-    _id: 3,
-    name: "Study math for 1h",
-    workedTimeSpans: [
-      "03:00am - 01:00am",
-      "03:00am - 01:00am",
-      "03:00am - 01:00am",
-      "03:00am - 01:00am",
-      "03:00am - 01:00am",
-    ],
-    totalTime: "4h 50m",
-  },
-];
-
 const TaskList = () => {
   // tasksInfo contains the tasks and activeTaskId
   const [tasksInfo, setTasksInfo] = React.useState({

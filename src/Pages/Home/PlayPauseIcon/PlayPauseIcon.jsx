@@ -2,12 +2,11 @@ import { FiPlayCircle } from "react-icons/fi";
 import { FiPauseCircle } from "react-icons/fi";
 import { socket } from "../../../socket";
 import styles from "./PlayPauseIcon.module.css";
-import withTaskProgressCalculation from "../../../HOC/withTaskProgressCalculation";
 import React from "react";
 
 const PlayPauseIcon = ({
   isTaskActive,
-  workedTimeSpans,
+  lastTimeSpanIndex,
   _id,
   activeTaskId,
   completedTimeInMilliseconds,
@@ -25,10 +24,6 @@ const PlayPauseIcon = ({
   // before registering endTime by emitting "workedTimeSpan:end" event
   // we will use this state
   const [isTaskActiveLoading, setIsTaskActiveLoading] = React.useState(false);
-
-
-  // last time span object's index in workedTimeSpans array of the task
-  const lastTimeSpanIndex = workedTimeSpans.length - 1;
 
 
   // if isTaskActiveLoading,
@@ -141,6 +136,5 @@ const PlayPauseIcon = ({
   );
 };
 
-const EnhancedPlayPauseIcon = withTaskProgressCalculation(PlayPauseIcon);
 
-export default EnhancedPlayPauseIcon;
+export default PlayPauseIcon;

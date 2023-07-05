@@ -1,6 +1,5 @@
 import { formatDuration, millisecondsToHours, millisecondsToMinutes } from "date-fns";
 import styles from "./Progress.module.css";
-import withTaskProgressCalculation from "../../../HOC/withTaskProgressCalculation";
 const Progress = ({
   completedTimeInMilliseconds,
   isTaskActive,
@@ -85,5 +84,4 @@ const Progress = ({
   );
 };
 
-const EnhancedProgress = withTaskProgressCalculation(Progress);
-export default EnhancedProgress;
+export default Progress;

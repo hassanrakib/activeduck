@@ -5,8 +5,9 @@ import Progress from "../Progress/Progress";
 import { format } from "date-fns";
 import Level from "../Level/Level";
 import PlayPauseIcon from "../PlayPauseIcon/PlayPauseIcon";
-import { socket } from "../../../socket";
 import TaskSettings from "../TaskSettings/TaskSettings";
+import useTaskProgress from "../../../hooks/useTaskProgress";
+import { socket } from "../../../socket";
 
 //** socket disconnection handling is important otherwise endTime property will not be added **//
 const Task = ({ task, activeTaskId }) => {
@@ -17,29 +18,40 @@ const Task = ({ task, activeTaskId }) => {
   //  if the current activeTaskId equals to this task's _id, that means the task is active
   const isTaskActive = _id === activeTaskId;
 
-  // before calculating and setting completedTimeBeforeTaskActiveRef in withTaskProgressCalculation HOC
-  // workedTimeSpans last element may not have its endTime property
-  // because user may delete endTime from localStorage that was saved when user got
-  // disconnected while doing a task, so we havn't been able to register endTime and
-  // and set tasks in TaskList component
-  // instead we set tasks only, skipping the registering endTime part in the TaskList
+  // get the last workedTimeSpan object
+  const lastTimeSpanIndex = workedTimeSpans.length - 1;
+  const lastWorkedTimeSpan = workedTimeSpans[lastTimeSpanIndex];
 
-  // if task is not active, endTime should exist
-  // even then, if endTime doesn't exist => we will delete that workedTimeSpan object with no
-  // endTime
-  if (!isTaskActive) {
-    // get the last workedTimeSpan object
-    const lastWorkedTimeSpan = workedTimeSpans[workedTimeSpans.length - 1];
-    // if lastWorkedTimeSpan.endTime is undefined, delete that from workedTimeSpans array
+  // pops out the last element from workedTimeSpans array
+  function deleteLastWorkedTimeSpanWithNoEndTime(_id) {
     if (lastWorkedTimeSpan && !lastWorkedTimeSpan.endTime) {
-      console.log("hit delete");
       socket.emit("workedTimeSpan:delete", _id);
-      // and return to avoid rendering of the Task
-      // because execution will cause bug of getting unefined for the lastWorkedTimeSpan.endTime
-      // in withTaskProgressCalculation HOC
+      // and return null from the component to avoid calling useTaskProgress hook
+      // because useTaskProgress hook call will cause bug because of getting unefined
+      // for the last time span's endTime in setCompletedTimeBeforeTaskActiveRef function
       return null;
     }
   }
+
+  // before calculating and setting completedTimeBeforeTaskActiveRef.current in useTaskProgress hook
+  // workedTimeSpans last element may not have its endTime property
+  // because user may delete endTime from localStorage that was saved when user got
+  // disconnected while doing a task, so we haven't been able to register endTime and
+  // and set tasks in TaskList component
+  // instead we set tasks only, skipping the registering endTime part in the TaskList
+
+  // if the task is not active, lastWorkedTimeSpan.endTime should exist
+  // even then, if lastWorkedTimeSpan.endTime doesn't exist
+  // we will delete that lastWorkedTimeSpan object from workedTimeSpans array
+  if (!isTaskActive) {
+    // if lastWorkedTimeSpan.endTime is undefined, delete that lastWorkedTimeSpan
+    // from workedTimeSpans array
+    deleteLastWorkedTimeSpanWithNoEndTime(_id);
+  }
+
+  // get the necessary calucalated progress for the task
+  const { completedTimeInMilliseconds, isDisconnected, currentLevel } = useTaskProgress(activeTaskId, isTaskActive, workedTimeSpans, levels);
+
   // format workedTimeSpan start time and end time
   function formatSpanTime(time) {
     // start time and end time stored in utc time in db
@@ -61,20 +73,16 @@ const Task = ({ task, activeTaskId }) => {
       {/* play / pause icon wrapper absolute positioned */}
       <PlayPauseIcon
         isTaskActive={isTaskActive}
-        workedTimeSpans={workedTimeSpans}
+        lastTimeSpanIndex={lastTimeSpanIndex}
         levels={levels}
         activeTaskId={activeTaskId}
         _id={_id}
+        completedTimeInMilliseconds={completedTimeInMilliseconds}
+        isDisconnected={isDisconnected}
       />
       <div className={styles.task}>
         {/* current level */}
-        <Level
-          isTaskActive={isTaskActive}
-          workedTimeSpans={workedTimeSpans}
-          levels={levels}
-          activeTaskId={activeTaskId}
-          _id={_id}
-        />
+        <Level currentLevel={currentLevel} />
         <div className={styles.taskDetailsWrapper}>
           <div className={styles.taskDetails}>
             {/* task name and settings */}
@@ -101,11 +109,11 @@ const Task = ({ task, activeTaskId }) => {
           </div>
           {/* progress bar */}
           <Progress
+          completedTimeInMilliseconds={completedTimeInMilliseconds}
             isTaskActive={isTaskActive}
-            workedTimeSpans={workedTimeSpans}
             levels={levels}
-            activeTaskId={activeTaskId}
-            _id={_id}
+            currentLevel={currentLevel}
+            isDisconnected={isDisconnected}
           />
         </div>
       </div>
