@@ -99,7 +99,6 @@ const SignIn = ({
             <div className={`${field}`}>
               <Button
                 className="btnFullHeightWidth btnLarge btnBlueviolet"
-                type="button"
                 handleClick={() => validateInputSetCurrentPage(2, "form.email")}
               >
                 Next
@@ -124,7 +123,6 @@ const SignIn = ({
             )}
             <div className={`${field} ${flexContainer} ${columnGap}`}>
               <Button
-                type="button"
                 className="btnFullHeightWidth btnLarge btnBlueviolet"
                 handleClick={() => setCurrentPage(1)}
               >
@@ -155,7 +153,6 @@ const SignIn = ({
                 </div>
                 <div className={field}>
                   <Button
-                    type="button"
                     className="btnDanger btnLarge btnFullHeightWidth"
                     handleClick={() => setCurrentPage(1)}
                   >

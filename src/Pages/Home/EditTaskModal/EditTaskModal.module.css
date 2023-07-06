@@ -1,0 +1,13 @@
+.modalBody {
+    display: flex;
+    flex-direction: column;
+    row-gap: 15px;
+}
+.field {
+    height: 30px;
+    max-width: 400px;
+}
+.buttons {
+    display: flex;
+    column-gap: 10px;
+}

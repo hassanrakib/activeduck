@@ -11,10 +11,18 @@
 .inputBorderRadiusLg {
     border-radius: 25px;
 }
+.inputNoBorderRadius {
+    border-radius: 0;
+}
 
 .inputDashedBorder {
     border-style: dashed;
 }
+
+.inputBorderBottomOnly {
+    border-width: 0 0 1px 0;
+}
+
 .inputBorderBlueviolet {
     border-color: blueviolet;
 }

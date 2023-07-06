@@ -93,7 +93,6 @@ const SignUp = ({
             )}
             <div className={field}>
               <Button
-                type="button"
                 handleClick={() =>
                   validateInputSetCurrentPage(2, "form.username")
                 }
@@ -125,14 +124,12 @@ const SignUp = ({
             {errors?.form?.email && <Message error="Enter your email" />}
             <div className={`${field} ${flexContainer} ${columnGap}`}>
               <Button
-                type="button"
                 handleClick={() => setCurrentPage(1)}
                 className="btnFullHeightWidth btnLarge btnBlueviolet"
               >
                 Previous
               </Button>
               <Button
-                type="button"
                 handleClick={() => validateInputSetCurrentPage(3, "form.email")}
                 className="btnFullHeightWidth btnLarge btnBlueviolet"
               >
@@ -176,7 +173,6 @@ const SignUp = ({
             )}
             <div className={`${field} ${flexContainer} ${columnGap}`}>
               <Button
-                type="button"
                 handleClick={() => setCurrentPage(2)}
                 className="btnFullHeightWidth btnLarge btnBlueviolet"
               >
@@ -206,7 +202,6 @@ const SignUp = ({
                 </div>
                 <div className={field}>
                   <Button
-                    type="button"
                     className="btnFullHeightWidth btnDanger btnLarge"
                     handleClick={() => setCurrentPage(1)}
                   >

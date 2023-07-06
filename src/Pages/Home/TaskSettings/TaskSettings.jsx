@@ -74,8 +74,8 @@ const TaskSettings = ({ task, activeTaskId, currentLevel, completedTimeInMillise
                 closeDeleteTaskModal={toggleIsDeleteTaskModalOpen}
             />}
             {isEditTaskModalOpen && <EditTaskModal
+                task={task}
                 closeEditTaskModal={toggleIsEditTaskModalOpen}
-
             />}
         </>
     )

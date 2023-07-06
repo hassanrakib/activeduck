@@ -1,7 +1,7 @@
 import styles from "./Button.module.css";
 
 const Button = ({
-  type="text",
+  type="button",
   handleClick = undefined,
   disabled = false,
   children,

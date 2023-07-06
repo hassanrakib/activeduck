@@ -34,11 +34,6 @@
   column-gap: 5px;
   margin-bottom: 10px;
 }
-.timeSpans {
-  display: flex;
-  gap: 5px;
-  flex-wrap: wrap;
-}
 .zzzContainer {
   text-align: center;
 }
