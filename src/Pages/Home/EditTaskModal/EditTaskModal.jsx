@@ -12,6 +12,9 @@ const EditTaskModal = ({ task, closeEditTaskModal }) => {
   // destructure
   const { _id, name, workedTimeSpans } = task;
 
+  // get the _ids of workedTimeSpans that are marked for deletion
+  const [deleteMarkedTimeSpansIds, setDeleteMarkedTimeSpansIds] = React.useState([]);
+
   // useForm hook of react hook form
   const { register, handleSubmit, formState: { errors }, setFocus } = useForm({
     defaultValues: {
@@ -22,10 +25,12 @@ const EditTaskModal = ({ task, closeEditTaskModal }) => {
   // set focus to the taskName input field for the first time render
   React.useEffect(() => {
     setFocus("taskName");
-  })
+  }, [setFocus]);
 
+  // edit task
   const editTask = (data) => {
     console.log(data);
+    console.log(deleteMarkedTimeSpansIds);
   }
 
   return (
@@ -41,15 +46,23 @@ const EditTaskModal = ({ task, closeEditTaskModal }) => {
             {...register("taskName", { required: "Task name can't be empty!" })}
           />
         </div>
-        {/* show workedTimeSpans with a 'x' in buttons */}
-        <WorkedTimeSpans workedTimeSpans={workedTimeSpans} deleteOption={true} />
+        <WorkedTimeSpans
+          workedTimeSpans={workedTimeSpans}
+          // if deleteOption is true,
+          // show every workedTimeSpan with a 'x' in button and add click event handler
+          // also check that any workedTimeSpan's _id is in deleteMarkedTimeSpansIds state
+          // to add 'btnDanger' class
+          deleteOption={true}
+          deleteMarkedTimeSpansIds={deleteMarkedTimeSpansIds}
+          setDeleteMarkedTimeSpansIds={setDeleteMarkedTimeSpansIds}
+        />
         {/* if task name is empty */}
         {
-          errors.taskName && <Message error="Task name can't be empty" />
+          errors.taskName && <Message error={errors.taskName.message} />
         }
         <div className={styles.buttons}>
           <Button className="btnMedium btnGrayBorder" handleClick={closeEditTaskModal}>Cancel</Button>
-          <Button type="submit" className="btnMedium btnBlueviolet" handleClick={editTask}>Save</Button>
+          <Button type="submit" className="btnMedium btnBlueviolet">Save</Button>
         </div>
       </form>
     </Modal>

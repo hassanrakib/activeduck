@@ -40,13 +40,6 @@
   cursor: not-allowed;
 }
 
-/* button danger */
-.btnDanger {
-  background-color: white;
-  border: 1px solid #d50000;
-  color: #d50000;
-}
-
 /* button full height and width */
 .btnFullHeightWidth {
   height: 100%;
@@ -56,6 +49,13 @@
 /* button with gray border */
 .btnGrayBorder {
   border: 1px solid gray;
+}
+
+/* button danger */
+.btnDanger {
+  background-color: white;
+  border: 1px solid #d50000;
+  color: #d50000;
 }
 
 /* for buttons with icon */
