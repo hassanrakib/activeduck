@@ -1,4 +1,5 @@
 import styles from "./NewTaskModal.module.css";
+import inputStyles from "../../../styles/input.module.css";
 import Button from "../../Shared/Button/Button";
 import React from "react";
 import { endOfToday, hoursToMilliseconds, intervalToDuration, minutesToMilliseconds } from "date-fns";
@@ -158,7 +159,7 @@ const NewTaskModal = ({
             </div>
             {/* ----------- level_1 field ------------ */}
             <select
-              className={styles.inputField}
+              className={`${inputStyles.input} ${inputStyles.inputDashedBorder} ${inputStyles.inputBorderBlueviolet} ${styles.select}`}
               name="level_1"
               value={levels.level_1}
               // when change happens to level_1 index , clear indexs of the next levels to 0
@@ -185,7 +186,7 @@ const NewTaskModal = ({
             </div>
             {/* ----------- level_2 field ------------ */}
             <select
-              className={styles.inputField}
+              className={`${inputStyles.input} ${inputStyles.inputDashedBorder} ${inputStyles.inputBorderBlueviolet} ${styles.select}`}
               name="level_2"
               value={levels.level_2}
               // when change happens to level_2 index , clear indexs of the next levels to 0
@@ -213,7 +214,7 @@ const NewTaskModal = ({
             </div>
             {/* ------------ level_3 field ------------ */}
             <select
-              className={styles.inputField}
+              className={`${inputStyles.input} ${inputStyles.inputDashedBorder} ${inputStyles.inputBorderBlueviolet} ${styles.select}`}
               name="level_3"
               value={levels.level_3}
               onChange={(e) =>

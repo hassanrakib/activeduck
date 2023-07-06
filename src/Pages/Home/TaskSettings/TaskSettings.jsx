@@ -5,26 +5,28 @@ import React from "react";
 import Popup from "../../Shared/Popup/Popup";
 import Button from "../../Shared/Button/Button";
 import DeleteTaskModal from "../DeleteTaskModal/DeleteTaskModal";
+import EditTaskModal from "../EditTaskModal/EditTaskModal";
 
 const TaskSettings = ({ task, activeTaskId, currentLevel, completedTimeInMilliseconds, isTaskActive }) => {
-
-    // get the id of the task
-    const { _id } = task;
 
     // defines whether to show the popup
     const [isPopupActive, setIsPopupActive] = React.useState(false);
 
-    // deletingTaskId is the _id of the task that the user wants to delete
-    const [deletingTaskId, setDeletingTaskId] = React.useState("");
+    // defines whether to show the delete task modal
+    const [isDeleteTaskModalOpen, setIsDeleteTaskModalOpen] = React.useState(false);
 
-    // clear deletingTaskId
-    const closeDeleteTasModal = () => {
-        setDeletingTaskId("");
+    // defines whether to show the edit task modal
+    const [isEditTaskModalOpen, setIsEditTaskModalOpen] = React.useState(false);
+
+
+    // toggle isDeleteTaskModalOpen state to true or false
+    const toggleIsDeleteTaskModalOpen = () => {
+        setIsDeleteTaskModalOpen(prevIsDeleteTaskModalOpen => !prevIsDeleteTaskModalOpen);
     }
 
-    // set deletingTaskId
-    const openDeleteTaskModal = () => {
-        setDeletingTaskId(_id);
+    // toggle isEditTaskModalOpen state to true or false
+    const toggleIsEditTaskModalOpen = () => {
+        setIsEditTaskModalOpen(prevIsEditTaskModalOpen => !prevIsEditTaskModalOpen);
     }
 
     return (
@@ -40,16 +42,18 @@ const TaskSettings = ({ task, activeTaskId, currentLevel, completedTimeInMillise
                         {/* popup content */}
                         <ul className={styles.settingsList}>
                             <li>
-                                <Button className="btnMedium btnFlex">
+                                <Button
+                                    handleClick={toggleIsEditTaskModalOpen}
+                                    className="btnMedium btnFlex"
+                                >
                                     <AiOutlineEdit />
                                     Edit
                                 </Button>
                             </li>
                             <li>
-                                {/* if the task is active, don't allow user to delete the task */}
                                 <Button
-                                    handleClick={!isTaskActive ? openDeleteTaskModal : undefined}
-                                    className="btnMedium btnFlex" disabled={isTaskActive}
+                                    handleClick={toggleIsDeleteTaskModalOpen}
+                                    className="btnMedium btnFlex"
                                 >
                                     <AiOutlineDelete />
                                     Delete
@@ -61,12 +65,17 @@ const TaskSettings = ({ task, activeTaskId, currentLevel, completedTimeInMillise
             </div>
             {/* modals to open when edit or delete button clicked */}
             {/* kept modals outside the .taskSettings because there is a click event listener */}
-            {deletingTaskId && <DeleteTaskModal
+            {isDeleteTaskModalOpen && <DeleteTaskModal
                 task={task}
                 activeTaskId={activeTaskId}
                 currentLevel={currentLevel}
                 completedTimeInMilliseconds={completedTimeInMilliseconds}
-                closeDeleteTaskModal={closeDeleteTasModal}
+                isTaskActive={isTaskActive}
+                closeDeleteTaskModal={toggleIsDeleteTaskModalOpen}
+            />}
+            {isEditTaskModalOpen && <EditTaskModal
+                closeEditTaskModal={toggleIsEditTaskModalOpen}
+
             />}
         </>
     )

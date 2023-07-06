@@ -5,10 +5,10 @@ import {
   form,
   page,
   field,
-  inputField,
   flexContainer,
   columnGap,
 } from "../../../styles/signup-signin.module.css";
+import inputStyles from "../../../styles/input.module.css";
 import Message from "../../Shared/Message/Message";
 import Button from "../../Shared/Button/Button";
 import Loader from "../../Shared/Loader/Loader";
@@ -81,7 +81,7 @@ const SignIn = ({
           <div className={page} style={firstPageStyle}>
             <div className={field}>
               <input
-                className={inputField}
+                className={inputStyles.input}
                 type="text"
                 {...register("form.email", {
                   required: "The field is required",
@@ -111,7 +111,7 @@ const SignIn = ({
           <div className={page}>
             <div className={field}>
               <input
-                className={inputField}
+                className={inputStyles.input}
                 type="password"
                 {...register("form.password", {
                   required: "The field is required",

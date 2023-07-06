@@ -7,14 +7,8 @@
   display: flex;
 }
 
-.inputField {
-  height: 100%;
-  width: 100%;
-  outline: none;
-  font-size: 18px;
-  padding: 0 10px;
+.select {
   margin-left: -4px;
-  border: 0.7px dashed blueviolet;
   border-radius: 0 5px 5px 0;
 }
 .selectLabel {
