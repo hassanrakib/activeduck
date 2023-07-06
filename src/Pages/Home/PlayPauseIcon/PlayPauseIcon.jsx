@@ -15,8 +15,10 @@ const PlayPauseIcon = ({
   const { workedTimeSpans, _id, levels } = task;
   const { level_3 } = levels;
 
-  // get the index of the workedTimeSpans array's last element
-  const lastTimeSpanIndex = workedTimeSpans.length - 1;
+  // get the last workedTimeSpan object
+  // when the task becomes active, the last workedTimeSpan in workedTimeSpans array of the task
+  // is the active workedTimeSpan that has startTime property but no endTime property
+  const lastWorkedTimeSpan = workedTimeSpans[workedTimeSpans.length - 1];
 
   // a user can click more than one on the icon at a time
   // before getting response from the server
@@ -36,8 +38,8 @@ const PlayPauseIcon = ({
 
   // function that registers startTime and endTime property to a workedTimeSpan in workedTimeSpans array
   // used this function as onClick handler of the play pause icon container
-  // and send task's _id and workedTimeSpans array's last element's index
-  const addWorkedTimeSpan = (_id, lastTimeSpanIndex) => {
+  // and send task's _id and workedTimeSpans array's last element's _id
+  const addWorkedTimeSpan = (_id, workedTimeSpanId) => {
     // if the task is active
     // we need to set the endTime property to the last time span object in workedTimeSpans array
     if (isTaskActive) {
@@ -45,7 +47,7 @@ const PlayPauseIcon = ({
       return socket.emit(
         "workedTimeSpan:end",
         _id,
-        lastTimeSpanIndex,
+        workedTimeSpanId,
         // don't send endTime instead send undefined, because we manually stopping the task
         // so, it takes endTime from BE
         undefined,
@@ -106,7 +108,7 @@ const PlayPauseIcon = ({
   // then, registers the endTime property to the last workedTimeSpan object
   // and makes the task inactive
   if (completedTimeInMilliseconds >= level_3) {
-    addWorkedTimeSpan(_id, lastTimeSpanIndex);
+    addWorkedTimeSpan(_id, lastWorkedTimeSpan._id);
   }
 
   return (
@@ -114,8 +116,8 @@ const PlayPauseIcon = ({
       <div
         className={styles.iconContainer}
         // add workedTimeSpan to workedTimeSpans array
-        // and send _id of the task also the last element's index
-        onClick={() => addWorkedTimeSpan(_id, lastTimeSpanIndex)}
+        // and send _id of the task also the last element's _id
+        onClick={() => addWorkedTimeSpan(_id, lastWorkedTimeSpan._id)}
       >
         {/* when the task is active and not disconnected => spin the border */}
         {/* it is covering the icon container and have a dashed border*/}

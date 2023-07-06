@@ -33,7 +33,7 @@ const TaskList = () => {
       socket.emit(
         "workedTimeSpan:end",
         endTime._id,
-        endTime.lastTimeSpanIndex,
+        endTime.workedTimeSpanId,
         endTime.endTime,
         (response) => {
           console.log(response);

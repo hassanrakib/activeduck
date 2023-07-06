@@ -7,10 +7,10 @@ const useTaskProgress = (_id, activeTaskId, workedTimeSpans, levels) => {
   //  if the current activeTaskId equals to this task's _id, that means the task is active
   const isTaskActive = _id === activeTaskId;
 
-  // get the index of the workedTimeSpans array's last element
-  const lastTimeSpanIndex = workedTimeSpans.length - 1;
   // get the last workedTimeSpan object
-  const lastWorkedTimeSpan = workedTimeSpans[lastTimeSpanIndex];
+  // when the task becomes active, the last workedTimeSpan in workedTimeSpans array of the task
+  // is the active workedTimeSpan that has startTime property but no endTime property
+  const lastWorkedTimeSpan = workedTimeSpans[workedTimeSpans.length - 1];
 
   // when the task is active, "workedTimeSpan:continue" event listener
   // recieves the endTime and updates the ref.current
@@ -22,7 +22,7 @@ const useTaskProgress = (_id, activeTaskId, workedTimeSpans, levels) => {
 
   // initial completed time in milliseconds is stored in a ref object's current property
   // before the task becomes active
-  // we storing it in a ref, so that it's not lost between renders
+  // we are storing it in a ref, so that it's not lost between renders
   // as we will use the same initial time everytime to add it to the time difference
   // of the last workedTimeSpan object's startTime and endTime, when the task becomes active
   // and storing it in ref will also prevent one re-render
@@ -37,8 +37,8 @@ const useTaskProgress = (_id, activeTaskId, workedTimeSpans, levels) => {
 
 
   // pops out the last element from workedTimeSpans array
-  function deleteLastWorkedTimeSpan(_id) {
-    socket.emit("workedTimeSpan:delete", _id);
+  function deleteLastWorkedTimeSpan(_id, workedTimeSpanId) {
+    socket.emit("workedTimeSpan:delete", _id, workedTimeSpanId);
   }
 
   // get time difference in milliseconds between two date objects
@@ -95,7 +95,7 @@ const useTaskProgress = (_id, activeTaskId, workedTimeSpans, levels) => {
     // we will delete that lastWorkedTimeSpan object from workedTimeSpans array
     if (!lastWorkedTimeSpan.endTime) {
       // delete the lastWorkedTimeSpan
-      deleteLastWorkedTimeSpan(_id);
+      deleteLastWorkedTimeSpan(_id, lastWorkedTimeSpan._id);
     } else {
       // calculate the completed time in milliseconds from workedTimeSpans array
       // we have to store it in the completedTimeBeforeTaskActiveRef.current
@@ -119,7 +119,7 @@ const useTaskProgress = (_id, activeTaskId, workedTimeSpans, levels) => {
       // though endTime is not yet added to the object as it is in progress
       // we get the endTime by listening to the "workedTimeSpan:continue" event
       const timeDifference = getTimeDifferenceInMilliseconds(
-        workedTimeSpans[lastTimeSpanIndex].startTime,
+        lastWorkedTimeSpan.startTime,
         endTime
       );
 
@@ -160,7 +160,8 @@ const useTaskProgress = (_id, activeTaskId, workedTimeSpans, levels) => {
           JSON.stringify({
             _id: activeTaskId,
             endTime: activeTaskEndTimeRef.current,
-            lastTimeSpanIndex,
+            // saving the _id of the lastWorkedTimeSpan, because it is the active workedTimeSpan
+            workedTimeSpanId: lastWorkedTimeSpan._id,
           })
         );
 
@@ -172,7 +173,7 @@ const useTaskProgress = (_id, activeTaskId, workedTimeSpans, levels) => {
         const registerUnfinishedEndtime = (
           event,
           activeTaskId,
-          lastTimeSpanIndex,
+          workedTimeSpanId,
           endTime
         ) => {
           socket
@@ -180,7 +181,7 @@ const useTaskProgress = (_id, activeTaskId, workedTimeSpans, levels) => {
             .emit(
               event,
               activeTaskId,
-              lastTimeSpanIndex,
+              workedTimeSpanId,
               endTime,
               (err, response) => {
                 // if err happens in saving endTime, try again
@@ -188,7 +189,7 @@ const useTaskProgress = (_id, activeTaskId, workedTimeSpans, levels) => {
                   registerUnfinishedEndtime(
                     event,
                     activeTaskId,
-                    lastTimeSpanIndex,
+                    workedTimeSpanId,
                     endTime
                   );
                 } else {
@@ -212,7 +213,7 @@ const useTaskProgress = (_id, activeTaskId, workedTimeSpans, levels) => {
         registerUnfinishedEndtime(
           "workedTimeSpan:end",
           activeTaskId,
-          lastTimeSpanIndex,
+          lastWorkedTimeSpan._id,
           activeTaskEndTimeRef.current
         );
       });
@@ -239,7 +240,7 @@ const useTaskProgress = (_id, activeTaskId, workedTimeSpans, levels) => {
       // clear the timer
       clearInterval(interval);
     };
-  }, [isTaskActive, workedTimeSpans, activeTaskId, lastTimeSpanIndex]);
+  }, [isTaskActive, workedTimeSpans, activeTaskId, lastWorkedTimeSpan]);
 
   // determine the current level
   React.useEffect(() => {
