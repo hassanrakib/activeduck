@@ -108,7 +108,7 @@ const PlayPauseIcon = ({
   // then, registers the endTime property to the last workedTimeSpan object
   // and makes the task inactive
   if (completedTimeInMilliseconds >= level_3) {
-    addWorkedTimeSpan(_id, lastWorkedTimeSpan._id);
+    addWorkedTimeSpan(_id, lastWorkedTimeSpan?._id);
   }
 
   return (
@@ -117,7 +117,7 @@ const PlayPauseIcon = ({
         className={styles.iconContainer}
         // add workedTimeSpan to workedTimeSpans array
         // and send _id of the task also the last element's _id
-        onClick={() => addWorkedTimeSpan(_id, lastWorkedTimeSpan._id)}
+        onClick={() => addWorkedTimeSpan(_id, lastWorkedTimeSpan?._id)}
       >
         {/* when the task is active and not disconnected => spin the border */}
         {/* it is covering the icon container and have a dashed border*/}

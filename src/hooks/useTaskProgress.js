@@ -36,9 +36,10 @@ const useTaskProgress = (_id, activeTaskId, workedTimeSpans, levels) => {
   const [isDisconnected, setIsDisconnected] = React.useState(false);
 
 
-  // pops out the last element from workedTimeSpans array
+  // delete the last object from workedTimeSpans array
   function deleteLastWorkedTimeSpan(_id, workedTimeSpanId) {
-    socket.emit("workedTimeSpan:delete", _id, workedTimeSpanId);
+    // note that workedTimeSpanId is being wrapped in an array
+    socket.emit("workedTimeSpan:delete", _id, [workedTimeSpanId]);
   }
 
   // get time difference in milliseconds between two date objects

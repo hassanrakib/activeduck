@@ -43,8 +43,16 @@ const TaskSettings = ({ task, activeTaskId, currentLevel, completedTimeInMillise
                         <ul className={styles.settingsList}>
                             <li>
                                 <Button
-                                    handleClick={toggleIsEditTaskModalOpen}
-                                    className="btnMedium btnFlex"
+                                // if the task is not active, allow user to edit the task
+                                // we can allow to edit the task while the task is active,
+                                // but it needs to handle some other operations like calculating
+                                // completedTimeBeforeTaskActiveRef.current in useTaskProgress hook
+                                // when workedTimeSpans array changes by edit operation
+                                // moreover, if user deletes last workedTimeSpan (active TimeSpan)
+                                // then we need to change task's active state to not active state
+                                    handleClick={!isTaskActive ? toggleIsEditTaskModalOpen : undefined}
+                                    className="btnMedium btnFlex btnFullHeightWidth"
+                                    disabled={isTaskActive}
                                 >
                                     <AiOutlineEdit />
                                     Edit
@@ -53,7 +61,7 @@ const TaskSettings = ({ task, activeTaskId, currentLevel, completedTimeInMillise
                             <li>
                                 <Button
                                     handleClick={toggleIsDeleteTaskModalOpen}
-                                    className="btnMedium btnFlex"
+                                    className="btnMedium btnFlex btnFullHeightWidth"
                                 >
                                     <AiOutlineDelete />
                                     Delete
@@ -75,6 +83,7 @@ const TaskSettings = ({ task, activeTaskId, currentLevel, completedTimeInMillise
             />}
             {isEditTaskModalOpen && <EditTaskModal
                 task={task}
+                activeTaskId={activeTaskId}
                 closeEditTaskModal={toggleIsEditTaskModalOpen}
             />}
         </>

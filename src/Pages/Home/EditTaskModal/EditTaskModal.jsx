@@ -6,9 +6,10 @@ import Button from "../../Shared/Button/Button";
 import React from "react";
 import Message from "../../Shared/Message/Message";
 import WorkedTimeSpans from "../WorkedTimeSpans/WorkedTimeSpans";
+import { socket } from "../../../socket";
 
 
-const EditTaskModal = ({ task, closeEditTaskModal }) => {
+const EditTaskModal = ({ task, activeTaskId, closeEditTaskModal }) => {
   // destructure
   const { _id, name, workedTimeSpans } = task;
 
@@ -29,8 +30,20 @@ const EditTaskModal = ({ task, closeEditTaskModal }) => {
 
   // edit task
   const editTask = (data) => {
-    console.log(data);
-    console.log(deleteMarkedTimeSpansIds);
+    const updatedTaskName = data.taskName;
+    // emit event to update the taskName
+    // also send the activeTaskId to keep a task in active state (if it was active before update)
+    socket.emit("taskName:update", _id, updatedTaskName, activeTaskId, (response) => {
+      // after successfully updating the task name
+      console.log(response);
+    });
+
+    // update the workedTimeSpans array
+    // also send the activeTaskId to keep a task in active state (if it was active before update)
+    socket.emit("workedTimeSpan:delete", _id, deleteMarkedTimeSpansIds, activeTaskId);
+
+    // finally close the modal
+    closeEditTaskModal();
   }
 
   return (
