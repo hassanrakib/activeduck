@@ -4,15 +4,13 @@
     background-color: white;
     border-radius: 5px;
 }
-.ranking {
+.date {
     position: absolute;
-    height: 30px;
-    width: 30px;
-    border-radius: 50%;
-    background-color: black;
+    border-radius: 10px;
+    background-color: blueviolet;
     color: white;
     text-align: center;
-    line-height: 30px;
+    padding: 2px 5px;
     top: -10px;
     left: -10px;
 }

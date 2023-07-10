@@ -3,7 +3,7 @@ import Task from "../Task/Task";
 import styles from "./TaskList.module.css";
 import { socket } from "../../../socket";
 
-const TaskList = () => {
+const TaskList = ({ setDate }) => {
   // tasksInfo contains the tasks and activeTaskId
   const [tasksInfo, setTasksInfo] = React.useState({
     tasks: [],
@@ -11,9 +11,14 @@ const TaskList = () => {
   });
 
   React.useEffect(() => {
-    
+
     // "tasks:read" event listener recieves the tasks and activeTaskId
     function onTasksReadEvent({ tasks, activeTaskId }) {
+
+      // get the first task's utc date string then set the date state in UserStatus component
+      setDate(tasks[0].date);
+
+      // set tasksInfo state
       setTasksInfo({ tasks, activeTaskId });
     }
 
@@ -65,7 +70,7 @@ const TaskList = () => {
       socket.off("tasks:read", onTasksReadEvent);
       socket.off("tasks:change", onTasksChangeEvent);
     };
-  }, []);
+  }, [setDate]);
 
   React.useEffect(() => {
     // it emits "tasks:read" event with the stored activeTaskId of the state
