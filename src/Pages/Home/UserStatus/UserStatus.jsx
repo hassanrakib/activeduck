@@ -19,9 +19,10 @@ const UserStatus = () => {
     if (lastTaskDate) {
       // sending lastTaskDate state and days to subtract from the lastTaskDate
       // subtraction will give the start date from where we will collect tasks
-      socket.emit("totalCompletedTimes:read", lastTaskDate, 7, (response) => {
+      socket.emit("totalCompletedTimes:read", lastTaskDate, 7, (completedTimes) => {
         // set totalCompletedTimes state
-        // setTotalCompletedTimes();
+        console.log(completedTimes);
+        // setTotalCompletedTimes(completedTimes);
       });
     }
   }, [lastTaskDate]);
@@ -42,7 +43,7 @@ const UserStatus = () => {
       {/* tasks creation date */}
       <div className={styles.date}>{formattedLocalDateString}</div>
       {/* user introduction with total working time */}
-      <UserIntro />
+      <UserIntro totalCompletedTimes={totalCompletedTimes}/>
       <TaskList setLastTaskDate={setLastTaskDate} />
       <TimeChart />
     </div>

@@ -3,7 +3,7 @@ import userImage from "../../../assets/user.png";
 import { GiSandsOfTime } from "react-icons/gi";
 import Avatar from "../../Shared/Avatar/Avatar";
 import useAuth from "../../../hooks/useAuth";
-const UserIntro = () => {
+const UserIntro = ({totalCompletedTimes}) => {
 
   // get the user from the context
   const { user } = useAuth();
@@ -15,7 +15,7 @@ const UserIntro = () => {
       {/* user name and worked time*/}
       <p className={styles.userName}>
         <b>@{user?.username}</b> worked for <GiSandsOfTime color="blueviolet" />{" "}
-        <span className={styles.totalTime}>8hours 30minutes</span>
+        <span className={styles.totalTime}>{totalCompletedTimes[0]}</span>
       </p>
     </div>
   );
