@@ -3,7 +3,7 @@ import Task from "../Task/Task";
 import styles from "./TaskList.module.css";
 import { socket } from "../../../socket";
 
-const TaskList = ({ setDate }) => {
+const TaskList = ({ setLastTaskDate }) => {
   // tasksInfo contains the tasks and activeTaskId
   const [tasksInfo, setTasksInfo] = React.useState({
     tasks: [],
@@ -15,8 +15,19 @@ const TaskList = ({ setDate }) => {
     // "tasks:read" event listener recieves the tasks and activeTaskId
     function onTasksReadEvent({ tasks, activeTaskId }) {
 
-      // get the first task's utc date string then set the date state in UserStatus component
-      setDate(tasks[0].date);
+      // if the tasks that comes from backend is not empty array
+      if (tasks.length) {
+        // get the last task's utc date string then set the lastTaskDate state in UserStatus component
+        setLastTaskDate(tasks[tasks.length - 1].date);
+      } else {
+        // if tasks is empty array
+        // tasks will be empty if no tasks created for today
+        // create utc time from current local time set it to the lastTaskDate state
+        const utcDateString = new Date().toISOString();
+
+        // set the lastTaskDate state to the current utc date
+        setLastTaskDate(utcDateString);
+      }
 
       // set tasksInfo state
       setTasksInfo({ tasks, activeTaskId });
@@ -70,7 +81,7 @@ const TaskList = ({ setDate }) => {
       socket.off("tasks:read", onTasksReadEvent);
       socket.off("tasks:change", onTasksChangeEvent);
     };
-  }, [setDate]);
+  }, [setLastTaskDate]);
 
   React.useEffect(() => {
     // it emits "tasks:read" event with the stored activeTaskId of the state

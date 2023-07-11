@@ -4,16 +4,31 @@ import TaskList from "../TaskList/TaskList";
 import UserIntro from "../UserIntro/UserIntro";
 import styles from "./UserStatus.module.css";
 import { format, isSameYear } from "date-fns";
+import { socket } from "../../../socket";
 const UserStatus = () => {
-  // get an array of completedTimes for a date range (ex: last 7 days completedTimes: [1, 2, 3, 4])
-  // completed Times will be in milliseconds
+  // set the lastTaskDate from the TaskList component
+  // this date is the creation date (in utc) of the last task from tasks that are loaded in TaskList component 
+  const [lastTaskDate, setLastTaskDate] = React.useState(null);
 
-  // set the date from the TaskList component
-  // this date is the creation date (in utc) of the tasks that are loaded in TaskList component 
-  const [date, setDate] = React.useState(null);
+  // totalCompletedTimes is going to be an array of total completed times of a date range
+  // total completed times will be in milliseconds (ex: [103, 2234, 3243243, 463533])
+  const [totalCompletedTimes, setTotalCompletedTimes] = React.useState([]);
 
-  // convert the utc date string in date state to local date object
-  const localDate = new Date(date);
+  // get an array of totalCompletedTimes for a date range
+  React.useEffect(() => {
+    if (lastTaskDate) {
+      // sending lastTaskDate state and days to subtract from the lastTaskDate
+      // subtraction will give the start date from where we will collect tasks
+      socket.emit("totalCompletedTimes:read", lastTaskDate, 7, (response) => {
+        // set totalCompletedTimes state
+        // setTotalCompletedTimes();
+      });
+    }
+  }, [lastTaskDate]);
+
+
+  // convert the utc date string in lastTaskDate state to local date object
+  const localDate = new Date(lastTaskDate);
 
   // format the localDate object to date string like "10 Jul 2023"
   // but if the localDate contains the year that is the current year then the year is not shown
@@ -28,7 +43,7 @@ const UserStatus = () => {
       <div className={styles.date}>{formattedLocalDateString}</div>
       {/* user introduction with total working time */}
       <UserIntro />
-      <TaskList setDate={setDate} />
+      <TaskList setLastTaskDate={setLastTaskDate} />
       <TimeChart />
     </div>
   )
