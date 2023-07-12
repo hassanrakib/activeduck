@@ -2,8 +2,14 @@ import React from "react";
 import Task from "../Task/Task";
 import styles from "./TaskList.module.css";
 import { socket } from "../../../socket";
+import { startOfToday } from "date-fns";
 
 const TaskList = ({ setLastTaskDate }) => {
+  // to show tasks that are created only today
+  // create a utc date string that is the start of today
+  const startOfTodayString =  startOfToday().toISOString();
+
+
   // tasksInfo contains the tasks and activeTaskId
   const [tasksInfo, setTasksInfo] = React.useState({
     tasks: [],
@@ -38,8 +44,8 @@ const TaskList = ({ setLastTaskDate }) => {
     // this listener emits the "tasks:read" event and send the activeTaskId
     function onTasksChangeEvent(activeTaskId) {
       // send event to get the tasks of an user for today
-      // used query { doer: username, date: { $gte: startOfToday() } } in the backend
-      socket.emit("tasks:read", activeTaskId);
+      // used query { doer: username, date: { $gte: new Date(startOfTodayString) } } in the backend
+      socket.emit("tasks:read", startOfTodayString, activeTaskId);
     }
 
     // if socket got disconnected while a task was active, we stored endTime in localStorage
@@ -66,8 +72,8 @@ const TaskList = ({ setLastTaskDate }) => {
       );
     } else {
       // send event to get the tasks of an user for today
-      // used query { doer: username, date: { $gte: startOfToday() } } in the backend
-      socket.emit("tasks:read");
+      // used query { doer: username, date: { $gte: new Date(startOfTodayString) } } in the backend
+      socket.emit("tasks:read", startOfTodayString);
     }
 
     // get the tasks from BE
@@ -81,13 +87,13 @@ const TaskList = ({ setLastTaskDate }) => {
       socket.off("tasks:read", onTasksReadEvent);
       socket.off("tasks:change", onTasksChangeEvent);
     };
-  }, [setLastTaskDate]);
+  }, [setLastTaskDate, startOfTodayString]);
 
   React.useEffect(() => {
-    // it emits "tasks:read" event with the stored activeTaskId of the state
+    // it emits "tasks:read" event with the stored activeTaskId from the state
     // because in the time of creating a new task, another task might be active
     const onTasksChangeByCreateEvent = () => {
-      socket.emit("tasks:read", tasksInfo.activeTaskId);
+      socket.emit("tasks:read", startOfTodayString, tasksInfo.activeTaskId);
     };
 
     // "tasks:change-by-create" event is fired from server when new task is created
@@ -97,7 +103,7 @@ const TaskList = ({ setLastTaskDate }) => {
     return () => {
       socket.off("tasks:change-by-create", onTasksChangeByCreateEvent);
     };
-  }, [tasksInfo.activeTaskId]);
+  }, [tasksInfo.activeTaskId, startOfTodayString]);
 
   return (
     <ul className={styles.taskList}>
