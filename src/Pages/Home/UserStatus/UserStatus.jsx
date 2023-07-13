@@ -11,7 +11,8 @@ const UserStatus = () => {
   const [lastTaskDate, setLastTaskDate] = React.useState(null);
 
   // totalCompletedTimes is going to be an array of total completed times of a date range
-  // total completed times will be in milliseconds (ex: [{_id: '2023-07-12', completedTime: 0}, {}])
+  // total completed times will be in milliseconds (ex: [{_id: '2023-07-12', date:utcDate completedTime: 0}, {}])
+  // _id holds the local date
   const [totalCompletedTimes, setTotalCompletedTimes] = React.useState([]);
 
   // get an array of totalCompletedTimes for a date range
@@ -34,9 +35,10 @@ const UserStatus = () => {
 
       // sending startDateString, endDateString and timeZone
       // we will collect all the tasks between startDateString and endDateString to get
-      // array of completedTimes for a number of days [{_id: '2023-07-12', completedTime: 0}, {}]
+      // array of completedTimes for a number of days [{_id: '2023-07-12', date: utcDate, completedTime: 0}, {}]
       // sending timeZone to convert utc date to local date and get it here in _id
       socket.emit("totalCompletedTimes:read", startDateString, endDateString, timeZone, (completedTimes) => {
+        console.log(completedTimes);
         // set totalCompletedTimes state
         setTotalCompletedTimes(completedTimes);
       });
@@ -60,8 +62,10 @@ const UserStatus = () => {
       {lastTaskDate && <div className={styles.date}>{formattedLocalDateString}</div>}
       {/* user introduction with total worked time */}
       {/* totalCompletedTimes state holds an array of completedTimes objects of a date range */}
-      {/* the first element is the end date's total worked time, because we sorted in descending in be */}
-      <UserIntro totalCompletedTime={totalCompletedTimes[0]?.completedTime} />
+      {/* the last element is the end date's total worked time that we will show in the UserIntro */}
+      <UserIntro
+        totalCompletedTime={totalCompletedTimes[totalCompletedTimes.length - 1]?.completedTime}
+      />
       <TaskList setLastTaskDate={setLastTaskDate} />
       <TimeChart />
     </div>
