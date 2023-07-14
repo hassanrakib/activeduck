@@ -1,6 +1,6 @@
-import { differenceInMilliseconds } from "date-fns";
 import React from "react";
 import { socket } from "../socket";
+import getTimeDifferenceInMilliseconds from "../lib/getTimeDifferenceInMilliseconds";
 
 const useTaskProgress = (_id, activeTaskId, workedTimeSpans, levels) => {
 
@@ -41,19 +41,6 @@ const useTaskProgress = (_id, activeTaskId, workedTimeSpans, levels) => {
     // note that workedTimeSpanId is being wrapped in an array
     socket.emit("workedTimeSpan:delete", _id, [workedTimeSpanId]);
   }
-
-  // get time difference in milliseconds between two date objects
-  const getTimeDifferenceInMilliseconds = (
-    startTimeInString,
-    endTimeInString
-  ) => {
-    // converts utc date strings to the date objects
-    const startTime = new Date(startTimeInString);
-    const endTime = new Date(endTimeInString);
-
-    // get the time difference between startTime and endTime in milliseconds
-    return differenceInMilliseconds(endTime, startTime);
-  };
 
   // set the completedTimeBeforeTaskActiveRef.current
   function setCompletedTimeBeforeTaskActiveRef() {
@@ -110,7 +97,7 @@ const useTaskProgress = (_id, activeTaskId, workedTimeSpans, levels) => {
 
   React.useEffect(() => {
     // register the listener of the "workedTimeSpan:continue" event
-    function onWorkedTimeSpanContinue(endTime) {
+    function onWorkedTimeSpanContinue(startTime, endTime) {
       // update the activeTaskEndTimeRef.current, so that when the socket gets disconnected
       // we can store the endTime in localStorage to update endTime of the task after socket
       // again reconnects
@@ -120,7 +107,7 @@ const useTaskProgress = (_id, activeTaskId, workedTimeSpans, levels) => {
       // though endTime is not yet added to the object as it is in progress
       // we get the endTime by listening to the "workedTimeSpan:continue" event
       const timeDifference = getTimeDifferenceInMilliseconds(
-        lastWorkedTimeSpan.startTime,
+        startTime,
         endTime
       );
 
@@ -135,9 +122,9 @@ const useTaskProgress = (_id, activeTaskId, workedTimeSpans, levels) => {
     // if the task is active
     if (isTaskActive) {
       interval = setInterval(() => {
-        // ping the server every one second
-        // so that, server sends back the end time
-        socket.emit("workedTimeSpan:continue");
+        // ping the server every one second and send the startTime of the last workedTimeSpan
+        // so that, server sends back the startTime and endTime as well
+        socket.emit("workedTimeSpan:continue", lastWorkedTimeSpan.startTime);
       }, 1000);
 
       // "workedTimeSpan:continue" for getting end time

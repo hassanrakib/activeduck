@@ -6,8 +6,13 @@ import styles from "./UserStatus.module.css";
 import { format, isSameYear, parseISO, startOfDay, subDays } from "date-fns";
 import { socket } from "../../../socket";
 const UserStatus = () => {
+
   // set the lastTaskDate from the TaskList component
-  // this date is the creation date (in utc) of the last task from tasks that are loaded in TaskList component 
+  // this state contains an object whose taskDate property is the creation date (in utc)
+  // of the last task from tasks that are loaded in TaskList component
+
+  // also, it has dateOfToday property that holds the utc date string of the current date
+  // we will use dateOfToday when taskDate is undefined 
   const [lastTaskDate, setLastTaskDate] = React.useState(null);
 
   // totalCompletedTimes is going to be an array of total completed times of a date range
@@ -18,17 +23,20 @@ const UserStatus = () => {
   // get an array of totalCompletedTimes for a date range
   React.useEffect(() => {
     if (lastTaskDate) {
-      // convert the utc date string in lastTaskDate state to local date object
-      const localDate = parseISO(lastTaskDate);
+
+      // lastTaskDate.taskDate is the utc date in string
+      // it was defined as a utc date object when the last task was created
+      // if lastTaskDate.taskDate is undefined, use the lastTaskDate.dateOfToday
+      const endDateString = lastTaskDate.taskDate || lastTaskDate.dateOfToday;
+
+      // convert the utc date string in endDateString to local date object
+      const localDate = parseISO(endDateString);
 
       // subtract the number of days from localDate
       const dateAfterSubtraction = subDays(localDate, 7);
 
-      // get startDateString of dateAfterSubtraction, then convert it to utc date
+      // get utc startDateString of dateAfterSubtraction, then convert it to utc date
       const startDateString = startOfDay(dateAfterSubtraction).toISOString();
-      // lastTaskDate is the utc date in string
-      // it was defined as a utc date object when the last task was created
-      const endDateString = lastTaskDate;
 
       // get the user's time zone to send it to the backend
       const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -47,7 +55,9 @@ const UserStatus = () => {
 
 
   // convert the utc date string in lastTaskDate state to local date object
-  const localDate = new Date(lastTaskDate);
+  // first time lastTaskDate state will be null so return null
+  // because new Date(undefined) causes error, on the oterhand new Date(null) doesn't do that 
+  const localDate = new Date(lastTaskDate && (lastTaskDate?.taskDate || lastTaskDate?.dateOfToday));
 
   // format the localDate object to date string like "10 Jul 2023"
   // but if the localDate contains the year that is the current year then the year is not shown
