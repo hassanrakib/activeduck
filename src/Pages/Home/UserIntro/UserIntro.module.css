@@ -7,6 +7,35 @@
   position: relative;
   z-index: 1;
 }
+
 .totalTime {
   border-bottom: 1px dashed blueviolet;
+}
+
+/* spin the sand glass icon when the task is active */
+
+.spin {
+  /* after the first animation ends second animation starts with a .5s delay at 181deg */
+  animation: spin, spinback;
+  animation-delay: .5s, .5s;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(180deg)
+  }
+}
+
+@keyframes spinback {
+  0% {
+    transform: rotate(181deg);
+    color: #ffa500;
+  }
+
+  100% {
+    transform: rotate(360deg);
+    color: black
+  }
 }

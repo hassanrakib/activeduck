@@ -11,8 +11,8 @@ const UserStatus = () => {
   // this state contains an object whose taskDate property is the creation date (in utc)
   // of the last task from tasks that are loaded in TaskList component
 
-  // also, it has dateOfToday property that holds the utc date string of the current date
-  // we will use dateOfToday when taskDate is undefined 
+  // also, it has activeTaskId property that holds the current active task's id
+  // we will use it to spin the sand glass icon in the UserIntro component
   const [lastTaskDate, setLastTaskDate] = React.useState(null);
 
   // totalCompletedTimes is going to be an array of total completed times of a date range
@@ -26,8 +26,10 @@ const UserStatus = () => {
 
       // lastTaskDate.taskDate is the utc date in string
       // it was defined as a utc date object when the last task was created
-      // if lastTaskDate.taskDate is undefined, use the lastTaskDate.dateOfToday
-      const endDateString = lastTaskDate.taskDate || lastTaskDate.dateOfToday;
+      // if lastTaskDate.taskDate is undefined, use the current utc date
+      // (lastTaskDate.taskDate will be undefined when no tasks is recieved from be for the date)
+      // endDateString will be used to collect all the tasks upto this date
+      const endDateString = lastTaskDate.taskDate || new Date().toISOString();
 
       // convert the utc date string in endDateString to local date object
       const localDate = parseISO(endDateString);
@@ -35,7 +37,7 @@ const UserStatus = () => {
       // subtract the number of days from localDate
       const dateAfterSubtraction = subDays(localDate, 7);
 
-      // get utc startDateString of dateAfterSubtraction, then convert it to utc date
+      // get start date of dateAfterSubtraction, then convert it to utc date
       const startDateString = startOfDay(dateAfterSubtraction).toISOString();
 
       // get the user's time zone to send it to the backend
@@ -54,10 +56,11 @@ const UserStatus = () => {
   }, [lastTaskDate]);
 
 
-  // convert the utc date string in lastTaskDate state to local date object
-  // first time lastTaskDate state will be null so return null
-  // because new Date(undefined) causes error, on the oterhand new Date(null) doesn't do that 
-  const localDate = new Date(lastTaskDate && (lastTaskDate?.taskDate || lastTaskDate?.dateOfToday));
+  // convert the taskDate utc date string in lastTaskDate state to local date object
+  // first time lastTaskDate state will be null also lastTaskDate.taskDate can be undefined
+  // if no tasks found for the date
+  // in these cases use current date
+  const localDate = lastTaskDate?.taskDate ? parseISO(lastTaskDate.taskDate) : new Date();
 
   // format the localDate object to date string like "10 Jul 2023"
   // but if the localDate contains the year that is the current year then the year is not shown
@@ -69,12 +72,13 @@ const UserStatus = () => {
   return (
     <div className={styles.userStatus}>
       {/* tasks creation date */}
-      {lastTaskDate && <div className={styles.date}>{formattedLocalDateString}</div>}
+      <div className={styles.date}>{formattedLocalDateString}</div>
       {/* user introduction with total worked time */}
       {/* totalCompletedTimes state holds an array of completedTimes objects of a date range */}
       {/* the last element is the end date's total worked time that we will show in the UserIntro */}
       <UserIntro
         totalCompletedTime={totalCompletedTimes[totalCompletedTimes.length - 1]?.completedTime}
+        isAnyTaskActive = {!!lastTaskDate?.activeTaskId}
       />
       <TaskList setLastTaskDate={setLastTaskDate} />
       <TimeChart />

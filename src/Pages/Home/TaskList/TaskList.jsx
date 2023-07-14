@@ -25,17 +25,15 @@ const TaskList = ({ setLastTaskDate }) => {
       // if the tasks that comes from backend is not an empty array
       // set the lastTaskDate state in UserStatus component
       // with an object whose taskDate property set to the last task's utc date string
+      // activeTaskId property set to the current active task's id
+      // we will use it to spin the sand glass icon in the UserIntro component
 
-      // if tasks is empty array (tasks will be empty if no tasks created for today)
-      // taskDate will be undefined. so, instead taskDate
-      // we will use the dateOfToday from the lastTaskDate in UserStatus component
-
-      // also, dateOfToday has another benifit
+      // also, lastTaskDate state's activeTaskId has another benifit
       // when you start doing a task, you set lastTaskDate
       // when you stop doing a task, you set lastTaskDate
-      // dateOfToday makes the lastTaskDate state to be different after every setLastTaskDate function call
+      // activeTaskId makes the lastTaskDate state to be different after every setLastTaskDate function call
       // otherwise setting lastTaskDate wouldn't change the lastTaskDate state
-      // (without dateOfToday, it is just taskDate which is last task's utc date string)
+      // (without activeTaskId property, it is just taskDate which is last task's utc date string)
       // (last task's utc date string always the same no matter you start or stop doing a task)
       // (taskDate only changes when new task is created)
       // as a result we wouldn't get updated totalCompletedTimes state after we stop doing a task
@@ -43,10 +41,7 @@ const TaskList = ({ setLastTaskDate }) => {
       // object's completed time to the UserIntro component to add timeDifference of the active workedTimeSpan
       // to show the completedTime of the tasks for today
 
-      // create utc time from the current local time to set the dateOfToday property of the lastTaskDate
-      const currentUTCDate = new Date().toISOString();
-
-      setLastTaskDate({ taskDate: tasks[tasks.length - 1].date, dateOfToday: currentUTCDate });
+      setLastTaskDate({ taskDate: tasks[tasks.length - 1].date, activeTaskId });
 
       // set tasksInfo state
       setTasksInfo({ tasks, activeTaskId });
