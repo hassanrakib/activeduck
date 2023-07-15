@@ -6,7 +6,6 @@ import styles from "./UserStatus.module.css";
 import { format, isSameYear, parseISO, startOfDay, subDays } from "date-fns";
 import { socket } from "../../../socket";
 const UserStatus = () => {
-
   // set the lastTaskDate from the TaskList component
   // this state contains an object whose taskDate property is the creation date (in utc)
   // of the last task from tasks that are loaded in TaskList component
@@ -19,6 +18,8 @@ const UserStatus = () => {
   // total completed times will be in milliseconds (ex: [{_id: '2023-07-12', date:utcDate completedTime: 0}, {}])
   // _id holds the local date
   const [totalCompletedTimes, setTotalCompletedTimes] = React.useState([]);
+
+  console.log(totalCompletedTimes);
 
   // get an array of totalCompletedTimes for a date range
   React.useEffect(() => {
@@ -48,7 +49,6 @@ const UserStatus = () => {
       // array of completedTimes for a number of days [{_id: '2023-07-12', date: utcDate, completedTime: 0}, {}]
       // sending timeZone to convert utc date to local date and get it here in _id
       socket.emit("totalCompletedTimes:read", startDateString, endDateString, timeZone, (completedTimes) => {
-        console.log(completedTimes);
         // set totalCompletedTimes state
         setTotalCompletedTimes(completedTimes);
       });

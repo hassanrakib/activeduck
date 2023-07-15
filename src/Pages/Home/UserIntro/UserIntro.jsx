@@ -22,6 +22,9 @@ const UserIntro = ({ totalCompletedTime = 0, isAnyTaskActive }) => {
   // isAnyTaskActiveState state determines whether spin the sand glass icon
   const [isAnyTaskActiveState, setIsAnyTaskActiveState] = React.useState(false);
 
+  // know whether user got disconnected
+  const [isDisconnected, setIsDisconnected] = React.useState(false);
+
   // keeping the totalCompletedTime prop to the totalCompletedTimeInMs state
   React.useEffect(() => {
     // when totalCompletedTime anything other than falsy value, set totalCompletedTimeInMs state
@@ -54,11 +57,17 @@ const UserIntro = ({ totalCompletedTime = 0, isAnyTaskActive }) => {
 
       // if user gets disconnected
       socket.on("disconnect", () => {
-        // set the isAnyTaskActiveState state to false
-        setIsAnyTaskActiveState(false);
+        // set isDisconnected state to true
+        setIsDisconnected(true);
         // clean the event listener
         socket.off("workedTimeSpan:continue", onWorkedTimeSpanContinue);
       });
+
+      // if user gets reconnected
+      socket.on("connect", () => {
+        // set isDisconnected state to false
+        setIsDisconnected(false);
+      })
     }
 
     // if no task is active
@@ -70,6 +79,8 @@ const UserIntro = ({ totalCompletedTime = 0, isAnyTaskActive }) => {
     // cleanup
     return () => {
       socket.off("workedTimeSpan:continue", onWorkedTimeSpanContinue);
+      socket.off("disconnected");
+      socket.off("connect");
     }
   }, [totalCompletedTime, isAnyTaskActiveState]);
 
@@ -79,7 +90,11 @@ const UserIntro = ({ totalCompletedTime = 0, isAnyTaskActive }) => {
       <Avatar image={userImage} />
       {/* user name and worked time*/}
       <p className={styles.userName}>
-        <b>@{user?.username}</b> worked for <GiSandsOfTime color="blueviolet" className={isAnyTaskActiveState ? styles.spin : ""} />{" "}
+        <b>@{user?.username}</b> worked for {" "}
+        <GiSandsOfTime
+          color="blueviolet"
+          className={isAnyTaskActiveState && !isDisconnected ? styles.spin : ""}
+        />{" "}
         {/* convertToHumanReadableTime converts time in milliseconds to human readable time */}
         <span className={styles.totalTime}>{convertToHumanReadableTime(totalCompletedTimeInMs)}</span>
       </p>

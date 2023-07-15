@@ -41,7 +41,7 @@ const TaskList = ({ setLastTaskDate }) => {
       // object's completed time to the UserIntro component to add timeDifference of the active workedTimeSpan
       // to show the completedTime of the tasks for today
 
-      setLastTaskDate({ taskDate: tasks[tasks.length - 1].date, activeTaskId });
+      setLastTaskDate({ taskDate: tasks[tasks.length - 1]?.date, activeTaskId });
 
       // set tasksInfo state
       setTasksInfo({ tasks, activeTaskId });
