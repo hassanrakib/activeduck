@@ -111,7 +111,7 @@ const UserStatus = () => {
         isAnyTaskActive={!!lastTaskDate?.activeTaskId}
       />
       <TaskList setLastTaskDate={setLastTaskDate} />
-      <TimeChart />
+      <TimeChart totalCompletedTimes={totalCompletedTimes} />
     </div>
   );
 };
