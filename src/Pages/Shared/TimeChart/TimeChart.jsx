@@ -41,7 +41,8 @@ const TimeChart = ({ totalCompletedTimes }) => {
         dy={-6}
         fontSize="12px"
       >
-        {convertToHumanReadableTime(value)}
+        {/* second argument is to show shorter format of human readable time */}
+        {convertToHumanReadableTime(value, true)}
       </text>
     );
   };

@@ -2,6 +2,7 @@ import { IoMdNotificationsOutline } from "react-icons/io";
 import { Link } from "react-router-dom";
 import userImage from "../../../assets/user.png";
 import styles from "./Navbar.module.css";
+import {version} from "../../../styles/version.module.css";
 import Avatar from "../Avatar/Avatar";
 import Popup from "../Popup/Popup";
 import React from "react";
@@ -18,7 +19,7 @@ const Navbar = () => {
       {/* logo */}
       <div>
         <Link to="/" className={styles.logo}>
-          zitbo
+          zitbo <span className={version}>v 1.0</span>
         </Link>
       </div>
       <div className={styles.navItems}>

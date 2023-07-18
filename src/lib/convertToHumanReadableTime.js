@@ -2,7 +2,7 @@ import { formatDuration, millisecondsToHours, millisecondsToMinutes } from "date
 
 // converts the time in milliseconds to {hours: 3, minutes: 30} type object
 // then return a human readable string that uses the object
-const convertToHumanReadableTime = (timeInMilliseconds) => {
+const convertToHumanReadableTime = (timeInMilliseconds, isShorterFormat) => {
     const duration = {
         hours: millisecondsToHours(timeInMilliseconds),
         // removing the number of milliseconds for hours by using remainder operator
@@ -11,14 +11,20 @@ const convertToHumanReadableTime = (timeInMilliseconds) => {
     };
 
     // convert duration object to human readable time
-    const humanReadableTime = formatDuration(duration);
+    let humanReadableTime = formatDuration(duration, { format: ['hours', 'minutes'] });
 
     // if timeInMilliseconds parameter is assigned a value of zero 
     // humanReadableTime will be empty string. so, instead return "0 minute"
     // timeInMilliseconds will be zero if completedTimeInMilliseconds is zero
     // completedTimeInMilliseconds will be zero if no element in workedTimeSpans array of the task
     // or an element exists with startTime property but has not completed 1 minute
-    if (!humanReadableTime) return "0 minute";
+    if (!humanReadableTime) { humanReadableTime = "0 minute" }
+
+
+    if (isShorterFormat) {
+        // changes the matched string to its shorter format
+        humanReadableTime = humanReadableTime.replace(/\s(minutes|minute)/, "m").replace(/\s(hours|hour)/, "h");
+    }
 
     return humanReadableTime;
 };
