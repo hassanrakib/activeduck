@@ -10,7 +10,6 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
     // useToken hook provides you the newly created token from BE
     const { currentToken } = useToken(userFromFirebase);
 
-
     // know when the promise gets fullfilled in the onSubmit function
     const [loading, setLoading] = React.useState(false);
 
@@ -29,7 +28,7 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
       verifyEmail,
       setLoading: setUserLoading,
     } = useAuth();
-    
+
     // react hook form useForm() hook
     const {
       register,
@@ -118,7 +117,10 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
       signUp(form.email, form.password)
         // after successful user creation in firebase => save user to db
         .then(() => {
-          saveUserToDB({ username: form.username });
+          saveUserToDB({
+            username: form.username,
+            createdAt: new Date().toISOString(),
+          });
         })
         .then(() => {
           // after successful sign up update name of the user (firebase)
@@ -211,7 +213,7 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
         setCurrentPage={setCurrentPage}
         loading={loading}
         error={error}
-        token = {currentToken}
+        token={currentToken}
       />
     );
   };

@@ -2,7 +2,7 @@ import React from "react";
 import { socket } from "../socket";
 import getTimeDifferenceInMilliseconds from "../lib/getTimeDifferenceInMilliseconds";
 
-const useTaskProgress = (_id, activeTaskId, workedTimeSpans, levels) => {
+const useTaskProgress = (_id, activeTaskId, indexInTasksOfDays, workedTimeSpans, levels) => {
 
   //  if the current activeTaskId equals to this task's _id, that means the task is active
   const isTaskActive = _id === activeTaskId;
@@ -37,9 +37,9 @@ const useTaskProgress = (_id, activeTaskId, workedTimeSpans, levels) => {
 
 
   // delete the last object from workedTimeSpans array
-  function deleteLastWorkedTimeSpan(_id, workedTimeSpanId) {
+  function deleteLastWorkedTimeSpan(_id, workedTimeSpanId, indexInTasksOfDays) {
     // note that workedTimeSpanId is being wrapped in an array
-    socket.emit("workedTimeSpan:delete", _id, [workedTimeSpanId]);
+    socket.emit("workedTimeSpan:delete", _id, [workedTimeSpanId], indexInTasksOfDays);
   }
 
   // set the completedTimeBeforeTaskActiveRef.current
@@ -83,7 +83,7 @@ const useTaskProgress = (_id, activeTaskId, workedTimeSpans, levels) => {
     // we will delete that lastWorkedTimeSpan object from workedTimeSpans array
     if (!lastWorkedTimeSpan.endTime) {
       // delete the lastWorkedTimeSpan
-      deleteLastWorkedTimeSpan(_id, lastWorkedTimeSpan._id);
+      deleteLastWorkedTimeSpan(_id, lastWorkedTimeSpan._id, indexInTasksOfDays);
     } else {
       // calculate the completed time in milliseconds from workedTimeSpans array
       // we have to store it in the completedTimeBeforeTaskActiveRef.current
@@ -162,7 +162,8 @@ const useTaskProgress = (_id, activeTaskId, workedTimeSpans, levels) => {
           event,
           activeTaskId,
           workedTimeSpanId,
-          endTime
+          endTime,
+          indexInTasksOfDays,
         ) => {
           socket
             .timeout(2000)
@@ -171,6 +172,7 @@ const useTaskProgress = (_id, activeTaskId, workedTimeSpans, levels) => {
               activeTaskId,
               workedTimeSpanId,
               endTime,
+              indexInTasksOfDays,
               (err, response) => {
                 // if err happens in saving endTime, try again
                 if (err) {
@@ -178,7 +180,8 @@ const useTaskProgress = (_id, activeTaskId, workedTimeSpans, levels) => {
                     event,
                     activeTaskId,
                     workedTimeSpanId,
-                    endTime
+                    endTime,
+                    indexInTasksOfDays
                   );
                 } else {
                   console.log(response);
@@ -202,7 +205,8 @@ const useTaskProgress = (_id, activeTaskId, workedTimeSpans, levels) => {
           "workedTimeSpan:end",
           activeTaskId,
           lastWorkedTimeSpan._id,
-          activeTaskEndTimeRef.current
+          activeTaskEndTimeRef.current,
+          indexInTasksOfDays
         );
       });
     }
@@ -228,7 +232,7 @@ const useTaskProgress = (_id, activeTaskId, workedTimeSpans, levels) => {
       // clear the timer
       clearInterval(interval);
     };
-  }, [isTaskActive, workedTimeSpans, activeTaskId, lastWorkedTimeSpan]);
+  }, [isTaskActive, workedTimeSpans, activeTaskId, lastWorkedTimeSpan, indexInTasksOfDays]);
 
   // determine the current level
   React.useEffect(() => {

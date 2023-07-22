@@ -6,21 +6,14 @@ import styles from "./UserStatus.module.css";
 import {
   format,
   isSameYear,
-  parseISO,
   startOfDay,
-  endOfDay,
-  endOfToday,
   subDays,
+  isSameDay,
+  startOfToday,
 } from "date-fns";
 import { socket } from "../../../socket";
-const UserStatus = () => {
-  // set the lastTaskDate from the TaskList component
-  // this state contains an object whose taskDate property is the creation date (in utc)
-  // of the last task from tasks that are loaded in TaskList component
-
-  // also, it has activeTaskId property that holds the current active task's id
-  // we will use it to spin the sand glass icon in the UserIntro component
-  const [lastTaskDate, setLastTaskDate] = React.useState(null);
+const UserStatus = ({ tasksOfADay, indexInTasksOfDays }) => {
+  const { day, tasks} = tasksOfADay;
 
   // totalCompletedTimes is going to be an array of total completed times of a date range
   // total completed times will be in milliseconds (ex: [{_id: '2023-07-12', completedTime: 0}...])
@@ -29,25 +22,18 @@ const UserStatus = () => {
 
   // get an array of totalCompletedTimes for a date range
   React.useEffect(() => {
-    if (lastTaskDate) {
-      // lastTaskDate.taskDate is the utc date in string
-      // it was defined as a utc date object when the last task was created
-      // if lastTaskDate.taskDate is undefined, use the today's last utc date
-      // (lastTaskDate.taskDate will be undefined when no tasks is recieved from the be for today)
+    // if there are tasks or it is today
+    // then set totalCompletedTimes
+    if (tasks.length || isSameDay(day.startDate, startOfToday())) {
       // endDateString will be used to collect all the tasks upto this date
-      const endDateString = lastTaskDate.taskDate
-        ? endOfDay(parseISO(lastTaskDate.taskDate)).toISOString()
-        : endOfToday().toISOString();
-
-      // convert the utc date string in endDateString to local date object
-      const localEndDate = parseISO(endDateString);
+      const endDateString = day.endDate.toISOString();
 
       // the number of days completed times we want
       const numberOfDaysCompletedTimes = 7;
 
       // subtract the number of days from localDate
       const dateAfterSubtraction = subDays(
-        localEndDate,
+        day.endDate,
         // we have to subtract 1 day less than numberOfDaysCompletedTimes
         // because we want end date to be included, subtraction is done by keeping end date
         // such as if today is 16th July then subtracting 7 days will get us
@@ -80,21 +66,19 @@ const UserStatus = () => {
         }
       );
     }
-  }, [lastTaskDate]);
+  }, [day, tasks.length]);
 
-  // convert the taskDate utc date string in lastTaskDate state to local date object
-  // first time lastTaskDate state will be null also lastTaskDate.taskDate can be undefined
-  // if no tasks found for the date
-  // in these cases use current date
-  const localDate = lastTaskDate?.taskDate
-    ? parseISO(lastTaskDate.taskDate)
-    : new Date();
+  // if no task for the date & the date is not today
+  // then don't render, instead return null
+  if (!tasks.length && !isSameDay(day.startDate, startOfToday())) {
+    return null;
+  }
 
-  // format the localDate object to date string like "10 Jul 2023"
-  // but if the localDate contains the year that is the current year then the year is not shown
+  // format the day.startDate object to date string like "10 Jul 2023"
+  // but if the day.startDate contains the year that is the current year then the year is not shown
   const formattedLocalDateString = format(
-    localDate,
-    `d MMM ${isSameYear(localDate, new Date()) ? "" : "yyy"}`
+    day.startDate,
+    `d MMM ${isSameYear(day.startDate, new Date()) ? "" : "yyy"}`
   );
 
   return (
@@ -108,9 +92,9 @@ const UserStatus = () => {
         totalCompletedTime={
           totalCompletedTimes[totalCompletedTimes.length - 1]?.completedTime
         }
-        isAnyTaskActive={!!lastTaskDate?.activeTaskId}
+        // isAnyTaskActive={!!lastTaskDate?.activeTaskId}
       />
-      <TaskList setLastTaskDate={setLastTaskDate} />
+      <TaskList tasksOfADay={tasksOfADay} indexInTasksOfDays={indexInTasksOfDays} />
       <TimeChart totalCompletedTimes={totalCompletedTimes} />
     </div>
   );

@@ -10,6 +10,7 @@ const PlayPauseIcon = ({
   isTaskActive,
   completedTimeInMilliseconds,
   isDisconnected,
+  indexInTasksOfDays
 }) => {
   // destructure
   const { workedTimeSpans, _id, levels } = task;
@@ -51,6 +52,7 @@ const PlayPauseIcon = ({
         // don't send endTime instead send undefined, because we manually stopping the task
         // so, it takes endTime from BE
         undefined,
+        indexInTasksOfDays,
         (response) => {
           console.log(response);
           // if successful in saving the endTime
@@ -87,7 +89,7 @@ const PlayPauseIcon = ({
       // tasks and we get activeTaskId
       socket
         .timeout(5000)
-        .emit("workedTimeSpan:start", _id, (err, response) => {
+        .emit("workedTimeSpan:start", _id, indexInTasksOfDays, (err, response) => {
           if (err) {
             console.log(err);
             // as error happened so, set isTaskActiveLoading to false

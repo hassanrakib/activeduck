@@ -8,13 +8,13 @@ import useTaskProgress from "../../../hooks/useTaskProgress";
 import WorkedTimeSpans from "../WorkedTimeSpans/WorkedTimeSpans";
 
 //** socket disconnection handling is important otherwise endTime property will not be added **//
-const Task = ({ task, activeTaskId }) => {
+const Task = ({ task, activeTaskId, indexInTasksOfDays }) => {
 
   // destructuring
   const { _id, name, levels, workedTimeSpans } = task;
 
   // get the necessary calucalated progress for the task
-  const { isTaskActive, completedTimeInMilliseconds, isDisconnected, currentLevel } = useTaskProgress(_id, activeTaskId, workedTimeSpans, levels);
+  const { isTaskActive, completedTimeInMilliseconds, isDisconnected, currentLevel } = useTaskProgress(_id, activeTaskId, indexInTasksOfDays, workedTimeSpans, levels);
 
 
   return (
@@ -26,6 +26,7 @@ const Task = ({ task, activeTaskId }) => {
         isTaskActive={isTaskActive}
         completedTimeInMilliseconds={completedTimeInMilliseconds}
         isDisconnected={isDisconnected}
+        indexInTasksOfDays={indexInTasksOfDays}
       />
       <div className={styles.task}>
         {/* current level */}
@@ -41,6 +42,7 @@ const Task = ({ task, activeTaskId }) => {
                 currentLevel={currentLevel}
                 completedTimeInMilliseconds={completedTimeInMilliseconds}
                 isTaskActive={isTaskActive}
+                indexInTasksOfDays={indexInTasksOfDays}
               />
             </div>
             {workedTimeSpans.length === 0 ? (
