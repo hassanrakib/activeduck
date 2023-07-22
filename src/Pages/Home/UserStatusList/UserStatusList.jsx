@@ -23,7 +23,8 @@ const UserStatusList = () => {
   const [startDate, setStartDate] = React.useState(startOfToday());
 
   //   get tasks of different dates
-  const { loading, error, tasksOfDays } = useTasksOfDays(startDate);
+  const { loading, error, tasksOfDays, activeTaskId } =
+    useTasksOfDays(startDate);
 
   // send this function to the ref prop of the last <UserStatus /> component
   //   to get the node of the last <UserStatus />
@@ -68,11 +69,22 @@ const UserStatusList = () => {
               // add the ref prop
               ref={lastUserStatusRef}
             >
-              <UserStatus indexInTasksOfDays={index} tasksOfADay={tasksOfADay} />
+              <UserStatus
+                indexInTasksOfDays={index}
+                tasksOfADay={tasksOfADay}
+                activeTaskId={activeTaskId}
+              />
             </div>
           );
         }
-        return <UserStatus key={index} indexInTasksOfDays={index} tasksOfADay={tasksOfADay} />;
+        return (
+          <UserStatus
+            key={index}
+            indexInTasksOfDays={index}
+            tasksOfADay={tasksOfADay}
+            activeTaskId={activeTaskId}
+          />
+        );
       })}
       {loading && <p>Loading...</p>}
     </div>
