@@ -12,7 +12,7 @@ const UserStatusList = () => {
   // this is the date in utc string that says when the user was created
   // so, we can use it to check that the startDate variable is after the user created his account
   // if startDate before this date, we will not allow to set startDate state by subtracting one more day
-  //   convert to local date
+  // convert to local date
   const userCreatedAt = parseISO(user.createdAt);
 
   // observer.current holds an intersection observer
@@ -20,15 +20,16 @@ const UserStatusList = () => {
 
   // startDate by default set to the user's local start date of today
   // it defines for which date we will load the tasks
+  // startDate is sent to the useTasksOfDays hook to set tasksOfDays state
   const [startDate, setStartDate] = React.useState(startOfToday());
 
-  //   get tasks of different dates
+  // get tasks of different dates
   const { loading, error, tasksOfDays, activeTaskId } =
     useTasksOfDays(startDate);
 
   // send this function to the ref prop of the last <UserStatus /> component
-  //   to get the node of the last <UserStatus />
-  //   this node will be monitored by the intersection observer
+  // to get the node of the last <UserStatus />
+  // this node will be monitored by the intersection observer
   // to get to know when this node is visible on the viewport,
   const lastUserStatusRef = React.useCallback(
     (node) => {
@@ -70,6 +71,7 @@ const UserStatusList = () => {
               ref={lastUserStatusRef}
             >
               <UserStatus
+                // send the index of the of the UserStatus in tasksOfDays state
                 indexInTasksOfDays={index}
                 tasksOfADay={tasksOfADay}
                 activeTaskId={activeTaskId}
@@ -80,6 +82,7 @@ const UserStatusList = () => {
         return (
           <UserStatus
             key={index}
+            // send the index of the of the UserStatus in tasksOfDays state
             indexInTasksOfDays={index}
             tasksOfADay={tasksOfADay}
             activeTaskId={activeTaskId}

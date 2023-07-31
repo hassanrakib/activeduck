@@ -7,7 +7,6 @@ import TaskSettings from "../TaskSettings/TaskSettings";
 import useTaskProgress from "../../../hooks/useTaskProgress";
 import WorkedTimeSpans from "../WorkedTimeSpans/WorkedTimeSpans";
 
-//** socket disconnection handling is important otherwise endTime property will not be added **//
 const Task = ({ task, activeTaskId, indexInTasksOfDays }) => {
 
   // destructuring

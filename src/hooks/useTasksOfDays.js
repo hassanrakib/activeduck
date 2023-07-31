@@ -4,19 +4,20 @@ import { endOfDay, isSameDay, startOfDay, startOfToday, subDays } from "date-fns
 
 const useTasksOfDays = (startDate) => {
 
-    // tasksOfDays will hold an array of objects where every object will look like {day: {startDate: localDate, endDate: localDate}, tasks: []}
+    // tasksOfDays will hold an array of objects where every object will look like =>
+    // {day: {startDate: localDateObject, endDate: localDateObject}, tasks: [{}, {}...], totalCompletedTimes: [{}, {}]}
     const [tasksOfDays, setTasksOfDays] = React.useState([]);
-    // if loading new tasks of a date, it is true otherwise false
+    // if loading new tasks of a day, it is true otherwise false
     const [loading, setLoading] = React.useState(false);
-    // if error happens when trying to load tasks of a date
+    // if error happens when trying to load tasks of a day
     const [error, setError] = React.useState(false);
     // current activeTaskId
     const [activeTaskId, setActiveTaskId] = React.useState("");
 
 
     // totalCompletedTimes is going to be an array of total completed times of a date range
-    // total completed times will be in milliseconds (ex: [{_id: '2023-07-12', completedTime: 0}...])
-    // _id holds the local date
+    // total completed times will be in milliseconds (ex: [{localDate: '2023-07-12', completedTime: 0}...])
+    // readTotalCompletedTimes recieves a day's startDate & endDate also tasks of that day
     function readTotalCompletedTimes(startDate, endDate, { tasks }) {
         // create a promise to do asynchronous task inside it
         return new Promise((resolve) => {
@@ -43,6 +44,7 @@ const useTasksOfDays = (startDate) => {
                 );
 
                 // get start date of dateAfterSubtraction, then convert it to utc date
+                // from this date we will collect the totalCompletedTimes
                 const startDateString = startOfDay(dateAfterSubtraction).toISOString();
 
                 // get the user's time zone to send it to the backend
@@ -72,11 +74,11 @@ const useTasksOfDays = (startDate) => {
     // load tasks by date
     React.useEffect(() => {
 
-        // get the endDate based on the startDate
+        // get the endDate of a day based on the startDate
         const endDate = endOfDay(startDate);
 
         function readTasksOfADay(startDate, endDate) {
-            // emit "tasks:read" event to get the tasks of a date
+            // emit "tasks:read" event to get the tasks of a day
             // startDate & endDate is the two dates of the same day to define start & end of the day
             // convert the startDate and endDate to utc date string
             socket.emit(
@@ -87,6 +89,7 @@ const useTasksOfDays = (startDate) => {
                 (tasksOfADay) => {
 
                     // now read total completed times
+                    // startDate and endDate are two local date objects to define start and end of the same day
                     readTotalCompletedTimes(startDate, endDate, tasksOfADay)
                         .then(totalCompletedTimes => {
                             //   set the tasks of a day to tasksOfDays state
@@ -102,6 +105,8 @@ const useTasksOfDays = (startDate) => {
                             ]);
                         })
                         .then(() => {
+                            // after completing reading tasks of a day and totalCompletedTimes of a date range
+                            // set loading to false
                             setLoading(false);
                         })
                 });
@@ -122,6 +127,7 @@ const useTasksOfDays = (startDate) => {
                 endTime.workedTimeSpanId,
                 endTime.endTime,
                 // send indexInTasksOfDays undefined
+                // so, that we don't emit tasks:change event from the backend
                 undefined,
                 (response) => {
                     console.log(response);
@@ -147,9 +153,9 @@ const useTasksOfDays = (startDate) => {
     // when there is any change of task
     React.useEffect(() => {
         // "tasks:change" event listener recieves the active task id
-        // that we sent to BE during "workedTimeSpan:start" event in the Task component
-        // this listener emits the "tasks:read" event and send the activeTaskId
+        // that we sent to BE during "workedTimeSpan:start" event in the PlayPauseIcon component
         function onTasksChangeEvent(indexInTasksOfDays, activeTaskId) {
+            // get the object that has changed by the index of that in TasksOfDays state
             const changedTasksOfADay = tasksOfDays[indexInTasksOfDays];
             const { day, day: { startDate, endDate } } = changedTasksOfADay;
             socket.emit("tasks:read", startDate.toISOString(), endDate.toISOString(), (tasksOfADay) => {

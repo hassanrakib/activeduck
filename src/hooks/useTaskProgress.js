@@ -2,6 +2,8 @@ import React from "react";
 import { socket } from "../socket";
 import getTimeDifferenceInMilliseconds from "../lib/getTimeDifferenceInMilliseconds";
 
+// indexInTasksOfDays is the index of the object in the tasksOfDays state
+// for more understanding see the onTasksChange event listener function (that uses indexInTasksOfDays) in useTasksOfDays hook
 const useTaskProgress = (_id, activeTaskId, indexInTasksOfDays, workedTimeSpans, levels) => {
 
   //  if the current activeTaskId equals to this task's _id, that means the task is active

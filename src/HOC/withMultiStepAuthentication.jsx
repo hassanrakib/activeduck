@@ -119,6 +119,7 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
         .then(() => {
           saveUserToDB({
             username: form.username,
+            // save when the user is created
             createdAt: new Date().toISOString(),
           });
         })
