@@ -9,7 +9,7 @@ import WorkedTimeSpans from "../WorkedTimeSpans/WorkedTimeSpans";
 import { socket } from "../../../socket";
 
 
-const EditTaskModal = ({ task, activeTaskId, closeEditTaskModal, indexInTasksOfDays }) => {
+const EditTaskModal = ({ task, closeEditTaskModal, indexInTasksOfDays }) => {
   // destructure
   const { _id, name, workedTimeSpans } = task;
 
@@ -32,15 +32,13 @@ const EditTaskModal = ({ task, activeTaskId, closeEditTaskModal, indexInTasksOfD
   const editTask = (data) => {
     const updatedTaskName = data.taskName;
     // emit event to update the taskName
-    // also send the activeTaskId to keep a task in active state (if it was active before update)
-    socket.emit("taskName:update", _id, updatedTaskName, activeTaskId, indexInTasksOfDays, (response) => {
+    socket.emit("taskName:update", _id, updatedTaskName, indexInTasksOfDays, (response) => {
       // after successfully updating the task name
       console.log(response);
     });
 
     // update the workedTimeSpans array
-    // also send the activeTaskId to keep a task in active state (if it was active before update)
-    socket.emit("workedTimeSpan:delete", _id, deleteMarkedTimeSpansIds, activeTaskId, indexInTasksOfDays);
+    socket.emit("workedTimeSpan:delete", _id, deleteMarkedTimeSpansIds, indexInTasksOfDays);
 
     // finally close the modal
     closeEditTaskModal();

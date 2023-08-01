@@ -6,20 +6,14 @@ import Message from "../../Shared/Message/Message";
 import { socket } from "../../../socket";
 
 
-const DeleteTaskModal = ({ task, activeTaskId, currentLevel, completedTimeInMilliseconds, isTaskActive, closeDeleteTaskModal, indexInTasksOfDays }) => {
+const DeleteTaskModal = ({ task, currentLevel, completedTimeInMilliseconds, isTaskActive, closeDeleteTaskModal, indexInTasksOfDays }) => {
   // destructure
   const { name, _id } = task;
 
   // delete the task
   function deleteTask() {
-    // if the task is active, then after delete there will be no activeTaskId
-    // that's why sending empty string
-    // if the task is not active, then any other task might be active
-    // that's why sending activeTaskId
-    const activeTaskIdToSend = isTaskActive ? "" : activeTaskId;
-
     // emit "tasks:delete" event to delete the task
-    socket.emit("tasks:delete", _id, activeTaskIdToSend, indexInTasksOfDays, (response) => {
+    socket.emit("tasks:delete", _id, isTaskActive, indexInTasksOfDays, (response) => {
       console.log(response.message);
     });
   }

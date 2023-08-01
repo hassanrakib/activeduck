@@ -152,8 +152,11 @@ const useTasksOfDays = (startDate) => {
 
     // when there is any change of task
     React.useEffect(() => {
-        // "tasks:change" event listener recieves the active task id
-        // that we sent to BE during "workedTimeSpan:start" event in the PlayPauseIcon component
+        // "tasks:change" event listener recieves the activeTaskId
+        // that we sent to BE with "workedTimeSpan:start",
+        // "tasks:delete" event listener in BE sometimes sends activeTaskId as empty string
+        // "workedTimeSpan:end" event listener in BE sends activeTaskId as empty string
+        // otherwise activeTaskId undefined. when undefined we don't set activeTaskId state
         function onTasksChangeEvent(indexInTasksOfDays, activeTaskId) {
             // get the object that has changed by the index of that in TasksOfDays state
             const changedTasksOfADay = tasksOfDays[indexInTasksOfDays];
@@ -165,8 +168,12 @@ const useTasksOfDays = (startDate) => {
                         const updatedTasksOfDays = [...tasksOfDays];
                         updatedTasksOfDays[indexInTasksOfDays] = { day, ...tasksOfADay, ...totalCompletedTimes };
 
-                        // set activeTaskId state
-                        setActiveTaskId(activeTaskId);
+                        // set activeTaskId state when it is not undefined
+                        // activeTaskId will be undefined when it is not sent from the BE
+                        // it is not sent to keep the activeTaskId intact
+                        if (typeof activeTaskId !== "undefined") {
+                            setActiveTaskId(activeTaskId);
+                        }
 
                         // set the tasksOfDays state
                         setTasksOfDays(updatedTasksOfDays);

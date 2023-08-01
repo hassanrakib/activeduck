@@ -37,7 +37,6 @@ const Task = ({ task, activeTaskId, indexInTasksOfDays }) => {
               <p>{name}</p>
               <TaskSettings
                 task={task}
-                activeTaskId={activeTaskId}
                 currentLevel={currentLevel}
                 completedTimeInMilliseconds={completedTimeInMilliseconds}
                 isTaskActive={isTaskActive}
