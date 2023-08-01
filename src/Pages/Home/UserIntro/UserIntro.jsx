@@ -9,28 +9,34 @@ import { socket } from "../../../socket";
 import getTimeDifferenceInMilliseconds from "../../../lib/getTimeDifferenceInMilliseconds";
 
 const UserIntro = ({ totalCompletedTime, tasks, activeTaskId }) => {
-  
   // get the user from the context
   const { user } = useAuth();
 
   // initialize totalCompletedTimeInMs state with totalCompletedTime prop
   // as we will need to change totalCompletedTime
-  const [totalCompletedTimeInMs, setTotalCompletedTimeInMs] = React.useState(totalCompletedTime);
-
-  // isATaskActive state determines whether spin the sand glass icon
-  // const [isATaskActive, setIsATaskActive] = React.useState(false);
+  const [totalCompletedTimeInMs, setTotalCompletedTimeInMs] =
+    React.useState(totalCompletedTime);
 
   // know whether user got disconnected
   const [isDisconnected, setIsDisconnected] = React.useState(false);
 
+  // defines whether any task is active within this <UserStatus /> component
   const isATaskActive = React.useMemo(() => {
-    // comment here
-    return !!(tasks.find(task => task._id === activeTaskId));
+    // if any of the tasks _id property matches activeTaskId return true otherwise false
+    return !!tasks.find((task) => task._id === activeTaskId);
   }, [tasks, activeTaskId]);
+
+  // update totalCompletedTimeInMs state after re-render and change of totalCompletedTime prop
+  React.useEffect(() => {
+    setTotalCompletedTimeInMs(totalCompletedTime);
+  }, [totalCompletedTime]);
 
   React.useEffect(() => {
     function onWorkedTimeSpanContinue(startTime, endTime) {
-      const timeDifference = getTimeDifferenceInMilliseconds(startTime, endTime);
+      const timeDifference = getTimeDifferenceInMilliseconds(
+        startTime,
+        endTime
+      );
 
       // add the timeDifference to the totalCompletedTime and set the totalCompletedTimeInMs state
       setTotalCompletedTimeInMs(totalCompletedTime + timeDifference);
@@ -53,7 +59,7 @@ const UserIntro = ({ totalCompletedTime, tasks, activeTaskId }) => {
       socket.on("connect", () => {
         // set isDisconnected state to false
         setIsDisconnected(false);
-      })
+      });
     }
 
     // if no task is active
@@ -67,7 +73,7 @@ const UserIntro = ({ totalCompletedTime, tasks, activeTaskId }) => {
       socket.off("workedTimeSpan:continue", onWorkedTimeSpanContinue);
       socket.off("disconnected");
       socket.off("connect");
-    }
+    };
   }, [totalCompletedTime, isATaskActive]);
 
   return (
@@ -76,13 +82,15 @@ const UserIntro = ({ totalCompletedTime, tasks, activeTaskId }) => {
       <Avatar image={userImage} />
       {/* user name and worked time*/}
       <p className={styles.userName}>
-        <b>@{user?.username}</b> worked for {" "}
+        <b>@{user?.username}</b> worked for{" "}
         <GiSandsOfTime
           color="blueviolet"
           className={isATaskActive && !isDisconnected ? styles.spin : ""}
         />{" "}
         {/* convertToHumanReadableTime converts time in milliseconds to human readable time */}
-        <span className={styles.totalTime}>{convertToHumanReadableTime(totalCompletedTimeInMs)}</span>
+        <span className={styles.totalTime}>
+          {convertToHumanReadableTime(totalCompletedTimeInMs)}
+        </span>
       </p>
     </div>
   );
