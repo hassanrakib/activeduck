@@ -8,39 +8,25 @@ import React from "react";
 import { socket } from "../../../socket";
 import getTimeDifferenceInMilliseconds from "../../../lib/getTimeDifferenceInMilliseconds";
 
-// first time totalCompletedTime will be undefined
-// as totalCompletedTimes state in the UserStatus will be empty
-// so we give it a default value of 0 
-const UserIntro = ({ totalCompletedTime = 0, isAnyTaskActive }) => {
+const UserIntro = ({ totalCompletedTime, tasks, activeTaskId }) => {
+  
   // get the user from the context
   const { user } = useAuth();
 
-  // state that holds totalCompletedTime for the all the tasks loaded
-  // in the <TaskList /> child of the UserStatus parent
+  // initialize totalCompletedTimeInMs state with totalCompletedTime prop
+  // as we will need to change totalCompletedTime
   const [totalCompletedTimeInMs, setTotalCompletedTimeInMs] = React.useState(totalCompletedTime);
 
-  // isAnyTaskActiveState state determines whether spin the sand glass icon
-  const [isAnyTaskActiveState, setIsAnyTaskActiveState] = React.useState(false);
+  // isATaskActive state determines whether spin the sand glass icon
+  // const [isATaskActive, setIsATaskActive] = React.useState(false);
 
   // know whether user got disconnected
   const [isDisconnected, setIsDisconnected] = React.useState(false);
 
-  // keeping the totalCompletedTime prop to the totalCompletedTimeInMs state
-  React.useEffect(() => {
-    // when totalCompletedTime anything other than falsy value, set totalCompletedTimeInMs state
-    // with totalCompletedTime
-    if (totalCompletedTime) {
-      setTotalCompletedTimeInMs(totalCompletedTime);
-    }
-  }, [totalCompletedTime]);
-
-  // after getting isAnyTaskActive prop update the isAnyTaskActiveState state
-  React.useEffect(() => {
-    // if isAnyTaskActiveState state not equals to isAnyTaskActive prop update the state
-    if (isAnyTaskActiveState !== isAnyTaskActive) {
-      setIsAnyTaskActiveState(isAnyTaskActive);
-    }
-  }, [isAnyTaskActive, isAnyTaskActiveState]);
+  const isATaskActive = React.useMemo(() => {
+    // comment here
+    return !!(tasks.find(task => task._id === activeTaskId));
+  }, [tasks, activeTaskId]);
 
   React.useEffect(() => {
     function onWorkedTimeSpanContinue(startTime, endTime) {
@@ -52,7 +38,7 @@ const UserIntro = ({ totalCompletedTime = 0, isAnyTaskActive }) => {
     // register "workedTimeSpan:continue" event listener to calculate the time difference
     // in millisecond of the active task's last workedTimeSpan object's startTime and endTime
     // when any of the tasks is active
-    if (isAnyTaskActiveState) {
+    if (isATaskActive) {
       socket.on("workedTimeSpan:continue", onWorkedTimeSpanContinue);
 
       // if user gets disconnected
@@ -71,7 +57,7 @@ const UserIntro = ({ totalCompletedTime = 0, isAnyTaskActive }) => {
     }
 
     // if no task is active
-    if (!isAnyTaskActiveState) {
+    if (!isATaskActive) {
       // cleanup
       socket.off("workedTimeSpan:continue", onWorkedTimeSpanContinue);
     }
@@ -82,7 +68,7 @@ const UserIntro = ({ totalCompletedTime = 0, isAnyTaskActive }) => {
       socket.off("disconnected");
       socket.off("connect");
     }
-  }, [totalCompletedTime, isAnyTaskActiveState]);
+  }, [totalCompletedTime, isATaskActive]);
 
   return (
     <div className={styles.userIntro}>
@@ -93,7 +79,7 @@ const UserIntro = ({ totalCompletedTime = 0, isAnyTaskActive }) => {
         <b>@{user?.username}</b> worked for {" "}
         <GiSandsOfTime
           color="blueviolet"
-          className={isAnyTaskActiveState && !isDisconnected ? styles.spin : ""}
+          className={isATaskActive && !isDisconnected ? styles.spin : ""}
         />{" "}
         {/* convertToHumanReadableTime converts time in milliseconds to human readable time */}
         <span className={styles.totalTime}>{convertToHumanReadableTime(totalCompletedTimeInMs)}</span>

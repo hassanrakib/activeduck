@@ -1,9 +1,7 @@
 import Task from "../Task/Task";
 import styles from "./TaskList.module.css";
 
-const TaskList = ({tasksOfADay, indexInTasksOfDays}) => {
-
-  const {tasks} = tasksOfADay;
+const TaskList = ({tasks, indexInTasksOfDays, activeTaskId}) => {
 
   // React.useEffect(() => {
   //   // it emits "tasks:read" event with the stored activeTaskId from the state
@@ -27,10 +25,7 @@ const TaskList = ({tasksOfADay, indexInTasksOfDays}) => {
         <Task
           key={task._id}
           task={task}
-          // accomplish this
-          // activeTaskId={task.activeTaskId}
-          // remove this
-          activeTaskId=''
+          activeTaskId={activeTaskId}
           indexInTasksOfDays={indexInTasksOfDays}
         />
       ))}

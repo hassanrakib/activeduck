@@ -2,15 +2,10 @@ import TimeChart from "../../Shared/TimeChart/TimeChart";
 import TaskList from "../TaskList/TaskList";
 import UserIntro from "../UserIntro/UserIntro";
 import styles from "./UserStatus.module.css";
-import {
-  format,
-  isSameYear,
-  isSameDay,
-  startOfToday,
-} from "date-fns";
+import { format, isSameYear, isSameDay, startOfToday } from "date-fns";
 
 const UserStatus = ({ tasksOfADay, indexInTasksOfDays, activeTaskId }) => {
-  const { day, tasks, totalCompletedTimes} = tasksOfADay;
+  const { day, tasks, totalCompletedTimes } = tasksOfADay;
 
   // if no task for the date & the date is not today
   // then don't render, instead return null
@@ -36,9 +31,14 @@ const UserStatus = ({ tasksOfADay, indexInTasksOfDays, activeTaskId }) => {
         totalCompletedTime={
           totalCompletedTimes[totalCompletedTimes.length - 1]?.completedTime
         }
-        // isAnyTaskActive={!!lastTaskDate?.activeTaskId}
+        tasks={tasks}
+        activeTaskId={activeTaskId}
       />
-      <TaskList tasksOfADay={tasksOfADay} indexInTasksOfDays={indexInTasksOfDays} />
+      <TaskList
+        tasks={tasks}
+        indexInTasksOfDays={indexInTasksOfDays}
+        activeTaskId={activeTaskId}
+      />
       <TimeChart totalCompletedTimes={totalCompletedTimes} />
     </div>
   );
