@@ -52,8 +52,8 @@ const useTasksOfDays = (startDate) => {
 
                 // sending startDateString, endDateString and timeZone
                 // we will collect all the tasks between startDateString and endDateString to get
-                // array of completedTimes for a number of days [{_id: '2023-07-12', completedTime: 0}...]
-                // sending timeZone to convert utc date to local date and get it here in _id
+                // array of completedTimes for a number of days [{localDate: '2023-07-12', completedTime: 0}...]
+                // sending timeZone to convert utc date to local date
                 socket.emit(
                     "totalCompletedTimes:read",
                     startDateString,
@@ -132,11 +132,6 @@ const useTasksOfDays = (startDate) => {
                 (response) => {
                     console.log(response);
                     // if successful in saving the endTime
-                    // "tasks:change" event is emitted from BE, that is listened by the TaskList component
-                    // then the TaskList component emits "tasks:read" event to listen "tasks:read" event emitted by BE
-                    // then by listening "tasks:read", TaskList component sets tasks state
-                    // so re-render happens to this task as well
-                    // and we clear activeTaskId to empty string in this process
 
                     // clear the local storage after saving endTime
                     localStorage.removeItem("endTime");
