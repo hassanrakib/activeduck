@@ -1,4 +1,4 @@
-import { isSameDay, startOfToday } from "date-fns";
+import { isSameDay, startOfDay, startOfToday } from "date-fns";
 import React from "react";
 import Loader from "../../Shared/Loader/Loader";
 import UserStatus from "../UserStatus/UserStatus";
@@ -36,6 +36,7 @@ const UserStatusList = () => {
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     socket.emit("existingDates:read", timeZone, (existingDates) => {
+
       // get the local date strings of the tasks that user created
       // if no task created by an user existingDates will be an empty array
       // so, localDatesOfTasks will be undefined
@@ -91,7 +92,7 @@ const UserStatusList = () => {
         if (entries[0].isIntersecting && dates[indexInDatesRef.current]) {
           // set startDate state by taking the date string from the dates state
           // covert date string to date object
-          setStartDate(new Date(dates[indexInDatesRef.current]));
+          setStartDate(startOfDay(new Date(dates[indexInDatesRef.current])));
 
           // after using index to get the date from dates and setting it to the startDate
           // increase indexInDates by 1

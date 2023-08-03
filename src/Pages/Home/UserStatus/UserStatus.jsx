@@ -2,16 +2,10 @@ import TimeChart from "../../Shared/TimeChart/TimeChart";
 import TaskList from "../TaskList/TaskList";
 import UserIntro from "../UserIntro/UserIntro";
 import styles from "./UserStatus.module.css";
-import { format, isSameYear, isSameDay, startOfToday } from "date-fns";
+import { format, isSameYear } from "date-fns";
 
 const UserStatus = ({ tasksOfADay, indexInTasksOfDays, activeTaskId }) => {
   const { day, tasks, totalCompletedTimes } = tasksOfADay;
-
-  // if no task for the date & the date is not today
-  // then don't render, instead return null
-  if (!tasks.length && !isSameDay(day.startDate, startOfToday())) {
-    return null;
-  }
 
   // format the day.startDate object to date string like "10 Jul 2023"
   // but if the day.startDate contains the year that is the current year then the year is not shown
