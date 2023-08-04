@@ -148,25 +148,34 @@ const useTasksOfDays = (startDate) => {
         function onTasksChangeEvent(indexInTasksOfDays, activeTaskId) {
             // get the object that has changed by the index of that in TasksOfDays state
             const changedTasksOfADay = tasksOfDays[indexInTasksOfDays];
-            const { day, day: { startDate, endDate } } = changedTasksOfADay;
-            socket.emit("tasks:read", startDate.toISOString(), endDate.toISOString(), (tasksOfADay) => {
-                readTotalCompletedTimes(endDate)
-                    .then((totalCompletedTimes) => {
-                        // create a shallow copy of tasksOfDays
-                        const updatedTasksOfDays = [...tasksOfDays];
-                        updatedTasksOfDays[indexInTasksOfDays] = { day, ...tasksOfADay, ...totalCompletedTimes };
 
-                        // set activeTaskId state when it is not undefined
-                        // activeTaskId will be undefined when it is not sent from the BE
-                        // it is not sent to keep the activeTaskId intact
-                        if (typeof activeTaskId !== "undefined") {
-                            setActiveTaskId(activeTaskId);
-                        }
+            // if a user uses multiple devices
+            // and first device loaded a day's data using intersection observer
+            // but second device didn't load that day's data
+            // so, first device can emit "tasks:change" event to all the devices of the same user
+            // including the second device. but the second device won't find that day's data in
+            // tasksOfDays state using indexInTasksOfDays, as a result changedTasksOfADay will be undefined
+            if (changedTasksOfADay) {
+                const { day, day: { startDate, endDate } } = changedTasksOfADay;
+                socket.emit("tasks:read", startDate.toISOString(), endDate.toISOString(), (tasksOfADay) => {
+                    readTotalCompletedTimes(endDate)
+                        .then((totalCompletedTimes) => {
+                            // create a shallow copy of tasksOfDays
+                            const updatedTasksOfDays = [...tasksOfDays];
+                            updatedTasksOfDays[indexInTasksOfDays] = { day, ...tasksOfADay, ...totalCompletedTimes };
 
-                        // set the tasksOfDays state
-                        setTasksOfDays(updatedTasksOfDays);
-                    })
-            });
+                            // set activeTaskId state when it is not undefined
+                            // activeTaskId will be undefined when it is not sent from the BE
+                            // it is not sent to keep the activeTaskId intact
+                            if (typeof activeTaskId !== "undefined") {
+                                setActiveTaskId(activeTaskId);
+                            }
+
+                            // set the tasksOfDays state
+                            setTasksOfDays(updatedTasksOfDays);
+                        })
+                });
+            }
         }
 
         // listen to "tasks:change" event
