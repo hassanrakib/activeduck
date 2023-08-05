@@ -36,7 +36,6 @@ const UserStatusList = () => {
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     socket.emit("existingDates:read", timeZone, (existingDates) => {
-
       // get the local date strings of the tasks that user created
       // if no task created by an user existingDates will be an empty array
       // so, localDatesOfTasks will be undefined

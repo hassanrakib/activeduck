@@ -77,7 +77,7 @@ const useTaskProgress = (_id, activeTaskId, indexInTasksOfDays, workedTimeSpans,
     // workedTimeSpans last element may not have its endTime property
     // because user may delete endTime from localStorage that was saved when user got
     // disconnected while doing a task, so we haven't been able to register endTime and
-    // and set tasks in TaskList component
+    // and read tasksOfDays in useTasksOfDays hook
     // instead we set tasks only, skipping the registering endTime part in the TaskList
 
     // if the task is not active, lastWorkedTimeSpan.endTime should exist

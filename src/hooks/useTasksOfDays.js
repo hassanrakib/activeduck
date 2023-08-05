@@ -65,6 +65,15 @@ const useTasksOfDays = (startDate) => {
         })
     }
 
+    // get the state of the room of the user
+    // room state contains the activeTaskId
+    React.useEffect(() => {
+        socket.emit("roomState:read", (state) => {
+            setActiveTaskId(state.activeTaskId);
+            console.log(state);
+        })
+    }, []);
+
     // load tasks by date
     React.useEffect(() => {
 
@@ -140,6 +149,17 @@ const useTasksOfDays = (startDate) => {
 
     // when there is any change of task
     React.useEffect(() => {
+
+        // set activeTaskId state
+        const setActiveTaskIdFn = (activeTaskId) => {
+            // set activeTaskId state when it is not undefined
+            // activeTaskId will be undefined when it is not sent from the BE
+            // it is not sent to keep the activeTaskId intact
+            if (typeof activeTaskId !== "undefined") {
+                setActiveTaskId(activeTaskId);
+            }
+        }
+
         // "tasks:change" event listener recieves the activeTaskId
         // that we sent to BE with "workedTimeSpan:start",
         // "tasks:delete" event listener in BE sometimes sends activeTaskId as empty string
@@ -164,17 +184,23 @@ const useTasksOfDays = (startDate) => {
                             const updatedTasksOfDays = [...tasksOfDays];
                             updatedTasksOfDays[indexInTasksOfDays] = { day, ...tasksOfADay, ...totalCompletedTimes };
 
-                            // set activeTaskId state when it is not undefined
-                            // activeTaskId will be undefined when it is not sent from the BE
-                            // it is not sent to keep the activeTaskId intact
-                            if (typeof activeTaskId !== "undefined") {
-                                setActiveTaskId(activeTaskId);
-                            }
+                            // before setting activeTaskId in client side
+                            // update activeTaskId in the state of the room
+                            socket.emit("roomState:update", {activeTaskId});
+
+                            // set activeTaskId state with some checking
+                            setActiveTaskIdFn(activeTaskId);
 
                             // set the tasksOfDays state
                             setTasksOfDays(updatedTasksOfDays);
                         })
                 });
+            } else {
+                // we will not set tasksOfDays state as we tried to find data of the day using indexInTasksOfDays
+                // but not available in the tasksOfDays state
+                // we will set the activeTaskId state as when the data of that day is loaded using intersection observer
+                // it can use the activeTaskId state
+                setActiveTaskIdFn(activeTaskId);
             }
         }
 
