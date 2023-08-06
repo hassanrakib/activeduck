@@ -191,9 +191,8 @@ const useTaskProgress = (_id, activeTaskId, indexInTasksOfDays, workedTimeSpans,
                   setIsDisconnected(false);
 
                   // if successful in saving the endTime
-                  // "tasks:change" event is emitted from BE, that is listened by the TaskList component
-                  // then the TaskList component emits "tasks:read" event to listen "tasks:read" event emitted by BE
-                  // then by listening "tasks:read", TaskList component sets tasks state
+                  // "tasks:change" event is emitted from BE, that is listened by the useTasksOfDays hook
+                  // then the useTasksOfDays hook emits "tasks:read" event to set updated tasksOfDays
                   // so re-render happens to this task as well
                   // and we clear activeTaskId to empty string in this process
 

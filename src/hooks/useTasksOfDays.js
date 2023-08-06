@@ -65,12 +65,22 @@ const useTasksOfDays = (startDate) => {
         })
     }
 
-    // get the state of the room of the user
+    // get state of the user's room
     // room state contains the activeTaskId
     React.useEffect(() => {
         socket.emit("roomState:read", (state) => {
-            setActiveTaskId(state.activeTaskId);
             console.log(state);
+            setActiveTaskId(state.activeTaskId);
+
+            // when there is no socket(user) in a room we delete the room state from the db
+            // "disconnect" event in server side uses deleteARoomState() function to do this operation
+
+            // if the room state is found we call the callback in "roomState:read" listener in server side
+            // scenerio: suppose you have the same user from two different devices
+            // so, the room has two sockets
+            // now, if a task is active
+            // and one device gets disconnected, we store the endTime in localStorage of that device
+            // but if again the device reconnects, we will get the activeTaskId
         })
     }, []);
 
@@ -186,13 +196,17 @@ const useTasksOfDays = (startDate) => {
 
                             // before setting activeTaskId in client side
                             // update activeTaskId in the state of the room
-                            socket.emit("roomState:update", {activeTaskId});
+                            socket.emit("roomState:update", activeTaskId, () => {
+                                // if response recieved that means successfuly
+                                // updated the room's state in db
+                                // now do rest of the operations
 
-                            // set activeTaskId state with some checking
-                            setActiveTaskIdFn(activeTaskId);
+                                // set activeTaskId state with some checking
+                                setActiveTaskIdFn(activeTaskId);
 
-                            // set the tasksOfDays state
-                            setTasksOfDays(updatedTasksOfDays);
+                                // set the tasksOfDays state
+                                setTasksOfDays(updatedTasksOfDays);
+                            });
                         })
                 });
             } else {
