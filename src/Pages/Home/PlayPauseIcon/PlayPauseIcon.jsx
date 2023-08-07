@@ -52,6 +52,7 @@ const PlayPauseIcon = ({
         // don't send endTime instead send undefined, because we manually stopping the task
         // so, it takes endTime from BE
         undefined,
+        false,
         indexInTasksOfDays,
         (response) => {
           console.log(response);

@@ -138,6 +138,8 @@ const useTasksOfDays = (startDate) => {
                 endTime._id,
                 endTime.workedTimeSpanId,
                 endTime.endTime,
+                // send wasDisconnected as true
+                true,
                 // send indexInTasksOfDays undefined
                 // so, that we don't emit tasks:change event from the backend
                 undefined,

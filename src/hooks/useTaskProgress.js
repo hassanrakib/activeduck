@@ -165,6 +165,7 @@ const useTaskProgress = (_id, activeTaskId, indexInTasksOfDays, workedTimeSpans,
           activeTaskId,
           workedTimeSpanId,
           endTime,
+          wasDisconnected,
           indexInTasksOfDays,
         ) => {
           socket
@@ -174,6 +175,7 @@ const useTaskProgress = (_id, activeTaskId, indexInTasksOfDays, workedTimeSpans,
               activeTaskId,
               workedTimeSpanId,
               endTime,
+              wasDisconnected,
               indexInTasksOfDays,
               (err, response) => {
                 // if err happens in saving endTime, try again
@@ -183,6 +185,7 @@ const useTaskProgress = (_id, activeTaskId, indexInTasksOfDays, workedTimeSpans,
                     activeTaskId,
                     workedTimeSpanId,
                     endTime,
+                    wasDisconnected,
                     indexInTasksOfDays
                   );
                 } else {
@@ -207,7 +210,8 @@ const useTaskProgress = (_id, activeTaskId, indexInTasksOfDays, workedTimeSpans,
           activeTaskId,
           lastWorkedTimeSpan._id,
           activeTaskEndTimeRef.current,
-          indexInTasksOfDays
+          true,
+          indexInTasksOfDays,
         );
       });
     }
