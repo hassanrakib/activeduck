@@ -140,9 +140,9 @@ const useTasksOfDays = (startDate) => {
                 endTime.endTime,
                 // send wasDisconnected as true
                 true,
-                // send indexInTasksOfDays undefined
+                // send indexInTasksOfDays as -1
                 // so, that we don't emit tasks:change event from the backend
-                undefined,
+                -1,
                 (response) => {
                     console.log(response);
                     // if successful in saving the endTime

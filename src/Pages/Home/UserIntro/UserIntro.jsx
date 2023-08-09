@@ -32,6 +32,22 @@ const UserIntro = ({ totalCompletedTime, tasks, activeTaskId }) => {
   }, [totalCompletedTime]);
 
   React.useEffect(() => {
+    // add connect event listener to know when the socket is connected again
+    const onConnect = () => {
+      // set isDisconnected state to false if it was true before
+      if (isDisconnected) {
+        setIsDisconnected(false);
+      }
+    };
+    socket.on("connect", onConnect);
+    // cleanup
+    return () => {
+      socket.off("connect", onConnect);
+    };
+  }, [isDisconnected]);
+
+  React.useEffect(() => {
+    // "workedTimeSpan:continue" event listener
     function onWorkedTimeSpanContinue(startTime, endTime) {
       const timeDifference = getTimeDifferenceInMilliseconds(
         startTime,
@@ -41,6 +57,15 @@ const UserIntro = ({ totalCompletedTime, tasks, activeTaskId }) => {
       // add the timeDifference to the totalCompletedTime and set the totalCompletedTimeInMs state
       setTotalCompletedTimeInMs(totalCompletedTime + timeDifference);
     }
+
+    // "disconnect" event listener
+    function onDisconnect() {
+      // set isDisconnected state to true
+      setIsDisconnected(true);
+      // clean the event listener
+      socket.off("workedTimeSpan:continue", onWorkedTimeSpanContinue);
+    }
+
     // register "workedTimeSpan:continue" event listener to calculate the time difference
     // in millisecond of the active task's last workedTimeSpan object's startTime and endTime
     // when any of the tasks is active
@@ -48,31 +73,20 @@ const UserIntro = ({ totalCompletedTime, tasks, activeTaskId }) => {
       socket.on("workedTimeSpan:continue", onWorkedTimeSpanContinue);
 
       // if user gets disconnected
-      socket.on("disconnect", () => {
-        // set isDisconnected state to true
-        setIsDisconnected(true);
-        // clean the event listener
-        socket.off("workedTimeSpan:continue", onWorkedTimeSpanContinue);
-      });
-
-      // if user gets reconnected
-      socket.on("connect", () => {
-        // set isDisconnected state to false
-        setIsDisconnected(false);
-      });
+      socket.on("disconnect", onDisconnect);
     }
 
     // if no task is active
     if (!isATaskActive) {
       // cleanup
       socket.off("workedTimeSpan:continue", onWorkedTimeSpanContinue);
+      socket.off("disconnect", onDisconnect);
     }
 
     // cleanup
     return () => {
       socket.off("workedTimeSpan:continue", onWorkedTimeSpanContinue);
-      socket.off("disconnected");
-      socket.off("connect");
+      socket.off("disconnect", onDisconnect);
     };
   }, [totalCompletedTime, isATaskActive]);
 

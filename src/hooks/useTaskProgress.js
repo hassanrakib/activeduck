@@ -120,6 +120,89 @@ const useTaskProgress = (_id, activeTaskId, indexInTasksOfDays, workedTimeSpans,
       );
     }
 
+    // disconnect event listener
+    function onDisconnect(err) {
+      // clear the listener that gets endTime from BE
+      socket.off("workedTimeSpan:continue", onWorkedTimeSpanContinue);
+
+      console.log(err);
+      // if client can't communicate with the server we get err
+      // save the endTime of the active task to localStorage
+      // that we updated to activeTaskEndTimeRef.current
+      // when the socket had connection to the server and we listened to "workedTimeSpan:continue"
+
+      // saving to localStorage is important becuase the user may leave the application
+      // while he/she was disconnected
+      localStorage.setItem(
+        "endTime",
+        JSON.stringify({
+          _id: activeTaskId,
+          endTime: activeTaskEndTimeRef.current,
+          // saving the _id of the lastWorkedTimeSpan, because it is the active workedTimeSpan
+          workedTimeSpanId: lastWorkedTimeSpan._id,
+        })
+      );
+
+      // set isDisconnected to true so that Progress & PlayPauseIcon component can use it
+      // for some kind of styling
+      setIsDisconnected(true);
+
+      // but if user doesn't leave the application we will continuously try to save the endTime
+      const registerUnfinishedEndtime = (
+        event,
+        activeTaskId,
+        workedTimeSpanId,
+        endTime,
+        wasDisconnected,
+        indexInTasksOfDays,
+      ) => {
+        socket
+          .timeout(2000)
+          .emit(
+            event,
+            activeTaskId,
+            workedTimeSpanId,
+            endTime,
+            wasDisconnected,
+            indexInTasksOfDays,
+            (err, response) => {
+              // if err happens in saving endTime, try again
+              if (err) {
+                registerUnfinishedEndtime(
+                  event,
+                  activeTaskId,
+                  workedTimeSpanId,
+                  endTime,
+                  wasDisconnected,
+                  indexInTasksOfDays
+                );
+              } else {
+                console.log(response);
+                // if connection reestablishes, set isDisconnected to false
+                setIsDisconnected(false);
+
+                // if successful in saving the endTime
+                // "tasks:change" event is emitted from BE, that is listened by the useTasksOfDays hook
+                // then the useTasksOfDays hook emits "tasks:read" event to set updated tasksOfDays
+                // so re-render happens to this task as well
+                // and we clear activeTaskId to empty string in this process
+
+                // clear the local storage after saving endTime
+                localStorage.removeItem("endTime");
+              }
+            }
+          );
+      };
+      registerUnfinishedEndtime(
+        "workedTimeSpan:end",
+        activeTaskId,
+        lastWorkedTimeSpan._id,
+        activeTaskEndTimeRef.current,
+        true,
+        indexInTasksOfDays,
+      );
+    }
+
     let interval;
     // if the task is active
     if (isTaskActive) {
@@ -133,87 +216,7 @@ const useTaskProgress = (_id, activeTaskId, indexInTasksOfDays, workedTimeSpans,
       socket.on("workedTimeSpan:continue", onWorkedTimeSpanContinue);
 
       // when socket gets disconnected
-      socket.on("disconnect", (err) => {
-        // clear the listener that gets endTime from BE
-        socket.off("workedTimeSpan:continue", onWorkedTimeSpanContinue);
-
-        console.log(err);
-        // if client can't communicate with the server we get err
-        // save the endTime of the active task to localStorage
-        // that we updated to activeTaskEndTimeRef.current
-        // when the socket had connection to the server and we listened to "workedTimeSpan:continue"
-
-        // saving to localStorage is important becuase the user may leave the application
-        // while he/she was disconnected
-        localStorage.setItem(
-          "endTime",
-          JSON.stringify({
-            _id: activeTaskId,
-            endTime: activeTaskEndTimeRef.current,
-            // saving the _id of the lastWorkedTimeSpan, because it is the active workedTimeSpan
-            workedTimeSpanId: lastWorkedTimeSpan._id,
-          })
-        );
-
-        // set isDisconnected to true so that Progress & PlayPauseIcon component can use it
-        // for some kind of styling
-        setIsDisconnected(true);
-
-        // but if user doesn't leave the application we will continuously try to save the endTime
-        const registerUnfinishedEndtime = (
-          event,
-          activeTaskId,
-          workedTimeSpanId,
-          endTime,
-          wasDisconnected,
-          indexInTasksOfDays,
-        ) => {
-          socket
-            .timeout(2000)
-            .emit(
-              event,
-              activeTaskId,
-              workedTimeSpanId,
-              endTime,
-              wasDisconnected,
-              indexInTasksOfDays,
-              (err, response) => {
-                // if err happens in saving endTime, try again
-                if (err) {
-                  registerUnfinishedEndtime(
-                    event,
-                    activeTaskId,
-                    workedTimeSpanId,
-                    endTime,
-                    wasDisconnected,
-                    indexInTasksOfDays
-                  );
-                } else {
-                  console.log(response);
-                  // if connection reestablishes, set isDisconnected to false
-                  setIsDisconnected(false);
-
-                  // if successful in saving the endTime
-                  // "tasks:change" event is emitted from BE, that is listened by the useTasksOfDays hook
-                  // then the useTasksOfDays hook emits "tasks:read" event to set updated tasksOfDays
-                  // so re-render happens to this task as well
-                  // and we clear activeTaskId to empty string in this process
-
-                  // clear the local storage after saving endTime
-                  localStorage.removeItem("endTime");
-                }
-              }
-            );
-        };
-        registerUnfinishedEndtime(
-          "workedTimeSpan:end",
-          activeTaskId,
-          lastWorkedTimeSpan._id,
-          activeTaskEndTimeRef.current,
-          true,
-          indexInTasksOfDays,
-        );
-      });
+      socket.on("disconnect", onDisconnect);
     }
 
     // when the task is not active
@@ -221,7 +224,7 @@ const useTaskProgress = (_id, activeTaskId, indexInTasksOfDays, workedTimeSpans,
       return () => {
         // cleanup the listener
         socket.off("workedTimeSpan:continue", onWorkedTimeSpanContinue);
-        socket.off("disconnect");
+        socket.off("disconnect", onDisconnect);
 
         // clear the timer
         clearInterval(interval);
@@ -230,9 +233,9 @@ const useTaskProgress = (_id, activeTaskId, indexInTasksOfDays, workedTimeSpans,
 
     // cleanup before unmounts
     return () => {
-      // cleanup the listener
+      // cleanup the listeners
       socket.off("workedTimeSpan:continue", onWorkedTimeSpanContinue);
-      socket.off("disconnect");
+      socket.off("disconnect", onDisconnect);
 
       // clear the timer
       clearInterval(interval);
