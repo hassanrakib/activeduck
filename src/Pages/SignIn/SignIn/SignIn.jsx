@@ -16,6 +16,7 @@ import withMultiStepAuthentication from "../../../HOC/withMultiStepAuthenticatio
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import useAuth from "../../../hooks/useAuth";
 import { useEffect } from "react";
+import { socket } from "../../../socket";
 
 const SignIn = ({
   currentPage,
@@ -65,10 +66,6 @@ const SignIn = ({
       setToken(token);
     }
   }, [token, user, setUserLoading, setToken, from, navigate]);
-
-
-  console.log(signInOperationLoading, userLoading);
-
 
   return (
     <div className={formContainer}>

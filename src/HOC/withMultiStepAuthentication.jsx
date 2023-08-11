@@ -45,11 +45,14 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
     // so, check input validity before going to next page
     const validateInputSetCurrentPage = async (nextPageIndex, fieldName) => {
       // trigger function returns true if the current input field is valid
+      // {shouldFocus: true} focus the input during setting an error
       const isValid = await trigger(fieldName, { shouldFocus: true });
+      // if the input is valid
       if (isValid) {
-        // set the page index to next page if the input is valid
+        // set the currentPage state to nextPageIndex
         setCurrentPage(nextPageIndex);
       }
+      // finally return a resolved promise with isValid data
       return isValid;
     };
 
@@ -83,6 +86,7 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
     };
 
     // [caution: sign  up related]
+    // save new user to db
     const saveUserToDB = async (newUser) => {
       const response = await fetch(`${import.meta.env.VITE_LOCAL_HOST}/users`, {
         method: "POST",
@@ -93,15 +97,17 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
       });
       const result = await response.json();
 
-      if (!result.acknowledged) Promise.reject("User creation failed");
+      // if failed to save, return a rejected promise
+      if (!result.acknowledged) await Promise.reject({message: "User creation failed"});
     };
 
     // [caution: sign up related]
     // get the submitted data
     const handleSignUp = (data) => {
       // check validity of the last input set current page index to the last page
+      // send next page index to move to the next page and field name to validate
       validateInputSetCurrentPage(4, "form.password").then((isValid) => {
-        // if the last input is not valid then return from here
+        // if the last input is not valid then return from here to quit the signup operation
         if (!isValid) return;
       });
 
@@ -111,7 +117,6 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
       setError("");
 
       const form = data.form;
-      console.log(form);
 
       // create user account (firebase)
       signUp(form.email, form.password)
@@ -119,8 +124,6 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
         .then(() => {
           saveUserToDB({
             username: form.username,
-            // save when the user is created
-            createdAt: new Date().toISOString(),
           });
         })
         .then(() => {
@@ -133,12 +136,13 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
         })
         .then(() => {
           console.log("email verification sent");
-          // and sign out the user to prevent unverified user to automatically be signed in
+          // sign out the user to prevent unverified user to automatically be signed in to firebase
+          // also if not signed out, the next sign in will not call the observer in AuthProvider
           signOutUser();
         })
         .catch((error) => {
+          // if any of the operation fails
           setError(error.message);
-          console.log(error.message);
         })
         .finally(() => {
           // finally setLoading to false as the operations are done
@@ -150,7 +154,7 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
     const handleSignIn = (data) => {
       // check validity of the last input set current page index to the last page
       validateInputSetCurrentPage(3, "form.password").then((isValid) => {
-        // if the last input is not valid then return from here
+        // if the last input is not valid then return from here to quit the singin operation
         if (!isValid) return;
       });
 
@@ -189,6 +193,7 @@ const withMultiStepAuthentication = (Form, isSignIn) => {
           }
         })
         .catch((error) => {
+          // if fails to sign in to firebase
           setError(error.message);
 
           // because of error in sign in operation => onAuthStateChanged will not be called

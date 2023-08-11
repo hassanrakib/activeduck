@@ -4,9 +4,9 @@ const useToken = (userFromFirebase) => {
   const [currentToken, setCurrentToken] = React.useState("");
 
   React.useEffect(() => {
-    // useToken is invoked by the userFromFirebase state change in AuthProvider
+    // useToken is invoked by the userFromFirebase state change in withMultiStepAuthentication hoc
     // if userFromFirebase has it's emailVerified to true
-    // then we setUserFromFirebase(userFromFirebase) in sign in handler 
+    // then we "setUserFromFirebase(userFromFirebase)" in sign in handler 
     
     // at first userFromFirebase is null
     // so check is needed

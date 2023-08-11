@@ -1,6 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import Loader from "../Pages/Shared/Loader/Loader";
+import { socket } from "../socket";
 
 const RequireAuth = ({ children }) => {
   // get the current authenticated user from the context
@@ -34,6 +35,10 @@ const RequireAuth = ({ children }) => {
     // send the location to the /auth page using the state prop
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
+
+  // connect to the socket server as we are sure that user successfully signed in
+  // and the token in localStorage exists
+  socket.connect();
 
   //   if the visitor is an authenticated user, let him/her go to the destination page
   return children;

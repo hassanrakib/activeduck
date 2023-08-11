@@ -29,7 +29,6 @@ const useTaskProgress = (_id, activeTaskId, indexInTasksOfDays, workedTimeSpans,
   // we will use the same initial time everytime to add it to the time difference
   // of the last workedTimeSpan object's startTime and endTime and set completedTimeInMs state
   const initialCompletedTimeInMs = React.useMemo(() => {
-    console.log('calculating initial completed time');
     // calculate the completed time in milliseconds from workedTimeSpans array
     return workedTimeSpans.reduce(
       (completedTime, timeSpan) => {
