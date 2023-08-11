@@ -8,7 +8,7 @@ const PlayPauseIcon = ({
   task,
   activeTaskId,
   isTaskActive,
-  completedTimeInMilliseconds,
+  completedTimeInMs,
   isDisconnected,
   indexInTasksOfDays
 }) => {
@@ -68,13 +68,13 @@ const PlayPauseIcon = ({
 
     // first check that any other task is active or not
     // if not active, activeTaskId is empty string
-    // then check that completedTimeInMilliseconds is not greather than or equal to level_3
+    // then check that completedTimeInMs is not greather than or equal to level_3
     // if not equal to level_3, that means the task will take more time to complete
     // so we can activate the task
     if (
       !activeTaskId &&
       !isTaskActiveLoading &&
-      !(completedTimeInMilliseconds >= level_3)
+      !(completedTimeInMs >= level_3)
     ) {
       // make isTaskActiveLoading state true
       setIsTaskActiveLoading(true);
@@ -105,12 +105,12 @@ const PlayPauseIcon = ({
     }
   };
 
-  // whenever completedTimeInMilliseconds become greater than or equal to level_3 (last target time completed)
+  // whenever completedTimeInMs become greater than or equal to level_3 (last target time completed)
   // we call the addWorkedTimeSpan function
   // it checks that the task is active
   // then, registers the endTime property to the last workedTimeSpan object
   // and makes the task inactive
-  if (completedTimeInMilliseconds >= level_3) {
+  if (completedTimeInMs >= level_3) {
     addWorkedTimeSpan(_id, lastWorkedTimeSpan?._id);
   }
 

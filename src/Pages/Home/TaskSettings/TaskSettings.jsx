@@ -7,7 +7,7 @@ import Button from "../../Shared/Button/Button";
 import DeleteTaskModal from "../DeleteTaskModal/DeleteTaskModal";
 import EditTaskModal from "../EditTaskModal/EditTaskModal";
 
-const TaskSettings = ({ task, currentLevel, completedTimeInMilliseconds, isTaskActive, indexInTasksOfDays }) => {
+const TaskSettings = ({ task, currentLevel, completedTimeInMs, isTaskActive, indexInTasksOfDays }) => {
 
     // defines whether to show the popup
     const [isPopupActive, setIsPopupActive] = React.useState(false);
@@ -76,7 +76,7 @@ const TaskSettings = ({ task, currentLevel, completedTimeInMilliseconds, isTaskA
             {isDeleteTaskModalOpen && <DeleteTaskModal
                 task={task}
                 currentLevel={currentLevel}
-                completedTimeInMilliseconds={completedTimeInMilliseconds}
+                completedTimeInMs={completedTimeInMs}
                 isTaskActive={isTaskActive}
                 closeDeleteTaskModal={toggleIsDeleteTaskModalOpen}
                 indexInTasksOfDays={indexInTasksOfDays}

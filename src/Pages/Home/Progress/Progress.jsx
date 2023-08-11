@@ -1,7 +1,7 @@
 import convertToHumanReadableTime from "../../../lib/convertToHumanReadableTime";
 import styles from "./Progress.module.css";
 const Progress = ({
-  completedTimeInMilliseconds,
+  completedTimeInMs,
   isTaskActive,
   levels,
   currentLevel,
@@ -12,8 +12,8 @@ const Progress = ({
   const { level_1, level_2, level_3 } = levels;
 
   
-  // convert the completedTimeInMilliseconds to a human readable string that we show in the ui
-  const completedTime = convertToHumanReadableTime(completedTimeInMilliseconds);
+  // convert the completedTimeInMs to a human readable string that we show in the ui
+  const completedTime = convertToHumanReadableTime(completedTimeInMs);
 
   // define targetTime and targetTimeInMilliseconds based on currentLevel
   // targetTime is human readable that we show in the ui
@@ -39,8 +39,8 @@ const Progress = ({
   }
 
   // calculate tooltip width by calculating
-  // how much percentage is completedTimeInMilliseconds of the targetTimeInMilliseconds 
-  const tooltipWidth = (completedTimeInMilliseconds * 100) / targetTimeInMilliseconds;
+  // how much percentage is completedTimeInMs of the targetTimeInMilliseconds 
+  const tooltipWidth = (completedTimeInMs * 100) / targetTimeInMilliseconds;
 
 
   return (
@@ -54,9 +54,9 @@ const Progress = ({
       </div>
       <progress
         className={isTaskActive && !isDisconnected ? `${styles.animate}` : ""}
-        // max is the number of the targetTimeInMilliseconds and value is the completedTimeInMilliseconds
+        // max is the number of the targetTimeInMilliseconds and value is the completedTimeInMs
         max={targetTimeInMilliseconds}
-        value={completedTimeInMilliseconds}
+        value={completedTimeInMs}
       ></progress>
     </div>
   );

@@ -18,82 +18,68 @@ const useTaskProgress = (_id, activeTaskId, indexInTasksOfDays, workedTimeSpans,
   // recieves the endTime and updates the ref.current
   const activeTaskEndTimeRef = React.useRef();
 
-  // state that holds total completed time when the task is active
-  const [completedTimeInMilliseconds, setCompletedTimeInMilliseconds] =
-    React.useState(0);
-
-  // initial completed time in milliseconds is stored in a ref object's current property
-  // before the task becomes active
-  // we are storing it in a ref, so that it's not lost between renders
-  // as we will use the same initial time everytime to add it to the time difference
-  // of the last workedTimeSpan object's startTime and endTime, when the task becomes active
-  // and storing it in ref will also prevent one re-render
-  // that would happen if we would set it to a state after calculating
-  const completedTimeBeforeTaskActiveRef = React.useRef(0);
-
   // know which is the current level of a task
   const [currentLevel, setCurrentLevel] = React.useState("Level - 1");
 
   // know when the user got disconnected and use this to do some styling of progress & play pause icon
   const [isDisconnected, setIsDisconnected] = React.useState(false);
 
-
-  // delete the last object from workedTimeSpans array
-  function deleteLastWorkedTimeSpan(_id, workedTimeSpanId, indexInTasksOfDays) {
-    // note that workedTimeSpanId is being wrapped in an array
-    socket.emit("workedTimeSpan:delete", _id, [workedTimeSpanId], indexInTasksOfDays);
-  }
-
-  // set the completedTimeBeforeTaskActiveRef.current
-  function setCompletedTimeBeforeTaskActiveRef() {
+  // calculate initial completed time of a task
+  // when the task becomes active:
+  // we will use the same initial time everytime to add it to the time difference
+  // of the last workedTimeSpan object's startTime and endTime and set completedTimeInMs state
+  const initialCompletedTimeInMs = React.useMemo(() => {
+    console.log('calculating initial completed time');
     // calculate the completed time in milliseconds from workedTimeSpans array
-    const completedTimeBeforeTaskActive = workedTimeSpans.reduce(
+    return workedTimeSpans.reduce(
       (completedTime, timeSpan) => {
         // get the time difference between startTime and endTime in milliseconds
         // for every timeSpan we are getting time difference and adding it to the completedTime
         // finally we get one returned value by the reduce method
         const timeDifference = getTimeDifferenceInMilliseconds(
           timeSpan.startTime,
-          timeSpan.endTime
+          // if the task is active at the time of rendering the Task component
+          // (a socket of a user may have a task active and then another socket of the same user 
+          // may join the room and get activeTaskId, so at the time of rendering the task it is active)
+          // timeSpan.endTime will be undefined, so instead use timeSpan.startTime which will result
+          // timeDifference to be 0 millisecond
+          timeSpan.endTime || timeSpan.startTime
         );
 
         // add timeDifference to completedTime
-        // initial completedTime is 0
         return completedTime + timeDifference;
       },
+      // initial completedTime is 0
       0
     );
+  }, [workedTimeSpans]);
 
-    // store the initial time before the task is active
-    completedTimeBeforeTaskActiveRef.current = completedTimeBeforeTaskActive;
-  }
+  // state that holds total completed time of the task
+  // it is initialized to the computed initialCompletedTimeInMs
+  const [completedTimeInMs, setCompletedTimeInMs] =
+    React.useState(initialCompletedTimeInMs);
 
   //*** if the task not active ***//
 
-  // if the task is not active and it has lastWorkedTimeSpan object in workedTimeSpans array
-  // ensures that at least one element exists in the array
-  if (!isTaskActive && lastWorkedTimeSpan) {
-    // before calculating and setting completedTimeBeforeTaskActiveRef.current
-    // workedTimeSpans last element may not have its endTime property
-    // because user may delete endTime from localStorage that was saved when user got
-    // disconnected while doing a task, so we haven't been able to register endTime and
-    // and read tasksOfDays in useTasksOfDays hook
-    // instead we set tasks only, skipping the registering endTime part in the TaskList
+  React.useEffect(() => {
+    // if the task is not active and it has lastWorkedTimeSpan object in workedTimeSpans array
+    // (lastWorkedTimeSpan ensures that at least one element exists in the array)
+    // but no endTime property in lastWorkedTimeSpan
+    if (!isTaskActive && lastWorkedTimeSpan && !lastWorkedTimeSpan.endTime) {
+      // workedTimeSpans last element may not have its endTime property
+      // because user may delete endTime from localStorage that was saved when user got
+      // disconnected while doing a task, so we haven't been able to register endTime and
+      // and start reading tasks in useTasksOfDays hook
+      // instead we start reading tasks skipping the registering endTime part
 
-    // if the task is not active, lastWorkedTimeSpan.endTime should exist
-    // even then, if lastWorkedTimeSpan.endTime doesn't exist
-    // we will delete that lastWorkedTimeSpan object from workedTimeSpans array
-    if (!lastWorkedTimeSpan.endTime) {
-      // delete the lastWorkedTimeSpan
-      deleteLastWorkedTimeSpan(_id, lastWorkedTimeSpan._id, indexInTasksOfDays);
-    } else {
-      // calculate the completed time in milliseconds from workedTimeSpans array
-      // we have to store it in the completedTimeBeforeTaskActiveRef.current
-      // so that when the task becomes active, we can add last workedTimeSpan's startTime
-      // and endTime difference to this
-      setCompletedTimeBeforeTaskActiveRef();
+      // if the task is not active, lastWorkedTimeSpan.endTime should exist
+      // even then, if lastWorkedTimeSpan.endTime doesn't exist
+      // we will delete that lastWorkedTimeSpan object from workedTimeSpans array
+
+      // note that workedTimeSpanId is being wrapped in an array
+      socket.emit("workedTimeSpan:delete", _id, [lastWorkedTimeSpan._id], indexInTasksOfDays);
     }
-  }
+  }, [_id, indexInTasksOfDays, isTaskActive, lastWorkedTimeSpan]);
 
   //*** if task active ***//
 
@@ -113,10 +99,10 @@ const useTaskProgress = (_id, activeTaskId, indexInTasksOfDays, workedTimeSpans,
         endTime
       );
 
-      // update the completedTimeInMilliseconds state by adding everytime the timeDifference
-      // to the same initial completedTimeBeforeTaskActiveRef.current
-      setCompletedTimeInMilliseconds(
-        completedTimeBeforeTaskActiveRef.current + timeDifference
+      // update the completedTimeInMs state by adding everytime the timeDifference
+      // to the same initial completed time
+      setCompletedTimeInMs(
+        initialCompletedTimeInMs + timeDifference
       );
     }
 
@@ -240,7 +226,7 @@ const useTaskProgress = (_id, activeTaskId, indexInTasksOfDays, workedTimeSpans,
       // clear the timer
       clearInterval(interval);
     };
-  }, [isTaskActive, workedTimeSpans, activeTaskId, lastWorkedTimeSpan, indexInTasksOfDays]);
+  }, [activeTaskId, indexInTasksOfDays, initialCompletedTimeInMs, isTaskActive, lastWorkedTimeSpan]);
 
   // determine the current level
   React.useEffect(() => {
@@ -258,30 +244,13 @@ const useTaskProgress = (_id, activeTaskId, indexInTasksOfDays, workedTimeSpans,
         setCurrentLevel("Level - 2");
       }
     };
-    // if the task is active, completedTime = completedTimeInMilliseconds
-    if (isTaskActive) {
-      setCurrentLevelFn(completedTimeInMilliseconds);
-
-      // if the task is not active completedTime = completedTimeBeforeTaskActiveRef.current
-    } else {
-      setCurrentLevelFn(completedTimeBeforeTaskActiveRef.current);
-    }
-  }, [
-    isTaskActive,
-    completedTimeBeforeTaskActiveRef,
-    completedTimeInMilliseconds,
-    levels,
-  ]);
+    // call the setCurrentLevelFn function
+    setCurrentLevelFn(completedTimeInMs);
+  }, [levels, completedTimeInMs]);
 
   // return necessary properties that have been calculated here
   return {
-    completedTimeInMilliseconds:
-      // if the task is active, then send completedTimeInMilliseconds state
-      // that is calculated after the task becomes active
-      // if the task is not active, send initial completed time from ref.current
-      isTaskActive
-        ? completedTimeInMilliseconds
-        : completedTimeBeforeTaskActiveRef.current,
+    completedTimeInMs,
     isDisconnected,
     currentLevel,
     isTaskActive,

@@ -15,8 +15,8 @@ const convertToHumanReadableTime = (timeInMilliseconds, isShorterFormat) => {
 
     // if timeInMilliseconds parameter is assigned a value of zero 
     // humanReadableTime will be empty string. so, instead return "0 minute"
-    // timeInMilliseconds will be zero if completedTimeInMilliseconds is zero
-    // completedTimeInMilliseconds will be zero if no element in workedTimeSpans array of the task
+    // timeInMilliseconds will be zero if completedTimeInMs is zero
+    // completedTimeInMs will be zero if no element in workedTimeSpans array of the task
     // or an element exists with startTime property but has not completed 1 minute
     if (!humanReadableTime) { humanReadableTime = "0 minute" }
 

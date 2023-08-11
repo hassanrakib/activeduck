@@ -13,7 +13,7 @@ const Task = ({ task, activeTaskId, indexInTasksOfDays }) => {
   const { _id, name, levels, workedTimeSpans } = task;
 
   // get the necessary calucalated progress for the task
-  const { isTaskActive, completedTimeInMilliseconds, isDisconnected, currentLevel } = useTaskProgress(_id, activeTaskId, indexInTasksOfDays, workedTimeSpans, levels);
+  const { isTaskActive, completedTimeInMs, isDisconnected, currentLevel } = useTaskProgress(_id, activeTaskId, indexInTasksOfDays, workedTimeSpans, levels);
 
 
   return (
@@ -23,7 +23,7 @@ const Task = ({ task, activeTaskId, indexInTasksOfDays }) => {
         task={task}
         activeTaskId={activeTaskId}
         isTaskActive={isTaskActive}
-        completedTimeInMilliseconds={completedTimeInMilliseconds}
+        completedTimeInMs={completedTimeInMs}
         isDisconnected={isDisconnected}
         indexInTasksOfDays={indexInTasksOfDays}
       />
@@ -38,7 +38,7 @@ const Task = ({ task, activeTaskId, indexInTasksOfDays }) => {
               <TaskSettings
                 task={task}
                 currentLevel={currentLevel}
-                completedTimeInMilliseconds={completedTimeInMilliseconds}
+                completedTimeInMs={completedTimeInMs}
                 isTaskActive={isTaskActive}
                 indexInTasksOfDays={indexInTasksOfDays}
               />
@@ -53,7 +53,7 @@ const Task = ({ task, activeTaskId, indexInTasksOfDays }) => {
           {/* progress bar */}
           <Progress
             levels={levels}
-            completedTimeInMilliseconds={completedTimeInMilliseconds}
+            completedTimeInMs={completedTimeInMs}
             isTaskActive={isTaskActive}
             currentLevel={currentLevel}
             isDisconnected={isDisconnected}

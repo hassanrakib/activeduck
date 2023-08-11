@@ -6,7 +6,7 @@ import Message from "../../Shared/Message/Message";
 import { socket } from "../../../socket";
 
 
-const DeleteTaskModal = ({ task, currentLevel, completedTimeInMilliseconds, isTaskActive, closeDeleteTaskModal, indexInTasksOfDays }) => {
+const DeleteTaskModal = ({ task, currentLevel, completedTimeInMs, isTaskActive, closeDeleteTaskModal, indexInTasksOfDays }) => {
   // destructure
   const { name, _id } = task;
 
@@ -29,7 +29,7 @@ const DeleteTaskModal = ({ task, currentLevel, completedTimeInMilliseconds, isTa
         <Message error="The following progress will be lost!" withBackgroundColor={true} />
         <ul className={styles.progressList}>
           <li>Level: {currentLevel}</li>
-          <li>Completed Time: {convertToHumanReadableTime(completedTimeInMilliseconds)}</li>
+          <li>Completed Time: {convertToHumanReadableTime(completedTimeInMs)}</li>
         </ul>
         <div className={styles.buttons}>
           <Button className="btnMedium btnBlueviolet" handleClick={closeDeleteTaskModal}>Cancel</Button>
