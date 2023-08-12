@@ -10,7 +10,6 @@ import {
   signOut,
   updateProfile,
 } from "firebase/auth";
-import { socket } from "../../socket";
 
 // initialize Firebase
 const app = initializeFirebase();
@@ -61,8 +60,6 @@ const AuthProvider = ({ children }) => {
     setLoading(true);
     // remove the existing token from the localStorage
     localStorage.removeItem("token");
-    // disconnect the socket
-    socket.disconnect();
     return signOut(auth);
   }
 
@@ -120,9 +117,9 @@ const AuthProvider = ({ children }) => {
           // when user logs out we get userFromDB as null
           setUser(userFromDB);
         })
-        .catch((err) => {
+        .catch(() => {
           // if the token is expired or compromised
-          console.log(err.message);
+          setUser(null);
         })
         .finally(() => {
           // set user loading to false
