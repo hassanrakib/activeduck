@@ -8,9 +8,7 @@ const useTasksOfDays = (startDate) => {
     // {day: {startDate: localDateObject, endDate: localDateObject}, tasks: [{}, {}...], totalCompletedTimes: [{}, {}]}
     const [tasksOfDays, setTasksOfDays] = React.useState([]);
     // if loading new tasks of a day, it is true otherwise false
-    const [loading, setLoading] = React.useState(false);
-    // if error happens when trying to load tasks of a day
-    const [error, setError] = React.useState(false);
+    const [loading, setLoading] = React.useState(true);
     // current activeTaskId
     const [activeTaskId, setActiveTaskId] = React.useState("");
 
@@ -69,7 +67,6 @@ const useTasksOfDays = (startDate) => {
     // room state contains the activeTaskId
     React.useEffect(() => {
         socket.emit("roomState:read", (state) => {
-            console.log(state);
             setActiveTaskId(state.activeTaskId);
 
             // when there is no socket(user) in a room we delete the room state from the db
@@ -126,8 +123,6 @@ const useTasksOfDays = (startDate) => {
 
         // as we are going to load tasks
         setLoading(true);
-        // clear if there is any previous error
-        setError(false);
 
         // if socket got disconnected while a task was active, we stored endTime in localStorage
         // now, before reading tasks register endTime to workedTimeSpan object of that task
@@ -231,7 +226,7 @@ const useTasksOfDays = (startDate) => {
 
 
 
-    return { loading, error, tasksOfDays, activeTaskId };
+    return { loading, tasksOfDays, activeTaskId };
 };
 
 export default useTasksOfDays;

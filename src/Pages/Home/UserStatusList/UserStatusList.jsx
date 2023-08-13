@@ -26,8 +26,7 @@ const UserStatusList = () => {
   const [startDate, setStartDate] = React.useState(startOfToday());
 
   // get tasks of different dates
-  const { loading, error, tasksOfDays, activeTaskId } =
-    useTasksOfDays(startDate);
+  const { loading, tasksOfDays, activeTaskId } = useTasksOfDays(startDate);
 
   // get the dates that have tasks created by the user
   // we will use every date from here to get the tasks for them and total completed times array
@@ -68,7 +67,7 @@ const UserStatusList = () => {
   // send this function to the ref prop of the last <UserStatus /> component
   // to get the node of the last <UserStatus />
   // this node will be monitored by the intersection observer
-  // to get to know when this node is visible on the viewport,
+  // to get to know when this node is visible in the viewport,
   const lastUserStatusRef = React.useCallback(
     (node) => {
       // if tasks of a date is loading, then don't go further
@@ -80,26 +79,30 @@ const UserStatusList = () => {
       if (observer.current) observer.current.disconnect();
 
       // add new intersection observer to the observer.current
-      // entries is an array of nodes that IntersectionObserver constructor recieves
+      // entries is an array of nodes that the intersection observer is observing
+      // the callback inside the IntersectionObserver is called whenever an observing node
+      // changes its visibility in the viewport
       observer.current = new IntersectionObserver((entries) => {
-        // if the node is visible on the viewport
-        // and date in dates state is not undefined
-        // it will be undefined if dates are not recieved yet from the backend
-        // or, we have completed iteration on dates array so indexInDatesRef.current
-        // has gone up 1 above the last index
-        // then we allow to set startDate by subtracting one more day
-        if (entries[0].isIntersecting && dates[indexInDatesRef.current]) {
-          // set startDate state by taking the date string from the dates state
-          // covert date string to date object
-          setStartDate(startOfDay(new Date(dates[indexInDatesRef.current])));
+        entries.forEach((entry) => {
+          // if the node is visible on the viewport
+          // and date in dates state is not undefined
+          // it will be undefined if dates are not recieved yet from the backend
+          // or, we have completed iteration on dates array so indexInDatesRef.current
+          // has gone up 1 above the last index
+          // then we allow to set startDate by subtracting one more day
+          if (entry.isIntersecting && dates[indexInDatesRef.current]) {
+            // set startDate state by taking the date string from the dates state
+            // covert date string to date object
+            setStartDate(startOfDay(new Date(dates[indexInDatesRef.current])));
 
-          // after using index to get the date from dates and setting it to the startDate
-          // increase indexInDates by 1
-          indexInDatesRef.current += 1;
-        }
+            // after using index to get the date from dates and setting it to the startDate
+            // increase indexInDates by 1
+            indexInDatesRef.current += 1;
+          }
+        });
       });
 
-      // let intersection observer that is stored in observer.current to monitore the last <UserStatus />
+      // let intersection observer that is stored in observer.current to monitor the last <UserStatus />
       if (node) observer.current.observe(node);
     },
     [loading, dates]
@@ -111,24 +114,23 @@ const UserStatusList = () => {
         // if it is the last <UserStatus />
         if (tasksOfDays.length === index + 1) {
           return (
-            <div
+            <UserStatus
               key={index}
-              // add the ref prop
+              // send lastUserStatusRef callback function as ref to recieve the node
               ref={lastUserStatusRef}
-            >
-              <UserStatus
-                // send the index of the of the UserStatus in tasksOfDays state
-                indexInTasksOfDays={index}
-                tasksOfADay={tasksOfADay}
-                activeTaskId={activeTaskId}
-              />
-            </div>
+              // index will be used to know which day's data need to fetch again and update
+              // that day's data in tasksOfDays state by useTasksOfDays hook
+              indexInTasksOfDays={index}
+              tasksOfADay={tasksOfADay}
+              activeTaskId={activeTaskId}
+            />
           );
         }
         return (
           <UserStatus
             key={index}
-            // send the index of the of the UserStatus in tasksOfDays state
+            // index will be used to know which day's data need to fetch again and update
+            // that day's data in tasksOfDays state by useTasksOfDays hook
             indexInTasksOfDays={index}
             tasksOfADay={tasksOfADay}
             activeTaskId={activeTaskId}
@@ -143,7 +145,7 @@ const UserStatusList = () => {
             margin: "20px 0 10px",
           }}
         >
-          <Loader />
+          <Loader width="40px" height="40px" />
         </div>
       )}
     </div>

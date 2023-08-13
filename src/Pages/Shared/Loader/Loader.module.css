@@ -1,9 +1,7 @@
 .loader {
-  border: 5px dashed #f3f3f3;
-  border-bottom-color: grey;
+  border: 5px double grey;
+  border-bottom: 8px double blueviolet;
   border-radius: 50%;
-  width: 80px;
-  height: 80px;
   animation: spin 2s linear infinite;
 }
 

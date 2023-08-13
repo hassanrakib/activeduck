@@ -16,9 +16,9 @@ import withMultiStepAuthentication from "../../../HOC/withMultiStepAuthenticatio
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import useAuth from "../../../hooks/useAuth";
 import { useEffect } from "react";
-import { socket } from "../../../socket";
 
-const SignIn = ({
+// withMultiStepAuthentication hoc takes a component and true value for isSignIn parameter
+const SignIn = withMultiStepAuthentication(({
   currentPage,
   handleSubmit,
   onSubmit,
@@ -170,6 +170,6 @@ const SignIn = ({
       </p>
     </div>
   );
-};
+}, true);
 
-export default withMultiStepAuthentication(SignIn, true);
+export default SignIn;

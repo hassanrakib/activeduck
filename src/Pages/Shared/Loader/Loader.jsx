@@ -1,7 +1,8 @@
 import { loader } from "./Loader.module.css";
 
-const Loader = () => {
-  return <div className={loader}></div>;
+// by default loader width and height set to 80px
+const Loader = ({width = "80px", height = "80px"}) => {
+  return <div style={{width, height}} className={loader}></div>;
 };
 
 export default Loader;

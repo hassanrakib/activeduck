@@ -16,7 +16,8 @@ import Button from "../../Shared/Button/Button";
 import withMultiStepAuthentication from "../../../HOC/withMultiStepAuthentication";
 import { Link } from "react-router-dom";
 
-const SignUp = ({
+// withMultiStepAuthentication hoc takes a component and false value for isSignIn parameter
+const SignUp = withMultiStepAuthentication(({
   currentPage,
   handleSubmit,
   onSubmit,
@@ -222,6 +223,6 @@ const SignUp = ({
       </p>
     </div>
   );
-};
+}, false);
 
-export default withMultiStepAuthentication(SignUp);
+export default SignUp;

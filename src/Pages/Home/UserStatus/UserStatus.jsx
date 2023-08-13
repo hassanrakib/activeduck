@@ -1,10 +1,15 @@
+import React from "react";
 import TimeChart from "../../Shared/TimeChart/TimeChart";
 import TaskList from "../TaskList/TaskList";
 import UserIntro from "../UserIntro/UserIntro";
 import styles from "./UserStatus.module.css";
 import { format, isSameYear } from "date-fns";
 
-const UserStatus = ({ tasksOfADay, indexInTasksOfDays, activeTaskId }) => {
+// recieve the ref prop using React.forwardRef(renderFunction)
+const UserStatus = React.forwardRef(function UserStatus(
+  { tasksOfADay, indexInTasksOfDays, activeTaskId },
+  ref
+) {
   const { day, tasks, totalCompletedTimes } = tasksOfADay;
 
   // format the day.startDate object to date string like "10 Jul 2023"
@@ -15,7 +20,8 @@ const UserStatus = ({ tasksOfADay, indexInTasksOfDays, activeTaskId }) => {
   );
 
   return (
-    <div className={styles.userStatus}>
+    // when this node becomes visible, we load previous date's data
+    <div ref={ref} className={styles.userStatus}>
       {/* tasks creation date */}
       <div className={styles.date}>{formattedLocalDateString}</div>
       {/* user introduction with total worked time */}
@@ -36,6 +42,6 @@ const UserStatus = ({ tasksOfADay, indexInTasksOfDays, activeTaskId }) => {
       <TimeChart totalCompletedTimes={totalCompletedTimes} />
     </div>
   );
-};
+});
 
 export default UserStatus;
