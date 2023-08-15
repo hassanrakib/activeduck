@@ -1,8 +1,8 @@
 import { Navigate, useLocation } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import Loader from "../Pages/Shared/Loader/Loader";
-import { socket } from "../socket";
 import React from "react";
+import { socket } from "../socket";
 
 const RequireAuth = ({ children }) => {
   // get the current authenticated user from the context
@@ -11,28 +11,14 @@ const RequireAuth = ({ children }) => {
   // get the current location
   const location = useLocation();
 
-  // state that says socket connection established or not
-  const [isSocketConnected, setIsSocketConnected] = React.useState(false);
-
-  // loader that is used here for different cases
-  const LoadingUI = (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Loader />
-    </div>
-  );
-
   React.useEffect(() => {
-    // if user not loading and user found condition
+    // user not loading and user found condition
     // ensures all credentials needed to make a socket connection exists
     if (!loading && user) {
-      // connect to the socket
+      // update socket auth token then connect
+      socket.auth = { token: `Bearer ${localStorage.getItem("token")}` };
+
+      // now as we have updated the token, there will be no issue while connecting
       socket.connect();
     }
 
@@ -44,24 +30,21 @@ const RequireAuth = ({ children }) => {
     };
   }, [loading, user]);
 
-  React.useEffect(() => {
-    // connect event listener
-    function onConnectEvent() {
-      // connect event makes isSocketConnected set to true
-      setIsSocketConnected(true);
-    }
-    socket.on("connect", onConnectEvent);
-
-    // cleanup
-    return () => {
-      socket.off("connect", onConnectEvent);
-    };
-  }, []);
-
   // if user loading
   if (loading) {
     // show loader
-    return LoadingUI;
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Loader />
+      </div>
+    );
   }
 
   // if the visitor is not authenticated the user variable is null
@@ -73,12 +56,6 @@ const RequireAuth = ({ children }) => {
 
     // send the location to the /auth page using the state prop
     return <Navigate to="/auth" state={{ from: location }} replace />;
-  }
-
-  // if socket connection not yet established
-  if (!isSocketConnected) {
-    // show loader
-    return LoadingUI;
   }
 
   // if the visitor is an authenticated user & after the socket connection established successfully
